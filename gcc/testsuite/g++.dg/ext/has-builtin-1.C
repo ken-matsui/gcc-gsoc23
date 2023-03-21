@@ -113,6 +113,9 @@
 #if !__has_builtin (__is_same_as)
 # error "__has_builtin (__is_same_as) failed"
 #endif
+#if !__has_builtin (__is_signed)
+# error "__has_builtin (__is_signed) failed"
+#endif
 #if !__has_builtin (__is_standard_layout)
 # error "__has_builtin (__is_standard_layout) failed"
 #endif
