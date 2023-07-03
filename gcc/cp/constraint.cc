@@ -3776,6 +3776,9 @@ diagnose_trait_expr (tree expr, tree args)
     case CPTK_IS_SAME:
       inform (loc, "  %qT is not the same as %qT", t1, t2);
       break;
+    case CPTK_IS_SCALAR:
+      inform (loc, "  %qT is not a scalar type", t1);
+      break;
     case CPTK_IS_SIGNED:
       inform (loc, "  %qT is not a signed type", t1);
       break;
