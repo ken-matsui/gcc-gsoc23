@@ -12143,6 +12143,9 @@ trait_expr_value (cp_trait_kind kind, tree type1, tree type2)
     case CPTK_IS_AGGREGATE:
       return CP_AGGREGATE_TYPE_P (type1);
 
+    case CPTK_IS_ARITHMETIC:
+      return ARITHMETIC_TYPE_P (type1);
+
     case CPTK_IS_ASSIGNABLE:
       return is_xible (MODIFY_EXPR, type1, type2);
 
@@ -12370,6 +12373,7 @@ finish_trait_expr (location_t loc, cp_trait_kind kind, tree type1, tree type2)
 	return error_mark_node;
       break;
 
+    case CPTK_IS_ARITHMETIC:
     case CPTK_IS_CLASS:
     case CPTK_IS_ENUM:
     case CPTK_IS_SAME:
