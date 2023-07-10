@@ -3791,6 +3791,9 @@ diagnose_trait_expr (tree expr, tree args)
     case CPTK_IS_POD:
       inform (loc, "  %qT is not a POD type", t1);
       break;
+    case CPTK_IS_POINTER:
+      inform (loc, "  %qT is not a pointer", t1);
+      break;
     case CPTK_IS_POLYMORPHIC:
       inform (loc, "  %qT is not a polymorphic type", t1);
       break;

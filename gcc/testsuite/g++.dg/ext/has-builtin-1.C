@@ -125,6 +125,9 @@
 #if !__has_builtin (__is_pod)
 # error "__has_builtin (__is_pod) failed"
 #endif
+#if !__has_builtin (__is_pointer)
+# error "__has_builtin (__is_pointer) failed"
+#endif
 #if !__has_builtin (__is_polymorphic)
 # error "__has_builtin (__is_polymorphic) failed"
 #endif
