@@ -363,6 +363,13 @@ __INT_N(__GLIBCXX_TYPE_INT_N_3)
   //
   // Pointer types
   //
+#if _GLIBCXX_USE_BUILTIN_TRAIT(__is_pointer)
+  template<typename _Tp, bool _IsPtr = __is_pointer(_Tp)>
+    struct __is_pointer : __truth_type<_IsPtr>
+    {
+      enum { __value = _IsPtr };
+    };
+#else
   template<typename _Tp>
     struct __is_pointer
     {
@@ -372,6 +379,28 @@ __INT_N(__GLIBCXX_TYPE_INT_N_3)
 
   template<typename _Tp>
     struct __is_pointer<_Tp*>
+    {
+      enum { __value = 1 };
+      typedef __true_type __type;
+    };
+
+  template<typename _Tp>
+    struct __is_pointer<_Tp* const>
+    {
+      enum { __value = 1 };
+      typedef __true_type __type;
+    };
+
+  template<typename _Tp>
+    struct __is_pointer<_Tp* volatile>
+    {
+      enum { __value = 1 };
+      typedef __true_type __type;
+    };
+#endif
+
+  template<typename _Tp>
+    struct __is_pointer<_Tp* const volatile>
     {
       enum { __value = 1 };
       typedef __true_type __type;
