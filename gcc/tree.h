@@ -691,13 +691,6 @@ extern void omp_clause_range_check_failed (const_tree, const char *, int,
 #define INDIRECT_TYPE_P(NODE)			\
   (TYPE_PTR_P (NODE) || TYPE_REF_P (NODE))
 
-/* Nonzero if TYPE represents a pointer or reference type.
-   (It should be renamed to INDIRECT_TYPE_P.)  Keep these checks in
-   ascending code order.  */
-
-#define POINTER_TYPE_P(TYPE) \
-  (TREE_CODE (TYPE) == POINTER_TYPE || TYPE_REF_P (TYPE))
-
 /* Nonzero if TYPE represents a pointer to function.  */
 #define FUNCTION_POINTER_TYPE_P(TYPE) \
   (INDIRECT_TYPE_P (TYPE) && TREE_CODE (TREE_TYPE (TYPE)) == FUNCTION_TYPE)
