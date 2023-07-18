@@ -22772,8 +22772,7 @@ maybe_adjust_types_for_deduction (tree tparms,
 	 too, but here handle it by stripping the reference from PARM
 	 rather than by adding it to ARG.  */
       if (forwarding_reference_p (*parm, TPARMS_PRIMARY_TEMPLATE (tparms))
-	  && TYPE_REF_P (*arg)
-	  && !TYPE_REF_IS_RVALUE (*arg))
+	  && TYPE_REF_IS_LVALUE (*arg))
 	*parm = TREE_TYPE (*parm);
       /* Nothing else to do in this case.  */
       return 0;
@@ -27595,8 +27594,7 @@ invalid_nontype_parm_type_p (tree type, tsubst_flags_t complain)
     return false;
   else if (TYPE_PTR_P (type))
     return false;
-  else if (TYPE_REF_P (type)
-	   && !TYPE_REF_IS_RVALUE (type))
+  else if (TYPE_REF_IS_LVALUE (type))
     return false;
   else if (TYPE_PTRMEM_P (type))
     return false;

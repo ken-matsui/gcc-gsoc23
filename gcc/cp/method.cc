@@ -1207,8 +1207,7 @@ early_check_defaulted_comparison (tree fn)
       tree parmtype = TREE_VALUE (parmnode);
       if (CLASS_TYPE_P (parmtype))
 	saw_byval = true;
-      else if (TYPE_REF_P (parmtype)
-	       && !TYPE_REF_IS_RVALUE (parmtype)
+      else if (TYPE_REF_IS_LVALUE (parmtype)
 	       && TYPE_QUALS (TREE_TYPE (parmtype)) == TYPE_QUAL_CONST)
 	{
 	  saw_byref = true;

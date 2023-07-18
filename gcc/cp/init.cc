@@ -778,8 +778,7 @@ maybe_warn_list_ctor (tree member, tree init)
   tree initlist = non_reference (parm);
 
   /* Do not warn if the parameter is an lvalue reference to non-const.  */
-  if (TYPE_REF_P (parm) && !TYPE_REF_IS_RVALUE (parm)
-      && !CP_TYPE_CONST_P (initlist))
+  if (TYPE_REF_IS_LVALUE (parm) && !CP_TYPE_CONST_P (initlist))
     return;
 
   tree targs = CLASSTYPE_TI_ARGS (initlist);

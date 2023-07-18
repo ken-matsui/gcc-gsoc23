@@ -998,7 +998,7 @@ lto_fixup_prevailing_type (tree t)
 	  TYPE_NEXT_PTR_TO (t) = TYPE_POINTER_TO (TREE_TYPE (t));
 	  TYPE_POINTER_TO (TREE_TYPE (t)) = t;
 	}
-      else if (TYPE_REF_P (t) && !TYPE_REF_IS_RVALUE (t))
+      else if (TYPE_REF_IS_LVALUE (t))
 	{
 	  TYPE_NEXT_REF_TO (t) = TYPE_REFERENCE_TO (TREE_TYPE (t));
 	  TYPE_REFERENCE_TO (TREE_TYPE (t)) = t;

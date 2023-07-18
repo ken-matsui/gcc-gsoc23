@@ -15250,8 +15250,7 @@ copy_fn_p (const_tree d)
       /* Pass by value copy assignment operator.  */
       result = -1;
     }
-  else if (TYPE_REF_P (arg_type)
-	   && !TYPE_REF_IS_RVALUE (arg_type)
+  else if (TYPE_REF_IS_LVALUE (arg_type)
 	   && TYPE_MAIN_VARIANT (TREE_TYPE (arg_type)) == DECL_CONTEXT (d))
     {
       if (CP_TYPE_CONST_P (TREE_TYPE (arg_type)))

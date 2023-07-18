@@ -4928,7 +4928,7 @@ structural_type_p (tree t, bool explain)
   if (SCALAR_TYPE_P (t))
     return true;
   /* an lvalue reference type, or */
-  if (TYPE_REF_P (t) && !TYPE_REF_IS_RVALUE (t))
+  if (TYPE_REF_IS_LVALUE (t))
     return true;
   /* a literal class type with the following properties:
      - all base classes and non-static data members are public and non-mutable
