@@ -4706,10 +4706,6 @@ get_vec_init_expr (tree t)
 #define TYPE_PTRDATAMEM_P(NODE)			\
   (TREE_CODE (NODE) == OFFSET_TYPE)
 
-/* Returns true if NODE is a pointer or a reference.  */
-#define INDIRECT_TYPE_P(NODE)			\
-  (TYPE_PTR_P (NODE) || TYPE_REF_P (NODE))
-
 /* Returns true if NODE is an object type:
 
      [basic.types]
