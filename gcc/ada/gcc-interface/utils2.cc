@@ -1406,7 +1406,7 @@ build_unary_op (enum tree_code op_code, tree result_type, tree operand)
 		  = build_pointer_type_for_mode (TREE_TYPE (result_type),
 						 TYPE_MODE (result_type),
 						 true);
-	      else if (TREE_CODE (result_type) == REFERENCE_TYPE
+	      else if (TYPE_REF_P (result_type)
 		       && !TYPE_REF_CAN_ALIAS_ALL (result_type))
 	        result_type
 		  = build_reference_type_for_mode (TREE_TYPE (result_type),

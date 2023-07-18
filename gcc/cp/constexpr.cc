@@ -4544,7 +4544,7 @@ check_bit_cast_type (const constexpr_ctx *ctx, location_t loc, tree type,
 	}
       return true;
     }
-  if (TREE_CODE (type) == REFERENCE_TYPE)
+  if (TYPE_REF_P (type))
     {
       if (!ctx->quiet)
 	{

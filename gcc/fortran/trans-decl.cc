@@ -7648,7 +7648,7 @@ gfc_generate_function_code (gfc_namespace * ns)
 	if (POINTER_TYPE_P (TREE_TYPE (type)))
 	  /* For instance, allocatable scalars.  */
 	  type = TREE_TYPE (type);
-	if (TREE_CODE (type) == REFERENCE_TYPE)
+	if (TYPE_REF_P (type))
 	  type = build_pointer_type (TREE_TYPE (type));
 	desc_p = build_decl (loc, VAR_DECL, get_identifier (fsym->name), type);
 	if (!fsym->attr.dimension)

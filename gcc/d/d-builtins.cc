@@ -307,7 +307,7 @@ build_frontend_type (tree type)
 		}
 
 	      StorageClass sc = STCundefined;
-	      if (TREE_CODE (argtype) == REFERENCE_TYPE)
+	      if (TYPE_REF_P (argtype))
 		{
 		  argtype = TREE_TYPE (argtype);
 		  sc |= STCref;

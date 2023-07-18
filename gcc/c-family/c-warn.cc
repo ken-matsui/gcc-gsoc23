@@ -659,7 +659,7 @@ warn_if_unused_value (const_tree exp, location_t locus, bool quiet)
     case INDIRECT_REF:
       /* Don't warn about automatic dereferencing of references, since
 	 the user cannot control it.  */
-      if (TREE_CODE (TREE_TYPE (TREE_OPERAND (exp, 0))) == REFERENCE_TYPE)
+      if (TYPE_REF_P (TREE_TYPE (TREE_OPERAND (exp, 0))))
 	{
 	  exp = TREE_OPERAND (exp, 0);
 	  goto restart;

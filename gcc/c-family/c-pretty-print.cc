@@ -2181,7 +2181,7 @@ c_pretty_printer::unary_expression (tree e)
       else if (code == INDIRECT_REF)
 	{
 	  tree type = TREE_TYPE (TREE_OPERAND (e, 0));
-	  if (type && TREE_CODE (type) == REFERENCE_TYPE)
+	  if (type && TYPE_REF_P (type))
 	    /* Reference decay is implicit, don't print anything.  */;
 	  else
 	    pp_c_star (this);

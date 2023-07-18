@@ -3657,7 +3657,7 @@ c_common_truthvalue_conversion (location_t location, tree expr)
 
 	if (POINTER_TYPE_P (totype)
 	    && !c_inhibit_evaluation_warnings
-	    && TREE_CODE (fromtype) == REFERENCE_TYPE)
+	    && TYPE_REF_P (fromtype))
 	  {
 	    tree inner = expr;
 	    STRIP_NOPS (inner);
@@ -3672,8 +3672,7 @@ c_common_truthvalue_conversion (location_t location, tree expr)
 
 	/* Don't cancel the effect of a CONVERT_EXPR from a REFERENCE_TYPE,
 	   since that affects how `default_conversion' will behave.  */
-	if (TREE_CODE (totype) == REFERENCE_TYPE
-	    || TREE_CODE (fromtype) == REFERENCE_TYPE)
+	if (TYPE_REF_P (totype) || TYPE_REF_P (fromtype))
 	  break;
 	/* Don't strip a conversion from C++0x scoped enum, since they
 	   don't implicitly convert to other types.  */
@@ -3768,7 +3767,7 @@ c_apply_type_quals_to_decl (int type_quals, tree decl)
     return;
 
   if ((type_quals & TYPE_QUAL_CONST)
-      || (type && TREE_CODE (type) == REFERENCE_TYPE))
+      || (type && TYPE_REF_P (type)))
     /* We used to check TYPE_NEEDS_CONSTRUCTING here, but now a constexpr
        constructor can produce constant init, so rely on cp_finish_decl to
        clear TREE_READONLY if the variable has non-constant init.  */

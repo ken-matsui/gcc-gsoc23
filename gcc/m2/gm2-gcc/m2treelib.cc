@@ -302,7 +302,7 @@ m2treelib_get_set_value (location_t location, tree p, tree field, bool is_const,
             field);
       else
         {
-          ASSERT_CONDITION (TREE_CODE (TREE_TYPE (p)) == REFERENCE_TYPE);
+          ASSERT_CONDITION (TYPE_REF_P (TREE_TYPE (p)));
           value = m2expr_BuildComponentRef (location, p, field);
         }
     }

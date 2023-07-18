@@ -1706,7 +1706,7 @@ gimple_call_nonnull_result_p (gcall *call)
 
   /* References are always non-NULL.  */
   if (flag_delete_null_pointer_checks
-      && TREE_CODE (TREE_TYPE (fndecl)) == REFERENCE_TYPE)
+      && TYPE_REF_P (TREE_TYPE (fndecl)))
     return true;
 
   if (flag_delete_null_pointer_checks

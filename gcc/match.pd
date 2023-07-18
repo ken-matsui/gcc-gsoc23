@@ -6343,7 +6343,7 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
 	 /* Don't perform this optimization in GENERIC if @0 has reference
 	    type when sanitizing.  See PR101210.  */
 	 && !(GENERIC
-	      && TREE_CODE (TREE_TYPE (@0)) == REFERENCE_TYPE
+	      && TYPE_REF_P (TREE_TYPE (@0))
 	      && (flag_sanitize & (SANITIZE_NULL | SANITIZE_ALIGNMENT))))
 	|| (INTEGRAL_TYPE_P (TREE_TYPE (@0))
 	    && POINTER_TYPE_P (TREE_TYPE (@1))

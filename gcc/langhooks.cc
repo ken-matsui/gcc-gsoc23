@@ -650,7 +650,7 @@ bool
 lhd_omp_scalar_p (tree decl, bool ptr_ok)
 {
   tree type = TREE_TYPE (decl);
-  if (TREE_CODE (type) == REFERENCE_TYPE)
+  if (TYPE_REF_P (type))
     type = TREE_TYPE (type);
   if (TREE_CODE (type) == COMPLEX_TYPE)
     type = TREE_TYPE (type);

@@ -1777,7 +1777,7 @@ gfc_conv_intrinsic_caf_get (gfc_se *se, gfc_expr *expr, tree lhs, tree lhs_kind,
 	    lhs_kind = kind;
 
 	  caf_decl = gfc_get_tree_for_caf_expr (array_expr);
-	  if (TREE_CODE (TREE_TYPE (caf_decl)) == REFERENCE_TYPE)
+	  if (TYPE_REF_P (TREE_TYPE (caf_decl)))
 	    caf_decl = build_fold_indirect_ref_loc (input_location, caf_decl);
 	  image_index = gfc_caf_get_image_index (&se->pre, array_expr,
 						 caf_decl);
@@ -1899,7 +1899,7 @@ gfc_conv_intrinsic_caf_get (gfc_se *se, gfc_expr *expr, tree lhs, tree lhs_kind,
   gfc_add_block_to_block (&se->post, &argse.post);
 
   caf_decl = gfc_get_tree_for_caf_expr (array_expr);
-  if (TREE_CODE (TREE_TYPE (caf_decl)) == REFERENCE_TYPE)
+  if (TYPE_REF_P (TREE_TYPE (caf_decl)))
     caf_decl = build_fold_indirect_ref_loc (input_location, caf_decl);
   image_index = gfc_caf_get_image_index (&se->pre, array_expr, caf_decl);
   gfc_get_caf_token_offset (se, &token, &offset, caf_decl, argse.expr,
@@ -2166,7 +2166,7 @@ conv_caf_send (gfc_code *code) {
 
   /* Obtain token, offset and image index for the LHS.  */
   caf_decl = gfc_get_tree_for_caf_expr (lhs_expr);
-  if (TREE_CODE (TREE_TYPE (caf_decl)) == REFERENCE_TYPE)
+  if (TYPE_REF_P (TREE_TYPE (caf_decl)))
     caf_decl = build_fold_indirect_ref_loc (input_location, caf_decl);
   image_index = gfc_caf_get_image_index (&block, lhs_expr, caf_decl);
   tmp = lhs_se.expr;
@@ -2305,7 +2305,7 @@ conv_caf_send (gfc_code *code) {
       gfc_add_expr_to_block (&block, tmp);
 
       caf_decl = gfc_get_tree_for_caf_expr (rhs_expr);
-      if (TREE_CODE (TREE_TYPE (caf_decl)) == REFERENCE_TYPE)
+      if (TYPE_REF_P (TREE_TYPE (caf_decl)))
 	caf_decl = build_fold_indirect_ref_loc (input_location, caf_decl);
       rhs_image_index = gfc_caf_get_image_index (&block, rhs_expr, caf_decl);
       tmp = rhs_se.expr;
@@ -8783,7 +8783,7 @@ trans_caf_is_present (gfc_se *se, gfc_expr *expr)
   gcc_assert (caf_reference != NULL_TREE);
 
   caf_decl = gfc_get_tree_for_caf_expr (expr);
-  if (TREE_CODE (TREE_TYPE (caf_decl)) == REFERENCE_TYPE)
+  if (TYPE_REF_P (TREE_TYPE (caf_decl)))
     caf_decl = build_fold_indirect_ref_loc (input_location, caf_decl);
   image_index = gfc_caf_get_image_index (&se->pre, expr, caf_decl);
   gfc_get_caf_token_offset (se, &token, NULL, caf_decl, NULL,
@@ -11845,7 +11845,7 @@ conv_intrinsic_atomic_op (gfc_code *code)
 	}
 
       caf_decl = gfc_get_tree_for_caf_expr (atom_expr);
-      if (TREE_CODE (TREE_TYPE (caf_decl)) == REFERENCE_TYPE)
+      if (TYPE_REF_P (TREE_TYPE (caf_decl)))
 	caf_decl = build_fold_indirect_ref_loc (input_location, caf_decl);
 
       if (gfc_is_coindexed (atom_expr))
@@ -12001,7 +12001,7 @@ conv_intrinsic_atomic_ref (gfc_code *code)
       tree orig_value = NULL_TREE, vardecl = NULL_TREE;
 
       caf_decl = gfc_get_tree_for_caf_expr (atom_expr);
-      if (TREE_CODE (TREE_TYPE (caf_decl)) == REFERENCE_TYPE)
+      if (TYPE_REF_P (TREE_TYPE (caf_decl)))
 	caf_decl = build_fold_indirect_ref_loc (input_location, caf_decl);
 
       if (gfc_is_coindexed (atom_expr))
@@ -12123,7 +12123,7 @@ conv_intrinsic_atomic_cas (gfc_code *code)
       tree image_index, caf_decl, offset, token;
 
       caf_decl = gfc_get_tree_for_caf_expr (atom_expr);
-      if (TREE_CODE (TREE_TYPE (caf_decl)) == REFERENCE_TYPE)
+      if (TYPE_REF_P (TREE_TYPE (caf_decl)))
 	caf_decl = build_fold_indirect_ref_loc (input_location, caf_decl);
 
       if (gfc_is_coindexed (atom_expr))

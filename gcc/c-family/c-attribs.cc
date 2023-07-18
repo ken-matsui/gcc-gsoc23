@@ -6098,7 +6098,7 @@ has_attribute (location_t atloc, tree t, tree attr, tree (*convert)(tree))
 	  if (code == INDIRECT_REF)
 	    {
 	      tree op0 = TREE_OPERAND (t, 0);
-	      if (TREE_CODE (TREE_TYPE (op0)) == REFERENCE_TYPE)
+	      if (TYPE_REF_P (TREE_TYPE (op0)))
 		t = op0;
 	      else
 		break;

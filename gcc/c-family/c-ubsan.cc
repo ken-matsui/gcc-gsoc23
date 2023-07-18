@@ -534,7 +534,7 @@ ubsan_maybe_instrument_reference_or_call (location_t loc, tree op, tree ptype,
 	 && TREE_CODE (TREE_TYPE (op)) == POINTER_TYPE)
     op = TREE_OPERAND (op, 0);
   if (TREE_CODE (op) == NOP_EXPR
-      && TREE_CODE (TREE_TYPE (op)) == REFERENCE_TYPE)
+      && TYPE_REF_P (TREE_TYPE (op)))
     {
       if (mina && mina > min_align_of_type (TREE_TYPE (TREE_TYPE (op))))
 	instrument = true;
@@ -570,7 +570,7 @@ ubsan_maybe_instrument_reference_or_call (location_t loc, tree op, tree ptype,
     return NULL_TREE;
   op = save_expr (orig_op);
   gcc_assert (POINTER_TYPE_P (ptype));
-  if (TREE_CODE (ptype) == REFERENCE_TYPE)
+  if (TYPE_REF_P (ptype))
     ptype = build_pointer_type (TREE_TYPE (ptype));
   tree kind = build_int_cst (ptype, ckind);
   tree align = build_int_cst (pointer_sized_int_node, mina);

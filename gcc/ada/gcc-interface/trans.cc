@@ -4540,7 +4540,7 @@ return_slot_opt_for_pure_call_p (tree target, tree call)
   FOR_EACH_CALL_EXPR_ARG (arg, iter, call)
     {
       tree arg_type = TREE_TYPE (arg);
-      if (TREE_CODE (arg_type) == REFERENCE_TYPE)
+      if (TYPE_REF_P (arg_type))
 	arg_type = TREE_TYPE (arg_type);
 
       if (is_array_of_scalar_type (arg_type))

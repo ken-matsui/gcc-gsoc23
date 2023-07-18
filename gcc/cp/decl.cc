@@ -18210,7 +18210,7 @@ finish_function (bool inline_p)
       if (IDENTIFIER_ASSIGN_OP_P (DECL_NAME (fndecl)))
 	{
 	  tree valtype = TREE_TYPE (DECL_RESULT (fndecl));
-	  if (TREE_CODE (valtype) == REFERENCE_TYPE
+	  if (TYPE_REF_P (valtype)
 	      && current_class_ref
 	      && same_type_ignoring_top_level_qualifiers_p
 		  (TREE_TYPE (valtype), TREE_TYPE (current_class_ref))

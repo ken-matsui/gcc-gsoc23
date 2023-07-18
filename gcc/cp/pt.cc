@@ -28023,7 +28023,7 @@ value_dependent_expression_p (tree expression)
 	if (TREE_CODE (expression) == TREE_LIST)
 	  return any_value_dependent_elements_p (expression);
 
-	if (TREE_CODE (type) == REFERENCE_TYPE
+	if (TYPE_REF_P (type)
 	    && has_value_dependent_address (expression))
 	  return true;
 

@@ -6816,7 +6816,7 @@ cp_oacc_check_attachments (tree c)
 
       type = TREE_TYPE (t);
 
-      if (TREE_CODE (type) == REFERENCE_TYPE)
+      if (TYPE_REF_P (type))
 	type = TREE_TYPE (type);
 
       if (TREE_CODE (type) != POINTER_TYPE)
@@ -9645,7 +9645,7 @@ finish_omp_target_clauses_r (tree *tp, int *walk_subtrees, void *ptr)
 	  tree fld = TREE_OPERAND (t, 1);
 	  if (data->ptr_members_accessed.get (fld) == NULL)
 	    {
-	      if (TREE_CODE (TREE_TYPE (t)) == REFERENCE_TYPE)
+	      if (TYPE_REF_P (TREE_TYPE (t)))
 		t = convert_from_reference (t);
 	      data->ptr_members_accessed.put (fld, t);
 	    }
@@ -9834,7 +9834,7 @@ finish_omp_target_clauses (location_t loc, tree body, tree *clauses_ptr)
 	  tree closure_expr = DECL_VALUE_EXPR (orig_decl);
 
 	  if (TREE_CODE (TREE_TYPE (orig_decl)) == POINTER_TYPE
-	      || TREE_CODE (TREE_TYPE (orig_decl)) == REFERENCE_TYPE)
+	      || TYPE_REF_P (TREE_TYPE (orig_decl)))
 	    {
 	      /* this-pointer is processed above, outside this loop.  */
 	      if (omp_target_this_expr
@@ -9931,7 +9931,7 @@ finish_omp_target_clauses (location_t loc, tree body, tree *clauses_ptr)
 	if (!cxx_mark_addressable (ptr_member))
 	  gcc_unreachable ();
 
-	if (TREE_CODE (TREE_TYPE (field_decl)) == REFERENCE_TYPE)
+	if (TYPE_REF_P (TREE_TYPE (field_decl)))
 	  {
 	    /* For reference to pointers, we need to map the referenced
 	       pointer first for things to be correct.  */
@@ -10026,7 +10026,7 @@ finish_omp_target_clauses (location_t loc, tree body, tree *clauses_ptr)
 	      OMP_CLAUSE_SIZE (c) = size_zero_node;
 	      new_clauses.safe_push (c);
 	    }
-	  else if (TREE_CODE (TREE_TYPE (fld)) == REFERENCE_TYPE)
+	  else if (TYPE_REF_P (TREE_TYPE (fld)))
 	    {
 	      tree exp = build3 (COMPONENT_REF, TREE_TYPE (fld),
 				 lobj, fld, NULL_TREE);

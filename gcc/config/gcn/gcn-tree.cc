@@ -310,7 +310,7 @@ gcn_goacc_get_worker_red_decl (tree type, unsigned offset)
 {
   machine_function *machfun = cfun->machine;
 
-  if (TREE_CODE (type) == REFERENCE_TYPE)
+  if (TYPE_REF_P (type))
     type = TREE_TYPE (type);
 
   tree var_type

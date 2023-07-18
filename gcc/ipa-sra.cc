@@ -1206,7 +1206,7 @@ create_parameter_descriptors (cgraph_node *node,
       if (POINTER_TYPE_P (type))
 	{
 	  desc->by_ref = true;
-	  if (TREE_CODE (type) == REFERENCE_TYPE
+	  if (TYPE_REF_P (type)
 	      || (num == 0
 		  && TREE_CODE (TREE_TYPE (node->decl)) == METHOD_TYPE))
 	    desc->safe_ref = true;

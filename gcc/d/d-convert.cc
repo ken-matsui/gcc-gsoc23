@@ -185,8 +185,8 @@ d_truthvalue_conversion (tree expr)
     case CONVERT_EXPR:
       /* Don't cancel the effect of a CONVERT_EXPR from a REFERENCE_TYPE,
 	 since that affects how `default_conversion' will behave.  */
-      if (TREE_CODE (TREE_TYPE (expr)) == REFERENCE_TYPE
-	  || TREE_CODE (TREE_TYPE (TREE_OPERAND (expr, 0))) == REFERENCE_TYPE)
+      if (TYPE_REF_P (TREE_TYPE (expr))
+	  || TYPE_REF_P (TREE_TYPE (TREE_OPERAND (expr, 0))))
 	break;
       /* Fall through.  */
 

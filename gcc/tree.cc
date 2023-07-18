@@ -10050,7 +10050,7 @@ reconstruct_complex_type (tree type, tree bottom)
       outer = build_pointer_type_for_mode (inner, TYPE_MODE (type),
 					   TYPE_REF_CAN_ALIAS_ALL (type));
     }
-  else if (TREE_CODE (type) == REFERENCE_TYPE)
+  else if (TYPE_REF_P (type))
     {
       inner = reconstruct_complex_type (TREE_TYPE (type), bottom);
       outer = build_reference_type_for_mode (inner, TYPE_MODE (type),
@@ -13387,7 +13387,7 @@ verify_type_variant (const_tree t, tree tv)
   /* FIXME: TYPE_SIZES_GIMPLIFIED may differs for Ada build.  */
   verify_variant_match (TYPE_UNSIGNED);
   verify_variant_match (TYPE_PACKED);
-  if (TREE_CODE (t) == REFERENCE_TYPE)
+  if (TYPE_REF_P (t))
     verify_variant_match (TYPE_REF_IS_RVALUE);
   if (AGGREGATE_TYPE_P (t))
     verify_variant_match (TYPE_REVERSE_STORAGE_ORDER);
@@ -14033,7 +14033,7 @@ verify_type (const_tree t)
 	  error_found = true;
 	}
     }
-  else if (TREE_CODE (t) == REFERENCE_TYPE)
+  else if (TYPE_REF_P (t))
     {
       if (TYPE_NEXT_REF_TO (t)
 	  && TREE_CODE (TYPE_NEXT_REF_TO (t)) != REFERENCE_TYPE)
@@ -14202,7 +14202,7 @@ verify_type (const_tree t)
   else if (TREE_CODE (t) == INTEGER_TYPE
 	   || TREE_CODE (t) == BOOLEAN_TYPE
 	   || TREE_CODE (t) == OFFSET_TYPE
-	   || TREE_CODE (t) == REFERENCE_TYPE
+	   || TYPE_REF_P (t)
 	   || TREE_CODE (t) == NULLPTR_TYPE
 	   || TREE_CODE (t) == POINTER_TYPE)
     {
@@ -14395,7 +14395,7 @@ nonnull_arg_p (const_tree arg)
     return true;
 
   /* Values passed by reference are always non-NULL.  */
-  if (TREE_CODE (TREE_TYPE (arg)) == REFERENCE_TYPE
+  if (TYPE_REF_P (TREE_TYPE (arg))
       && flag_delete_null_pointer_checks)
     return true;
 

@@ -1298,7 +1298,7 @@ gfc_conv_class_to_class (gfc_se *parmse, gfc_expr *e, gfc_typespec class_ts,
   gcc_assert (tmp != NULL_TREE);
 
   /* Dereference if needs be.  */
-  if (TREE_CODE (TREE_TYPE (tmp)) == REFERENCE_TYPE)
+  if (TYPE_REF_P (TREE_TYPE (tmp)))
     tmp = build_fold_indirect_ref_loc (input_location, tmp);
 
   if (!(gfc_is_class_array_function (e) && parmse->class_vptr))

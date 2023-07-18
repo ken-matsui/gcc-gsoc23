@@ -905,7 +905,7 @@ m2pp_parameter (pretty *s, tree t)
 {
   if (TREE_CODE (t) == PARM_DECL)
     {
-      if (TREE_TYPE (t) && (TREE_CODE (TREE_TYPE (t)) == REFERENCE_TYPE))
+      if (TREE_TYPE (t) && TYPE_REF_P (TREE_TYPE (t)))
         {
           m2pp_print (s, "VAR");
           m2pp_needspace (s);
@@ -929,7 +929,7 @@ m2pp_parameter (pretty *s, tree t)
 static void
 m2pp_param_type (pretty *s, tree t)
 {
-  if (t && (TREE_CODE (t) == REFERENCE_TYPE))
+  if (t && TYPE_REF_P (t))
     {
       m2pp_print (s, "VAR");
       m2pp_needspace (s);

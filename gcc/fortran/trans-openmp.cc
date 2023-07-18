@@ -219,7 +219,7 @@ gfc_omp_privatize_by_reference (const_tree decl)
 {
   tree type = TREE_TYPE (decl);
 
-  if (TREE_CODE (type) == REFERENCE_TYPE
+  if (TYPE_REF_P (type)
       && (!DECL_ARTIFICIAL (decl) || TREE_CODE (decl) == PARM_DECL))
     return true;
 
@@ -1584,7 +1584,7 @@ gfc_omp_finish_clause (tree c, gimple_seq *pre_p, bool openacc)
 	  OMP_CLAUSE_DECL (c) = decl;
 	  OMP_CLAUSE_SIZE (c) = NULL_TREE;
 	}
-      if (TREE_CODE (TREE_TYPE (orig_decl)) == REFERENCE_TYPE
+      if (TYPE_REF_P (TREE_TYPE (orig_decl))
 	  && (GFC_DECL_GET_SCALAR_POINTER (orig_decl)
 	      || GFC_DECL_GET_SCALAR_ALLOCATABLE (orig_decl)))
 	{
@@ -1747,7 +1747,7 @@ bool
 gfc_omp_scalar_p (tree decl, bool ptr_alloc_ok)
 {
   tree type = TREE_TYPE (decl);
-  if (TREE_CODE (type) == REFERENCE_TYPE)
+  if (TYPE_REF_P (type))
     type = TREE_TYPE (type);
   if (TREE_CODE (type) == POINTER_TYPE)
     {
@@ -2015,7 +2015,7 @@ gfc_trans_omp_array_reduction_or_udr (tree c, gfc_omp_namelist *n, locus where)
   type = TREE_TYPE (decl);
   outer_decl = create_tmp_var_raw (type);
   if (TREE_CODE (decl) == PARM_DECL
-      && TREE_CODE (type) == REFERENCE_TYPE
+      && TYPE_REF_P (type)
       && GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (type))
       && GFC_TYPE_ARRAY_AKIND (TREE_TYPE (type)) == GFC_ARRAY_ALLOCATABLE)
     {
@@ -3277,7 +3277,7 @@ gfc_trans_omp_clauses (stmtblock_t *block, gfc_omp_clauses *clauses,
 			  OMP_CLAUSE_SIZE (node4) = size;
 			}
 		      decl = build_fold_indirect_ref (decl);
-		      if ((TREE_CODE (TREE_TYPE (orig_decl)) == REFERENCE_TYPE
+		      if ((TYPE_REF_P (TREE_TYPE (orig_decl))
 			   || gfc_omp_is_optional_argument (orig_decl))
 			  && (GFC_DECL_GET_SCALAR_POINTER (orig_decl)
 			      || GFC_DECL_GET_SCALAR_ALLOCATABLE (orig_decl)))

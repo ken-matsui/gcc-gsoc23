@@ -258,7 +258,7 @@ tree
 gfc_conv_descriptor_data_get (tree desc)
 {
   tree type = TREE_TYPE (desc);
-  if (TREE_CODE (type) == REFERENCE_TYPE)
+  if (TYPE_REF_P (type))
     gcc_unreachable ();
 
   tree field = gfc_get_descriptor_field (desc, DATA_FIELD);
@@ -9105,7 +9105,7 @@ structure_alloc_comps (gfc_symbol * der_type, tree decl, tree dest,
   decl_type = TREE_TYPE (decl);
 
   if ((POINTER_TYPE_P (decl_type))
-	|| (TREE_CODE (decl_type) == REFERENCE_TYPE && rank == 0))
+	|| (TYPE_REF_P (decl_type) && rank == 0))
     {
       decl = build_fold_indirect_ref_loc (input_location, decl);
       /* Deref dest in sync with decl, but only when it is not NULL.  */

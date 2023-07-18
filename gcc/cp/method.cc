@@ -1207,7 +1207,7 @@ early_check_defaulted_comparison (tree fn)
       tree parmtype = TREE_VALUE (parmnode);
       if (CLASS_TYPE_P (parmtype))
 	saw_byval = true;
-      else if (TREE_CODE (parmtype) == REFERENCE_TYPE
+      else if (TYPE_REF_P (parmtype)
 	       && !TYPE_REF_IS_RVALUE (parmtype)
 	       && TYPE_QUALS (TREE_TYPE (parmtype)) == TYPE_QUAL_CONST)
 	{
@@ -1533,7 +1533,7 @@ build_comparison_op (tree fndecl, bool defining, tsubst_flags_t complain)
 	  /* A defaulted comparison operator function for class C is defined as
 	     deleted if any non-static data member of C is of reference type or
 	     C has variant members.  */
-	  if (TREE_CODE (expr_type) == REFERENCE_TYPE)
+	  if (TYPE_REF_P (expr_type))
 	    {
 	      if (complain & tf_error)
 		inform (field_loc, "cannot default compare "

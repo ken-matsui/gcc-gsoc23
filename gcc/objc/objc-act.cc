@@ -6374,7 +6374,7 @@ add_instance_variable (tree klass, objc_ivar_visibility_kind visibility,
   tree field_type = TREE_TYPE (field_decl);
 
 #ifdef OBJCPLUS
-  if (TREE_CODE (field_type) == REFERENCE_TYPE)
+  if (TYPE_REF_P (field_type))
     {
       error ("illegal reference type specified for instance variable %qs",
 	     printable_ivar_name (field_decl));

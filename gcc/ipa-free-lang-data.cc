@@ -771,7 +771,7 @@ find_decls_types_r (tree *tp, int *ws, void *data)
 	 in them.  */
       if (TREE_CODE (t) == POINTER_TYPE)
 	fld_worklist_push (TYPE_NEXT_PTR_TO (t), fld);
-      if (TREE_CODE (t) == REFERENCE_TYPE)
+      if (TYPE_REF_P (t))
 	fld_worklist_push (TYPE_NEXT_REF_TO (t), fld);
       if (!POINTER_TYPE_P (t))
 	fld_worklist_push (TYPE_MIN_VALUE_RAW (t), fld);

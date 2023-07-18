@@ -4366,7 +4366,7 @@ find_allocator_temps_r (tree *tp, int *walk_subtrees, void *data)
 	{
 	  tree arg = get_nth_callarg (t, i);
 	  tree atype = TREE_TYPE (arg);
-	  if (TREE_CODE (atype) == REFERENCE_TYPE
+	  if (TYPE_REF_P (atype)
 	      && is_std_allocator (TREE_TYPE (atype)))
 	    {
 	      STRIP_NOPS (arg);

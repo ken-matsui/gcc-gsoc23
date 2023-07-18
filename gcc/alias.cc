@@ -1041,7 +1041,7 @@ get_alias_set (tree t)
 	      p = ptr_type_node;
 	      break;
 	    }
-	  if (TREE_CODE (p) == REFERENCE_TYPE)
+	  if (TYPE_REF_P (p))
 	    /* In LTO we want languages that use references to be compatible
  	       with languages that use pointers.  */
 	    reference.safe_push (true && !in_lto_p);

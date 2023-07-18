@@ -432,7 +432,7 @@ remap_type_1 (tree type, copy_body_data *id)
       insert_decl_map (id, type, new_tree);
       return new_tree;
     }
-  else if (TREE_CODE (type) == REFERENCE_TYPE)
+  else if (TYPE_REF_P (type))
     {
       new_tree = build_reference_type_for_mode (remap_type (TREE_TYPE (type), id),
 					    TYPE_MODE (type),

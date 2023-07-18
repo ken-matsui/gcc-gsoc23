@@ -1625,7 +1625,7 @@ indirect_ref (tree type, tree exp)
   /* Maybe rewrite: *(e1, e2) => (e1, *e2)  */
   tree init = stabilize_expr (&exp);
 
-  if (TREE_CODE (TREE_TYPE (exp)) == REFERENCE_TYPE)
+  if (TYPE_REF_P (TREE_TYPE (exp)))
     exp = fold_build1 (INDIRECT_REF, type, exp);
   else
     {

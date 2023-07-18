@@ -95,7 +95,7 @@ m2tree_skip_const_decl (tree exp)
 tree
 m2tree_skip_reference_type (tree exp)
 {
-  if (TREE_CODE (exp) == REFERENCE_TYPE)
+  if (TYPE_REF_P (exp))
     return m2tree_skip_reference_type (TREE_TYPE (exp));
   if (TREE_CODE (exp) == POINTER_TYPE)
     return m2tree_skip_reference_type (TREE_TYPE (exp));

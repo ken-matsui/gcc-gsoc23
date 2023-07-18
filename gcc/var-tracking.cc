@@ -6282,7 +6282,7 @@ prepare_call_arguments (basic_block bb, rtx_insn *insn)
 	{
 	  for (t = TYPE_ARG_TYPES (type); t && t != void_list_node;
 	       t = TREE_CHAIN (t))
-	    if (TREE_CODE (TREE_VALUE (t)) == REFERENCE_TYPE
+	    if (TYPE_REF_P (TREE_VALUE (t))
 		&& INTEGRAL_TYPE_P (TREE_TYPE (TREE_VALUE (t))))
 	      break;
 	  if ((t == NULL || t == void_list_node) && obj_type_ref == NULL_TREE)
@@ -6433,7 +6433,7 @@ prepare_call_arguments (basic_block bb, rtx_insn *insn)
 	    function_arg_info arg (TREE_VALUE (t), /*named=*/true);
 	    apply_pass_by_reference_rules (&args_so_far_v, arg);
 	    reg = targetm.calls.function_arg (args_so_far, arg);
-	    if (TREE_CODE (arg.type) == REFERENCE_TYPE
+	    if (TYPE_REF_P (arg.type)
 		&& INTEGRAL_TYPE_P (TREE_TYPE (arg.type))
 		&& reg
 		&& REG_P (reg)
@@ -9870,7 +9870,7 @@ vt_add_function_parameter (tree parm)
       if (dv_is_value_p (dv))
 	{
 	  record_entry_value (CSELIB_VAL_PTR (dv_as_value (dv)), incoming);
-	  if (TREE_CODE (TREE_TYPE (parm)) == REFERENCE_TYPE
+	  if (TYPE_REF_P (TREE_TYPE (parm))
 	      && INTEGRAL_TYPE_P (TREE_TYPE (TREE_TYPE (parm))))
 	    {
 	      machine_mode indmode

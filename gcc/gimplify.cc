@@ -1861,7 +1861,7 @@ gimplify_decl_expr (tree *stmt_p, gimple_seq *seq_p)
       && !TYPE_SIZES_GIMPLIFIED (TREE_TYPE (decl)))
     {
       gimplify_type_sizes (TREE_TYPE (decl), seq_p);
-      if (TREE_CODE (TREE_TYPE (decl)) == REFERENCE_TYPE)
+      if (TYPE_REF_P (TREE_TYPE (decl)))
 	gimplify_type_sizes (TREE_TYPE (TREE_TYPE (decl)), seq_p);
     }
 
@@ -1872,7 +1872,7 @@ gimplify_decl_expr (tree *stmt_p, gimple_seq *seq_p)
       && !TYPE_SIZES_GIMPLIFIED (DECL_ORIGINAL_TYPE (decl)))
     {
       gimplify_type_sizes (DECL_ORIGINAL_TYPE (decl), seq_p);
-      if (TREE_CODE (DECL_ORIGINAL_TYPE (decl)) == REFERENCE_TYPE)
+      if (TYPE_REF_P (DECL_ORIGINAL_TYPE (decl)))
 	gimplify_type_sizes (TREE_TYPE (DECL_ORIGINAL_TYPE (decl)), seq_p);
     }
 
@@ -7905,7 +7905,7 @@ omp_notice_variable (struct gimplify_omp_ctx *ctx, tree decl, bool in_code)
 		  else if (lang_hooks.decls.omp_scalar_p (decl, false))
 		    gdmk = GDMK_SCALAR;
 		  else if (TREE_CODE (TREE_TYPE (decl)) == POINTER_TYPE
-			   || (TREE_CODE (TREE_TYPE (decl)) == REFERENCE_TYPE
+			   || (TYPE_REF_P (TREE_TYPE (decl))
 			       && (TREE_CODE (TREE_TYPE (TREE_TYPE (decl)))
 				   == POINTER_TYPE)))
 		    gdmk = GDMK_POINTER;
@@ -10418,7 +10418,7 @@ omp_accumulate_sibling_list (enum omp_region_type region_type,
 				    ptrdiff_type_node, baddr);
 	  /* This isn't going to be good enough when we add support for more
 	     complicated lvalue expressions.  FIXME.  */
-	  if (TREE_CODE (TREE_TYPE (sdecl)) == REFERENCE_TYPE
+	  if (TYPE_REF_P (TREE_TYPE (sdecl))
 	      && TREE_CODE (TREE_TYPE (TREE_TYPE (sdecl))) == POINTER_TYPE)
 	    sdecl = build_simple_mem_ref (sdecl);
 	  tree decladdr = fold_convert_loc (OMP_CLAUSE_LOCATION (grp_end),
@@ -10677,7 +10677,7 @@ omp_build_struct_sibling_lists (enum tree_code code,
 	    }
 
 	  tree stype = TREE_TYPE (decl);
-	  if (TREE_CODE (stype) == REFERENCE_TYPE)
+	  if (TYPE_REF_P (stype))
 	    stype = TREE_TYPE (stype);
 	  if (TYPE_SIZE_UNIT (stype) == NULL
 	      || TREE_CODE (TYPE_SIZE_UNIT (stype)) != INTEGER_CST)
@@ -11801,7 +11801,7 @@ gimplify_scan_omp_clauses (tree *list_p, gimple_seq *pre_p,
 		  if (OMP_CLAUSE_CODE (c) == OMP_CLAUSE_REDUCTION
 		      && TREE_CODE (OMP_CLAUSE_DECL (c)) == MEM_REF
 		      && (TREE_CODE (TREE_TYPE (decl)) == POINTER_TYPE
-			  || (TREE_CODE (TREE_TYPE (decl)) == REFERENCE_TYPE
+			  || (TYPE_REF_P (TREE_TYPE (decl))
 			      && (TREE_CODE (TREE_TYPE (TREE_TYPE (decl)))
 				  == POINTER_TYPE))))
 		    omp_firstprivatize_variable (outer_ctx, decl);
@@ -12184,7 +12184,7 @@ omp_shared_to_firstprivate_optimizable_decl_p (tree decl)
     return false;
   tree type = TREE_TYPE (decl);
   if (!is_gimple_reg_type (type)
-      || TREE_CODE (type) == REFERENCE_TYPE
+      || TYPE_REF_P (type)
       || TREE_ADDRESSABLE (type))
     return false;
   /* Don't optimize too large decls, as each thread/task will have
@@ -12432,7 +12432,7 @@ gimplify_adjust_omp_clauses_1 (splay_tree_node n, void *data)
     {
       tree nc = build_omp_clause (input_location, OMP_CLAUSE_MAP);
       OMP_CLAUSE_DECL (nc) = decl;
-      if (TREE_CODE (TREE_TYPE (decl)) == REFERENCE_TYPE
+      if (TYPE_REF_P (TREE_TYPE (decl))
 	  && TREE_CODE (TREE_TYPE (TREE_TYPE (decl))) == POINTER_TYPE)
 	OMP_CLAUSE_DECL (clause)
 	  = build_simple_mem_ref_loc (input_location, decl);
@@ -13591,7 +13591,7 @@ gimplify_omp_taskloop_expr (tree type, tree *tp, gimple_seq *pre_p,
      here.  */
   if (type
       && TREE_CODE (type) == POINTER_TYPE
-      && TREE_CODE (TREE_TYPE (*tp)) == REFERENCE_TYPE)
+      && TYPE_REF_P (TREE_TYPE (*tp)))
     {
       tree v = create_tmp_var (TYPE_MAIN_VARIANT (type));
       tree m = build2 (INIT_EXPR, TREE_TYPE (v), v, *tp);

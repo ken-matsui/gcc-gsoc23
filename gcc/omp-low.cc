@@ -1298,7 +1298,7 @@ scan_sharing_clauses (tree clauses, omp_context *ctx)
 		  && (!is_global_var (maybe_lookup_decl_in_outer_ctx (t, ctx))
 		      || (is_task_ctx (ctx)
 			  && (TREE_CODE (TREE_TYPE (t)) == POINTER_TYPE
-			      || (TREE_CODE (TREE_TYPE (t)) == REFERENCE_TYPE
+			      || (TYPE_REF_P (TREE_TYPE (t))
 				  && (TREE_CODE (TREE_TYPE (TREE_TYPE (t)))
 				      == POINTER_TYPE)))))
 		  && !is_variable_sized (t)
@@ -1308,7 +1308,7 @@ scan_sharing_clauses (tree clauses, omp_context *ctx)
 		{
 		  by_ref = use_pointer_for_field (t, NULL);
 		  if (is_task_ctx (ctx)
-		      && TREE_CODE (TREE_TYPE (t)) == REFERENCE_TYPE
+		      && TYPE_REF_P (TREE_TYPE (t))
 		      && TREE_CODE (TREE_TYPE (TREE_TYPE (t))) == POINTER_TYPE)
 		    {
 		      install_var_field (t, false, 1, ctx);
@@ -5306,7 +5306,7 @@ lower_rec_input_clauses (tree clauses, gimple_seq *ilist, gimple_seq *dlist,
 		    {
 		      bool by_ref = use_pointer_for_field (var, NULL);
 		      x = build_receiver_ref (var, by_ref, ctx);
-		      if (TREE_CODE (TREE_TYPE (var)) == REFERENCE_TYPE
+		      if (TYPE_REF_P (TREE_TYPE (var))
 			  && (TREE_CODE (TREE_TYPE (TREE_TYPE (var)))
 			      == POINTER_TYPE))
 			x = build_fold_addr_expr (x);
@@ -12200,7 +12200,7 @@ create_task_copyfn (gomp_task *task_stmt, omp_context *ctx)
 	src = build_simple_mem_ref_loc (loc, sarg);
 	src = omp_build_component_ref (src, sf);
 	if (decl != OMP_CLAUSE_DECL (c)
-	    && TREE_CODE (TREE_TYPE (decl)) == REFERENCE_TYPE
+	    && TYPE_REF_P (TREE_TYPE (decl))
 	    && TREE_CODE (TREE_TYPE (TREE_TYPE (decl))) == POINTER_TYPE)
 	  src = build_simple_mem_ref_loc (loc, src);
 	dst = build_simple_mem_ref_loc (loc, arg);
@@ -13313,7 +13313,7 @@ lower_omp_target (gimple_stmt_iterator *gsi_p, omp_context *ctx)
 	      {
 		gcc_checking_assert (is_gimple_omp_oacc (ctx->stmt));
 		s = TREE_TYPE (ovar);
-		if (TREE_CODE (s) == REFERENCE_TYPE
+		if (TYPE_REF_P (s)
 		    || omp_check_optional_argument (ovar, false))
 		  s = TREE_TYPE (s);
 		s = TYPE_SIZE_UNIT (s);
@@ -14046,7 +14046,7 @@ lower_omp_target (gimple_stmt_iterator *gsi_p, omp_context *ctx)
 		else if (TREE_CODE (OMP_CLAUSE_DECL (c)) == COMPONENT_REF)
 		  {
 		    type = TREE_TYPE (OMP_CLAUSE_DECL (c));
-		    is_ref = TREE_CODE (type) == REFERENCE_TYPE;
+		    is_ref = TYPE_REF_P (type);
 		    new_var = build2 (MEM_REF, type,
 				      build_fold_addr_expr (new_var),
 				      build_int_cst (build_pointer_type (type),
@@ -14076,7 +14076,7 @@ lower_omp_target (gimple_stmt_iterator *gsi_p, omp_context *ctx)
 		    new_var = decl2;
 		    type = TREE_TYPE (new_var);
 		  }
-		else if (TREE_CODE (type) == REFERENCE_TYPE
+		else if (TYPE_REF_P (type)
 			 && TREE_CODE (TREE_TYPE (type)) == POINTER_TYPE)
 		  {
 		    type = TREE_TYPE (type);
@@ -14617,8 +14617,7 @@ lower_omp_1 (gimple_stmt_iterator *gsi_p, omp_context *ctx)
 	  tree lhs = get_base_address (gimple_assign_lhs (stmt));
 	  if (TREE_CODE (lhs) == MEM_REF
 	      && DECL_P (TREE_OPERAND (lhs, 0))
-	      && TREE_CODE (TREE_TYPE (TREE_OPERAND (lhs,
-						     0))) == REFERENCE_TYPE)
+	      && TYPE_REF_P (TREE_TYPE (TREE_OPERAND (lhs, 0))))
 	    lhs = TREE_OPERAND (lhs, 0);
 	  if (DECL_P (lhs))
 	    if (tree *v = up->lastprivate_conditional_map->get (lhs))

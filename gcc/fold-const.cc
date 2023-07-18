@@ -9507,7 +9507,7 @@ fold_unary_loc (location_t loc, enum tree_code code, tree type, tree op0)
 	     when type is a reference type and arg00's type is not,
 	     because arg00 could be validly nullptr and if arg01 doesn't return,
 	     we don't want false positive binding of reference to nullptr.  */
-	  if (TREE_CODE (type) == REFERENCE_TYPE
+	  if (TYPE_REF_P (type)
 	      && !in_gimple_form
 	      && sanitize_flags_p (SANITIZE_NULL)
 	      && TREE_CODE (TREE_TYPE (arg00)) != REFERENCE_TYPE)

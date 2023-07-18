@@ -3834,7 +3834,7 @@ analyze_fn_parms (tree orig)
 	actual_type = error_mark_node;
       parm.orig_type = actual_type;
       parm.by_ref = parm.pt_ref = parm.rv_ref =  false;
-      if (TREE_CODE (actual_type) == REFERENCE_TYPE)
+      if (TYPE_REF_P (actual_type))
 	{
 	  /* If the user passes by reference, then we will save the
 	     pointer to the original.  As noted in

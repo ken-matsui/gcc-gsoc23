@@ -365,7 +365,7 @@ simd_clone_clauses_extract (struct cgraph_node *node, tree clauses,
 	    if (OMP_CLAUSE_LINEAR_VARIABLE_STRIDE (t))
 	      {
 		enum cgraph_simd_clone_arg_type arg_type;
-		if (TREE_CODE (args[argno]) == REFERENCE_TYPE)
+		if (TYPE_REF_P (args[argno]))
 		  switch (OMP_CLAUSE_LINEAR_KIND (t))
 		    {
 		    case OMP_CLAUSE_LINEAR_REF:
@@ -410,7 +410,7 @@ simd_clone_clauses_extract (struct cgraph_node *node, tree clauses,
 		else
 		  {
 		    enum cgraph_simd_clone_arg_type arg_type;
-		    if (TREE_CODE (args[argno]) == REFERENCE_TYPE)
+		    if (TYPE_REF_P (args[argno]))
 		      switch (OMP_CLAUSE_LINEAR_KIND (t))
 			{
 			case OMP_CLAUSE_LINEAR_REF:
@@ -1392,7 +1392,7 @@ simd_clone_linear_addend (struct cgraph_node *node, unsigned int i,
       gsi_insert_before (&gsi, g, GSI_SAME_STMT);
       ret = gimple_assign_lhs (g);
     }
-  if (TREE_CODE (TREE_TYPE (arg)) == REFERENCE_TYPE)
+  if (TYPE_REF_P (TREE_TYPE (arg)))
     {
       g = gimple_build_assign (make_ssa_name (TREE_TYPE (TREE_TYPE (arg))),
 			       build_simple_mem_ref (ret));
@@ -1823,7 +1823,7 @@ simd_clone_adjust (struct cgraph_node *node)
 	tree orig_arg = node->simdclone->args[i].orig_arg;
 	tree def = ssa_default_def (cfun, orig_arg);
 	gcc_assert (!TREE_ADDRESSABLE (orig_arg)
-		    && TREE_CODE (TREE_TYPE (orig_arg)) == REFERENCE_TYPE);
+		    && TYPE_REF_P (TREE_TYPE (orig_arg)));
 	if (def && !has_zero_uses (def))
 	  {
 	    tree rtype = TREE_TYPE (TREE_TYPE (orig_arg));
