@@ -571,7 +571,7 @@ install_var_field (tree var, tree record_type, field_map_t *fields)
 
   tree type = TREE_TYPE (var);
 
-  if (POINTER_TYPE_P (type)
+  if (INDIRECT_TYPE_P (type)
       && TYPE_RESTRICT (type))
     type = build_qualified_type (type, TYPE_QUALS (type) & ~TYPE_QUAL_RESTRICT);
 
@@ -950,7 +950,7 @@ build_receiver_ref (tree var, tree receiver_decl, field_map_t *fields)
 static tree
 build_sender_ref (tree var, tree sender_decl, field_map_t *fields)
 {
-  if (POINTER_TYPE_P (TREE_TYPE (sender_decl)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (sender_decl)))
     sender_decl = build_simple_mem_ref (sender_decl);
   tree field = *fields->get (var);
   return omp_build_component_ref (sender_decl, field);
@@ -1023,7 +1023,7 @@ worker_single_copy (basic_block from, basic_block to,
 
   gimple *call
     = gimple_build_call (decl, 1,
-			 POINTER_TYPE_P (TREE_TYPE (sender_decl))
+			 INDIRECT_TYPE_P (TREE_TYPE (sender_decl))
 			 ? sender_decl : build_fold_addr_expr (sender_decl));
   gimple_call_set_lhs (call, lhs);
   gsi_insert_before (&start, call, GSI_NEW_STMT);
@@ -1226,7 +1226,7 @@ worker_single_copy (basic_block from, basic_block to,
 
   decl = builtin_decl_explicit (BUILT_IN_GOACC_SINGLE_COPY_END);
   call = gimple_build_call (decl, 1,
-			    POINTER_TYPE_P (TREE_TYPE (sender_decl))
+			    INDIRECT_TYPE_P (TREE_TYPE (sender_decl))
 			    ? sender_decl
 			    : build_fold_addr_expr (sender_decl));
   gimple_seq_add_stmt (&sender_seq, call);

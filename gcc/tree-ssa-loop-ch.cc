@@ -188,7 +188,7 @@ should_duplicate_loop_header_p (basic_block header, class loop *loop,
 	gphi *phi = psi.phi ();
 	tree res = gimple_phi_result (phi);
 	if (INTEGRAL_TYPE_P (TREE_TYPE (res))
-	    || POINTER_TYPE_P (TREE_TYPE (res)))
+	    || INDIRECT_TYPE_P (TREE_TYPE (res)))
 	  gimple_set_uid (phi, 1 /* IV */);
 	else
 	  gimple_set_uid (phi, 0);

@@ -378,7 +378,7 @@ static bool
 look_through_cast_p (tree type, tree from)
 {
   return (INTEGRAL_TYPE_P (TREE_TYPE (from)) == INTEGRAL_TYPE_P (type)
-	  && POINTER_TYPE_P (TREE_TYPE (from)) == POINTER_TYPE_P (type));
+	  && INDIRECT_TYPE_P (TREE_TYPE (from)) == INDIRECT_TYPE_P (type));
 }
 
 /* Strip all conversions of integers or pointers from EXPR, regardless
@@ -1076,7 +1076,7 @@ loop_versioning::analyze_address_fragment (address_info &address)
   for (unsigned int i = 0; i < address.terms.length (); ++i)
     if (!find_per_loop_multiplication (address, address.terms[i])
 	&& !analyze_term_using_scevs (address, address.terms[i])
-	&& !POINTER_TYPE_P (TREE_TYPE (address.terms[i].expr)))
+	&& !INDIRECT_TYPE_P (TREE_TYPE (address.terms[i].expr)))
       analyze_arbitrary_term (address, address.terms[i]);
 
   /* Check for strides that are likely to be for the innermost dimension.

@@ -851,7 +851,7 @@ update_alias_info_with_stack_vars (void)
 	{
 	  struct ptr_info_def *pi;
 
-	  if (POINTER_TYPE_P (TREE_TYPE (name))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (name))
 	      && ((pi = SSA_NAME_PTR_INFO (name)) != NULL))
 	    add_partitioned_vars_to_ptset (&pi->pt, decls_to_partitions,
 					   &visited, temp);
@@ -1585,7 +1585,7 @@ adjust_one_expanded_partition_var (tree var)
   if (decl && !DECL_ARTIFICIAL (decl))
     mark_user_reg (x);
 
-  if (POINTER_TYPE_P (decl ? TREE_TYPE (decl) : TREE_TYPE (var)))
+  if (INDIRECT_TYPE_P (decl ? TREE_TYPE (decl) : TREE_TYPE (var)))
     mark_reg_pointer (x, get_pointer_alignment (var));
 }
 
@@ -1619,7 +1619,7 @@ expand_one_register_var (tree var)
   if (!DECL_ARTIFICIAL (decl))
     mark_user_reg (x);
 
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     mark_reg_pointer (x, get_pointer_alignment (var));
 }
 

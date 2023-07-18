@@ -720,7 +720,7 @@ find_tail_calls (basic_block bb, struct tailcall **ret)
     return;
 
   /* For pointers only allow additions.  */
-  if (m && POINTER_TYPE_P (TREE_TYPE (DECL_RESULT (current_function_decl))))
+  if (m && INDIRECT_TYPE_P (TREE_TYPE (DECL_RESULT (current_function_decl))))
     return;
 
   /* Move queued defs.  */
@@ -788,7 +788,7 @@ adjust_return_value_with_ops (enum tree_code code, const char *label,
   tree result = make_temp_ssa_name (ret_type, NULL, label);
   gassign *stmt;
 
-  if (POINTER_TYPE_P (ret_type))
+  if (INDIRECT_TYPE_P (ret_type))
     {
       gcc_assert (code == PLUS_EXPR && TREE_TYPE (acc) == sizetype);
       code = POINTER_PLUS_EXPR;
@@ -1081,7 +1081,7 @@ static tree
 create_tailcall_accumulator (const char *label, basic_block bb, tree init)
 {
   tree ret_type = TREE_TYPE (DECL_RESULT (current_function_decl));
-  if (POINTER_TYPE_P (ret_type))
+  if (INDIRECT_TYPE_P (ret_type))
     ret_type = sizetype;
 
   tree tmp = make_temp_ssa_name (ret_type, NULL, label);
@@ -1162,7 +1162,7 @@ tree_optimize_tail_calls_1 (bool opt_tailcalls)
 	  phis_constructed = true;
 	}
       tree ret_type = TREE_TYPE (DECL_RESULT (current_function_decl));
-      if (POINTER_TYPE_P (ret_type))
+      if (INDIRECT_TYPE_P (ret_type))
 	ret_type = sizetype;
 
       if (act->add && !a_acc)

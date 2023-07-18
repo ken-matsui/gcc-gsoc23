@@ -2100,7 +2100,7 @@ aarch64_simd_expand_args (rtx target, int icode, int have_retval,
 	  switch (thisarg)
 	    {
 	    case SIMD_ARG_COPY_TO_REG:
-	      if (POINTER_TYPE_P (TREE_TYPE (arg)))
+	      if (INDIRECT_TYPE_P (TREE_TYPE (arg)))
 		op[opc] = convert_memory_address (Pmode, op[opc]);
 	      /*gcc_assert (GET_MODE (op[opc]) == mode); */
 	      if (!(*insn_data[icode].operand[opc].predicate)

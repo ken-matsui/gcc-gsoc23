@@ -458,7 +458,7 @@ va_list_ptr_write (struct stdarg_info *si, tree ap, tree tem2)
 static void
 check_va_list_escapes (struct stdarg_info *si, tree lhs, tree rhs)
 {
-  if (! POINTER_TYPE_P (TREE_TYPE (rhs)))
+  if (! INDIRECT_TYPE_P (TREE_TYPE (rhs)))
     return;
 
   if (TREE_CODE (rhs) == SSA_NAME)
@@ -675,7 +675,7 @@ optimize_va_list_gpr_fpr_size (function *fun)
     funcname = lang_hooks.decl_printable_name (current_function_decl, 2);
 
   cfun_va_list = targetm.fn_abi_va_list (fun->decl);
-  va_list_simple_ptr = POINTER_TYPE_P (cfun_va_list)
+  va_list_simple_ptr = INDIRECT_TYPE_P (cfun_va_list)
 		       && (TREE_TYPE (cfun_va_list) == void_type_node
 			   || TREE_TYPE (cfun_va_list) == char_type_node);
   gcc_assert (is_gimple_reg_type (cfun_va_list) == va_list_simple_ptr);
@@ -1014,7 +1014,7 @@ expand_ifn_va_arg_1 (function *fun)
 	type = TREE_TYPE (TREE_TYPE (gimple_call_arg (stmt, 1)));
 	ap = gimple_call_arg (stmt, 0);
 	aptype = TREE_TYPE (gimple_call_arg (stmt, 2));
-	gcc_assert (POINTER_TYPE_P (aptype));
+	gcc_assert (INDIRECT_TYPE_P (aptype));
 
 	/* Balanced out the &ap, usually added by build_va_arg.  */
 	ap = build2 (MEM_REF, TREE_TYPE (aptype), ap,

@@ -83,7 +83,7 @@ chkp_type_has_function_pointer (const_tree type)
 {
   bool res = false;
 
-  if (POINTER_TYPE_P (type) && FUNC_OR_METHOD_TYPE_P (TREE_TYPE (type)))
+  if (INDIRECT_TYPE_P (type) && FUNC_OR_METHOD_TYPE_P (TREE_TYPE (type)))
     res = true;
   else if (RECORD_OR_UNION_TYPE_P (type))
     {

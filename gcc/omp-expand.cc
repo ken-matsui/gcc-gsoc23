@@ -353,7 +353,7 @@ determine_parallel_type (struct omp_region *region)
 	      || omp_find_clause (clauses, OMP_CLAUSE_ORDERED)
 	      || omp_find_clause (clauses, OMP_CLAUSE__REDUCTEMP_)
 	      || ((c = omp_find_clause (clauses, OMP_CLAUSE__CONDTEMP_))
-		  && POINTER_TYPE_P (TREE_TYPE (OMP_CLAUSE_DECL (c)))))
+		  && INDIRECT_TYPE_P (TREE_TYPE (OMP_CLAUSE_DECL (c)))))
 	    return;
 	}
       else if (region->inner->type == GIMPLE_OMP_SECTIONS
@@ -1573,7 +1573,7 @@ expand_oacc_collapse_init (const struct omp_for_data *fd,
 
       gcc_assert (loop->cond_code == LT_EXPR || loop->cond_code == GT_EXPR);
 
-      if (POINTER_TYPE_P (iter_type))
+      if (INDIRECT_TYPE_P (iter_type))
 	plus_type = sizetype;
 
       if (tiling)
@@ -1679,7 +1679,7 @@ expand_oacc_collapse_vars (const struct omp_for_data *fd, bool inner,
       enum tree_code plus_code = PLUS_EXPR;
       tree expr;
 
-      if (POINTER_TYPE_P (iter_type))
+      if (INDIRECT_TYPE_P (iter_type))
 	{
 	  plus_code = POINTER_PLUS_EXPR;
 	  plus_type = sizetype;
@@ -1928,7 +1928,7 @@ expand_omp_for_init_counts (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
 	  *gsi = gsi_last_nondebug_bb (entry_bb);
 	}
 
-      if (POINTER_TYPE_P (itype))
+      if (INDIRECT_TYPE_P (itype))
 	itype = signed_type_for (itype);
       t = build_int_cst (itype, (fd->loops[i].cond_code == LT_EXPR
 				 ? -1 : 1));
@@ -1989,7 +1989,7 @@ expand_omp_for_init_counts (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
 	  break;
       if (i == fd->last_nonrect
 	  && fd->loops[i].outer == fd->last_nonrect - fd->first_nonrect
-	  && !POINTER_TYPE_P (TREE_TYPE (fd->loops[i].v))
+	  && !INDIRECT_TYPE_P (TREE_TYPE (fd->loops[i].v))
 	  && !TYPE_UNSIGNED (TREE_TYPE (fd->loops[i].v)))
 	{
 	  int o = fd->first_nonrect;
@@ -2263,7 +2263,7 @@ expand_omp_for_init_counts (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
 	      t = fold_convert (itype, unshare_expr (fd->loops[i].n1));
 	      if (fd->loops[i].m1 == NULL_TREE)
 		n1 = t;
-	      else if (POINTER_TYPE_P (itype))
+	      else if (INDIRECT_TYPE_P (itype))
 		{
 		  gcc_assert (integer_onep (fd->loops[i].m1));
 		  t = unshare_expr (fd->loops[i].n1);
@@ -2286,7 +2286,7 @@ expand_omp_for_init_counts (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
 	      t = fold_convert (itype, unshare_expr (fd->loops[i].n2));
 	      if (fd->loops[i].m2 == NULL_TREE)
 		n2 = t;
-	      else if (POINTER_TYPE_P (itype))
+	      else if (INDIRECT_TYPE_P (itype))
 		{
 		  gcc_assert (integer_onep (fd->loops[i].m2));
 		  t = unshare_expr (fd->loops[i].n2);
@@ -2301,7 +2301,7 @@ expand_omp_for_init_counts (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
 		}
 	      n2 = force_gimple_operand_gsi (&gsi2, n2, true, NULL_TREE,
 					     true, GSI_SAME_STMT);
-	      if (POINTER_TYPE_P (itype))
+	      if (INDIRECT_TYPE_P (itype))
 		itype = signed_type_for (itype);
 	      if (i == fd->last_nonrect)
 		{
@@ -2349,7 +2349,7 @@ expand_omp_for_init_counts (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
 	      gsi2 = gsi_after_labels (e->dest);
 	      tree step = fold_convert (itype,
 					unshare_expr (fd->loops[i].step));
-	      if (POINTER_TYPE_P (TREE_TYPE (vs[i])))
+	      if (INDIRECT_TYPE_P (TREE_TYPE (vs[i])))
 		t = fold_build_pointer_plus (vs[i], step);
 	      else
 		t = fold_build2 (PLUS_EXPR, itype, vs[i], step);
@@ -2534,7 +2534,7 @@ expand_omp_for_init_vars (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
     {
       tree vtype = TREE_TYPE (fd->loops[i].v), itype, t;
       itype = vtype;
-      if (POINTER_TYPE_P (vtype))
+      if (INDIRECT_TYPE_P (vtype))
 	itype = signed_type_for (vtype);
       if (i != 0 && (i != fd->last_nonrect || fd->first_nonrect))
 	t = fold_build2 (TRUNC_MOD_EXPR, type, tem, counts[i]);
@@ -2787,7 +2787,7 @@ expand_omp_for_init_vars (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
 	      t = fold_convert (itype, unshare_expr (fd->loops[j].n1));
 	      if (fd->loops[j].m1 == NULL_TREE)
 		n1 = rect_p ? build_zero_cst (type) : t;
-	      else if (POINTER_TYPE_P (itype))
+	      else if (INDIRECT_TYPE_P (itype))
 		{
 		  gcc_assert (integer_onep (fd->loops[j].m1));
 		  t = unshare_expr (fd->loops[j].n1);
@@ -2810,7 +2810,7 @@ expand_omp_for_init_vars (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
 	      t = fold_convert (itype, unshare_expr (fd->loops[j].n2));
 	      if (fd->loops[j].m2 == NULL_TREE)
 		n2 = rect_p ? counts[j] : t;
-	      else if (POINTER_TYPE_P (itype))
+	      else if (INDIRECT_TYPE_P (itype))
 		{
 		  gcc_assert (integer_onep (fd->loops[j].m2));
 		  t = unshare_expr (fd->loops[j].n2);
@@ -2825,7 +2825,7 @@ expand_omp_for_init_vars (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
 		}
 	      n2 = force_gimple_operand_gsi (&gsi2, n2, true, NULL_TREE,
 					     true, GSI_SAME_STMT);
-	      if (POINTER_TYPE_P (itype))
+	      if (INDIRECT_TYPE_P (itype))
 		itype = signed_type_for (itype);
 	      if (j == fd->last_nonrect)
 		{
@@ -2888,7 +2888,7 @@ expand_omp_for_init_vars (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
 		{
 		  tree step
 		    = fold_convert (itype, unshare_expr (fd->loops[j].step));
-		  if (POINTER_TYPE_P (vtype))
+		  if (INDIRECT_TYPE_P (vtype))
 		    t = fold_build_pointer_plus (vs[j], step);
 		  else
 		    t = fold_build2 (PLUS_EXPR, itype, vs[j], step);
@@ -2939,7 +2939,7 @@ expand_omp_for_init_vars (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
 	    {
 	      tree vtype = TREE_TYPE (fd->loops[j].v);
 	      tree itype = vtype;
-	      if (POINTER_TYPE_P (itype))
+	      if (INDIRECT_TYPE_P (itype))
 		itype = signed_type_for (itype);
 	      bool rect_p = (fd->loops[j].m1 == NULL_TREE
 			     && fd->loops[j].m2 == NULL_TREE
@@ -2951,7 +2951,7 @@ expand_omp_for_init_vars (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
 		  tree t2
 		    = fold_convert (itype, unshare_expr (fd->loops[j].step));
 		  t = fold_build2 (MULT_EXPR, itype, t, t2);
-		  if (POINTER_TYPE_P (vtype))
+		  if (INDIRECT_TYPE_P (vtype))
 		    t = fold_build_pointer_plus (n1, t);
 		  else
 		    t = fold_build2 (PLUS_EXPR, itype, n1, t);
@@ -2961,7 +2961,7 @@ expand_omp_for_init_vars (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
 		  t = fold_convert (itype, vs[j]);
 		  t = fold_build2 (MULT_EXPR, itype, t,
 				   fold_convert (itype, fd->loops[j].step));
-		  if (POINTER_TYPE_P (vtype))
+		  if (INDIRECT_TYPE_P (vtype))
 		    t = fold_build_pointer_plus (fd->loops[j].n1, t);
 		  else
 		    t = fold_build2 (PLUS_EXPR, itype, fd->loops[j].n1, t);
@@ -2993,7 +2993,7 @@ expand_omp_for_init_vars (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
 	  t = fold_convert (itype, t);
 	  t = fold_build2 (MULT_EXPR, itype, t,
 			   fold_convert (itype, fd->loops[i].step));
-	  if (POINTER_TYPE_P (vtype))
+	  if (INDIRECT_TYPE_P (vtype))
 	    t = fold_build_pointer_plus (fd->loops[i].n1, t);
 	  else
 	    t = fold_build2 (PLUS_EXPR, itype, fd->loops[i].n1, t);
@@ -3023,7 +3023,7 @@ expand_omp_for_init_vars (struct omp_for_data *fd, gimple_stmt_iterator *gsi,
 	  tree itype = TREE_TYPE (fd->loops[i].v);
 
 	  tree t;
-	  if (POINTER_TYPE_P (itype))
+	  if (INDIRECT_TYPE_P (itype))
 	    {
 	      gcc_assert (integer_onep (fd->loops[i].m2));
 	      t = fold_build_pointer_plus (fd->loops[i - fd->loops[i].outer].v,
@@ -3118,7 +3118,7 @@ extract_omp_for_update_vars (struct omp_for_data *fd, tree *nonrect_bounds,
 	      t = l->n1;
 	      if (l->m1)
 		{
-		  if (POINTER_TYPE_P (TREE_TYPE (l->v)))
+		  if (INDIRECT_TYPE_P (TREE_TYPE (l->v)))
 		    t = fold_build_pointer_plus (fd->loops[i + 1 - l->outer].v,
 						 t);
 		  else
@@ -3143,7 +3143,7 @@ extract_omp_for_update_vars (struct omp_for_data *fd, tree *nonrect_bounds,
 
       set_immediate_dominator (CDI_DOMINATORS, bb, last_bb);
 
-      if (POINTER_TYPE_P (vtype))
+      if (INDIRECT_TYPE_P (vtype))
 	t = fold_build_pointer_plus (fd->loops[i].v, fd->loops[i].step);
       else
 	t = fold_build2 (PLUS_EXPR, vtype, fd->loops[i].v, fd->loops[i].step);
@@ -3175,7 +3175,7 @@ extract_omp_for_update_vars (struct omp_for_data *fd, tree *nonrect_bounds,
 		  }
 		if (l->m1)
 		  {
-		    if (POINTER_TYPE_P (TREE_TYPE (l->v)))
+		    if (INDIRECT_TYPE_P (TREE_TYPE (l->v)))
 		      t = fold_build_pointer_plus (fd->loops[i].v, l->n1);
 		    else
 		      {
@@ -3197,7 +3197,7 @@ extract_omp_for_update_vars (struct omp_for_data *fd, tree *nonrect_bounds,
 						 GSI_CONTINUE_LINKING);
 		if (l->m2)
 		  {
-		    if (POINTER_TYPE_P (TREE_TYPE (l->v)))
+		    if (INDIRECT_TYPE_P (TREE_TYPE (l->v)))
 		      t = fold_build_pointer_plus (fd->loops[i].v, l->n2);
 		    else
 		      {
@@ -3443,7 +3443,7 @@ expand_omp_ordered_sink (gimple_stmt_iterator *gsi, struct omp_for_data *fd,
       tree itype = TREE_TYPE (fd->loops[i].v);
       tree step = NULL_TREE;
       tree orig_off = NULL_TREE;
-      if (POINTER_TYPE_P (itype))
+      if (INDIRECT_TYPE_P (itype))
 	itype = sizetype;
       if (i)
 	deps = TREE_CHAIN (deps);
@@ -3454,7 +3454,7 @@ expand_omp_ordered_sink (gimple_stmt_iterator *gsi, struct omp_for_data *fd,
 	  off = TREE_OPERAND (off, 0);
 	  gcc_assert (fd->loops[i].cond_code == LT_EXPR
 		      && integer_onep (fd->loops[i].step)
-		      && !POINTER_TYPE_P (TREE_TYPE (fd->loops[i].v)));
+		      && !INDIRECT_TYPE_P (TREE_TYPE (fd->loops[i].v)));
 	}
       tree s = fold_convert_loc (loc, itype, step ? step : fd->loops[i].step);
       if (step)
@@ -3470,7 +3470,7 @@ expand_omp_ordered_sink (gimple_stmt_iterator *gsi, struct omp_for_data *fd,
 	{
 	  tree a;
 	  tree co = fold_convert_loc (loc, itype, off);
-	  if (POINTER_TYPE_P (TREE_TYPE (fd->loops[i].v)))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (fd->loops[i].v)))
 	    {
 	      if (OMP_CLAUSE_DOACROSS_SINK_NEGATIVE (deps))
 		co = fold_build1_loc (loc, NEGATE_EXPR, itype, co);
@@ -3637,7 +3637,7 @@ expand_omp_ordered_source_sink (struct omp_region *region,
       counts[i] = NULL_TREE;
     else if (i >= fd->collapse && !cont_bb)
       counts[i] = build_zero_cst (fd->iter_type);
-    else if (!POINTER_TYPE_P (TREE_TYPE (fd->loops[i].v))
+    else if (!INDIRECT_TYPE_P (TREE_TYPE (fd->loops[i].v))
 	     && integer_onep (fd->loops[i].step))
       counts[i] = NULL_TREE;
     else
@@ -3725,7 +3725,7 @@ expand_omp_for_ordered_loops (struct omp_for_data *fd, tree *counts,
       if (EDGE_COUNT (cont_bb->preds) > 0)
 	{
 	  gsi = gsi_last_bb (cont_bb);
-	  if (POINTER_TYPE_P (type))
+	  if (INDIRECT_TYPE_P (type))
 	    t = fold_build_pointer_plus (fd->loops[i].v, fd->loops[i].step);
 	  else
 	    t = fold_build2 (PLUS_EXPR, type, fd->loops[i].v,
@@ -4168,7 +4168,7 @@ expand_omp_for_generic (struct omp_region *region,
 	      gcc_assert (innerc);
 	      t1 = OMP_CLAUSE_DECL (innerc);
 	    }
-	  if (POINTER_TYPE_P (TREE_TYPE (t0))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (t0))
 	      && TYPE_PRECISION (TREE_TYPE (t0))
 		 != TYPE_PRECISION (fd->iter_type))
 	    {
@@ -4310,7 +4310,7 @@ expand_omp_for_generic (struct omp_region *region,
     t = fold_build2 (MINUS_EXPR, fd->iter_type, t, bias);
   if (fd->ordered && fd->collapse == 1)
     {
-      if (POINTER_TYPE_P (TREE_TYPE (startvar)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (startvar)))
 	t = fold_build2 (POINTER_PLUS_EXPR, TREE_TYPE (startvar),
 			 fd->loop.n1, fold_convert (sizetype, t));
       else
@@ -4322,7 +4322,7 @@ expand_omp_for_generic (struct omp_region *region,
     }
   else
     {
-      if (POINTER_TYPE_P (TREE_TYPE (startvar)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (startvar)))
 	t = fold_convert (signed_type_for (TREE_TYPE (startvar)), t);
       t = fold_convert (TREE_TYPE (startvar), t);
     }
@@ -4343,7 +4343,7 @@ expand_omp_for_generic (struct omp_region *region,
 	 incremented by 1.  */
       if ((fd->ordered && fd->collapse == 1)
 	  || bias
-	  || POINTER_TYPE_P (type)
+	  || INDIRECT_TYPE_P (type)
 	  || TREE_CODE (fd->loop.n1) != INTEGER_CST
 	  || fd->loop.cond_code != LT_EXPR)
 	t = fold_build2 (PLUS_EXPR, itype, fold_convert (itype, istart0),
@@ -4370,7 +4370,7 @@ expand_omp_for_generic (struct omp_region *region,
     t = fold_build2 (MINUS_EXPR, fd->iter_type, t, bias);
   if (fd->ordered && fd->collapse == 1)
     {
-      if (POINTER_TYPE_P (TREE_TYPE (startvar)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (startvar)))
 	t = fold_build2 (POINTER_PLUS_EXPR, TREE_TYPE (startvar),
 			 fd->loop.n1, fold_convert (sizetype, t));
       else
@@ -4382,7 +4382,7 @@ expand_omp_for_generic (struct omp_region *region,
     }
   else
     {
-      if (POINTER_TYPE_P (TREE_TYPE (startvar)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (startvar)))
 	t = fold_convert (signed_type_for (TREE_TYPE (startvar)), t);
       t = fold_convert (TREE_TYPE (startvar), t);
     }
@@ -4411,7 +4411,7 @@ expand_omp_for_generic (struct omp_region *region,
 	  if (omp_privatize_by_reference (t))
 	    t = build_simple_mem_ref_loc (OMP_CLAUSE_LOCATION (c), t);
 	  tree type = TREE_TYPE (t);
-	  if (POINTER_TYPE_P (type))
+	  if (INDIRECT_TYPE_P (type))
 	    type = sizetype;
 	  dest = unshare_expr (t);
 	  tree v = create_tmp_var (TREE_TYPE (t), NULL);
@@ -4420,7 +4420,7 @@ expand_omp_for_generic (struct omp_region *region,
 	    {
 	      itercnt = startvar;
 	      tree n1 = fd->loop.n1;
-	      if (POINTER_TYPE_P (TREE_TYPE (itercnt)))
+	      if (INDIRECT_TYPE_P (TREE_TYPE (itercnt)))
 		{
 		  itercnt
 		    = fold_convert (signed_type_for (TREE_TYPE (itercnt)),
@@ -4555,7 +4555,7 @@ expand_omp_for_generic (struct omp_region *region,
 	  tree t2;
 	  if ((fd->ordered && fd->collapse == 1)
 	       || bias
-	       || POINTER_TYPE_P (type)
+	       || INDIRECT_TYPE_P (type)
 	       || TREE_CODE (fd->loop.n1) != INTEGER_CST
 	       || fd->loop.cond_code != LT_EXPR)
 	    t2 = build_int_cst (itype, 1);
@@ -4570,7 +4570,7 @@ expand_omp_for_generic (struct omp_region *region,
 
       if (!gimple_omp_for_combined_p (fd->for_stmt))
 	{
-	  if (POINTER_TYPE_P (type))
+	  if (INDIRECT_TYPE_P (type))
 	    t = fold_build_pointer_plus (vmain, fd->loop.step);
 	  else
 	    t = fold_build2 (PLUS_EXPR, type, vmain, fd->loop.step);
@@ -4963,7 +4963,7 @@ expand_omp_for_static_nochunk (struct omp_region *region,
   tree cond_var = NULL_TREE, condtemp = NULL_TREE;
 
   itype = type = TREE_TYPE (fd->loop.v);
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     itype = signed_type_for (type);
 
   entry_bb = region->entry;
@@ -5337,10 +5337,10 @@ expand_omp_for_static_nochunk (struct omp_region *region,
     }
   t = fold_convert (itype, s0);
   t = fold_build2 (MULT_EXPR, itype, t, step);
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     {
       t = fold_build_pointer_plus (n1, t);
-      if (!POINTER_TYPE_P (TREE_TYPE (startvar))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (startvar))
 	  && TYPE_PRECISION (TREE_TYPE (startvar)) > TYPE_PRECISION (type))
 	t = fold_convert (signed_type_for (type), t);
     }
@@ -5362,7 +5362,7 @@ expand_omp_for_static_nochunk (struct omp_region *region,
 	 itself, use that, or startvar + constant (those would be
 	 incremented with step), and as last resort use the s0 + 1
 	 incremented by 1.  */
-      if (POINTER_TYPE_P (type)
+      if (INDIRECT_TYPE_P (type)
 	  || TREE_CODE (n1) != INTEGER_CST
 	  || fd->loop.cond_code != LT_EXPR)
 	t = fold_build2 (PLUS_EXPR, itype, fold_convert (itype, s0),
@@ -5383,10 +5383,10 @@ expand_omp_for_static_nochunk (struct omp_region *region,
 
   t = fold_convert (itype, e0);
   t = fold_build2 (MULT_EXPR, itype, t, step);
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     {
       t = fold_build_pointer_plus (n1, t);
-      if (!POINTER_TYPE_P (TREE_TYPE (startvar))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (startvar))
 	  && TYPE_PRECISION (TREE_TYPE (startvar)) > TYPE_PRECISION (type))
 	t = fold_convert (signed_type_for (type), t);
     }
@@ -5435,7 +5435,7 @@ expand_omp_for_static_nochunk (struct omp_region *region,
 		itercnt = s0;
 	    }
 	  tree type = TREE_TYPE (t);
-	  if (POINTER_TYPE_P (type))
+	  if (INDIRECT_TYPE_P (type))
 	    type = sizetype;
 	  a = fold_build2 (MULT_EXPR, type,
 			   fold_convert (type, itercnt),
@@ -5472,7 +5472,7 @@ expand_omp_for_static_nochunk (struct omp_region *region,
 	{
 	  tree itype = TREE_TYPE (cond_var);
 	  tree t2;
-	  if (POINTER_TYPE_P (type)
+	  if (INDIRECT_TYPE_P (type)
 	      || TREE_CODE (n1) != INTEGER_CST
 	      || fd->loop.cond_code != LT_EXPR)
 	    t2 = build_int_cst (itype, 1);
@@ -5487,7 +5487,7 @@ expand_omp_for_static_nochunk (struct omp_region *region,
 
       if (!gimple_omp_for_combined_p (fd->for_stmt))
 	{
-	  if (POINTER_TYPE_P (type))
+	  if (INDIRECT_TYPE_P (type))
 	    t = fold_build_pointer_plus (vmain, step);
 	  else
 	    t = fold_build2 (PLUS_EXPR, type, vmain, step);
@@ -5750,7 +5750,7 @@ expand_omp_for_static_chunk (struct omp_region *region,
   tree cond_var = NULL_TREE, condtemp = NULL_TREE;
 
   itype = type = TREE_TYPE (fd->loop.v);
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     itype = signed_type_for (type);
 
   entry_bb = region->entry;
@@ -5973,7 +5973,7 @@ expand_omp_for_static_chunk (struct omp_region *region,
 
   t = fold_build2 (MULT_EXPR, itype, threadid, chunk_size);
   t = fold_build2 (MULT_EXPR, itype, t, step);
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     t = fold_build_pointer_plus (n1, t);
   else
     t = fold_build2 (PLUS_EXPR, type, t, n1);
@@ -6040,10 +6040,10 @@ expand_omp_for_static_chunk (struct omp_region *region,
 
   t = fold_convert (itype, s0);
   t = fold_build2 (MULT_EXPR, itype, t, step);
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     {
       t = fold_build_pointer_plus (n1, t);
-      if (!POINTER_TYPE_P (TREE_TYPE (startvar))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (startvar))
 	  && TYPE_PRECISION (TREE_TYPE (startvar)) > TYPE_PRECISION (type))
 	t = fold_convert (signed_type_for (type), t);
     }
@@ -6065,7 +6065,7 @@ expand_omp_for_static_chunk (struct omp_region *region,
 	 itself, use that, or startvar + constant (those would be
 	 incremented with step), and as last resort use the s0 + 1
 	 incremented by 1.  */
-      if (POINTER_TYPE_P (type)
+      if (INDIRECT_TYPE_P (type)
 	  || TREE_CODE (n1) != INTEGER_CST
 	  || fd->loop.cond_code != LT_EXPR)
 	t = fold_build2 (PLUS_EXPR, itype, fold_convert (itype, s0),
@@ -6086,10 +6086,10 @@ expand_omp_for_static_chunk (struct omp_region *region,
 
   t = fold_convert (itype, e0);
   t = fold_build2 (MULT_EXPR, itype, t, step);
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     {
       t = fold_build_pointer_plus (n1, t);
-      if (!POINTER_TYPE_P (TREE_TYPE (startvar))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (startvar))
 	  && TYPE_PRECISION (TREE_TYPE (startvar)) > TYPE_PRECISION (type))
 	t = fold_convert (signed_type_for (type), t);
     }
@@ -6121,7 +6121,7 @@ expand_omp_for_static_chunk (struct omp_region *region,
 	  if (omp_privatize_by_reference (t))
 	    t = build_simple_mem_ref_loc (OMP_CLAUSE_LOCATION (c), t);
 	  tree type = TREE_TYPE (t);
-	  if (POINTER_TYPE_P (type))
+	  if (INDIRECT_TYPE_P (type))
 	    type = sizetype;
 	  dest = unshare_expr (t);
 	  tree v = create_tmp_var (TREE_TYPE (t), NULL);
@@ -6172,7 +6172,7 @@ expand_omp_for_static_chunk (struct omp_region *region,
 	{
 	  tree itype = TREE_TYPE (cond_var);
 	  tree t2;
-	  if (POINTER_TYPE_P (type)
+	  if (INDIRECT_TYPE_P (type)
 	      || TREE_CODE (n1) != INTEGER_CST
 	      || fd->loop.cond_code != LT_EXPR)
 	    t2 = build_int_cst (itype, 1);
@@ -6187,7 +6187,7 @@ expand_omp_for_static_chunk (struct omp_region *region,
 
       if (!gimple_omp_for_combined_p (fd->for_stmt))
 	{
-	  if (POINTER_TYPE_P (type))
+	  if (INDIRECT_TYPE_P (type))
 	    t = fold_build_pointer_plus (vmain, step);
 	  else
 	    t = fold_build2 (PLUS_EXPR, type, vmain, step);
@@ -6549,7 +6549,7 @@ expand_omp_simd (struct omp_region *region, struct omp_for_data *fd)
       tree offset = fold_build2 (MULT_EXPR, TREE_TYPE (step), step,
 				 fold_convert (TREE_TYPE (step), simt_lane));
       n1 = fold_convert (type, n1);
-      if (POINTER_TYPE_P (type))
+      if (INDIRECT_TYPE_P (type))
 	n1 = fold_build_pointer_plus (n1, offset);
       else
 	n1 = fold_build2 (PLUS_EXPR, type, n1, fold_convert (type, offset));
@@ -6602,7 +6602,7 @@ expand_omp_simd (struct omp_region *region, struct omp_for_data *fd)
 	  n2var = create_tmp_var (type);
 	  i = fd->collapse - 1;
 	  tree itype = TREE_TYPE (fd->loops[i].v);
-	  if (POINTER_TYPE_P (itype))
+	  if (INDIRECT_TYPE_P (itype))
 	    itype = signed_type_for (itype);
 	  t = build_int_cst (itype, (fd->loops[i].cond_code == LT_EXPR
 				     ? -1 : 1));
@@ -6693,7 +6693,7 @@ expand_omp_simd (struct omp_region *region, struct omp_for_data *fd)
       altv = create_tmp_var (unsigned_type_for (TREE_TYPE (fd->loops[0].v)));
       expand_omp_build_assign (&gsi, altv, build_zero_cst (TREE_TYPE (altv)));
       tree itype = TREE_TYPE (fd->loop.v);
-      if (POINTER_TYPE_P (itype))
+      if (INDIRECT_TYPE_P (itype))
 	itype = signed_type_for (itype);
       t = build_int_cst (itype, (fd->loop.cond_code == LT_EXPR ? -1 : 1));
       t = fold_build2 (PLUS_EXPR, itype,
@@ -6730,7 +6730,7 @@ expand_omp_simd (struct omp_region *region, struct omp_for_data *fd)
     }
   if (cond_var)
     {
-      if (POINTER_TYPE_P (type)
+      if (INDIRECT_TYPE_P (type)
 	  || TREE_CODE (n1) != INTEGER_CST
 	  || fd->loop.cond_code != LT_EXPR
 	  || tree_int_cst_sgn (n1) != 1)
@@ -6754,7 +6754,7 @@ expand_omp_simd (struct omp_region *region, struct omp_for_data *fd)
       if (fd->collapse == 1
 	  || gimple_omp_for_combined_into_p (fd->for_stmt))
 	{
-	  if (POINTER_TYPE_P (type))
+	  if (INDIRECT_TYPE_P (type))
 	    t = fold_build_pointer_plus (fd->loop.v, step);
 	  else
 	    t = fold_build2 (PLUS_EXPR, type, fd->loop.v, step);
@@ -6772,7 +6772,7 @@ expand_omp_simd (struct omp_region *region, struct omp_for_data *fd)
       if (fd->collapse > 1)
 	{
 	  i = fd->collapse - 1;
-	  if (POINTER_TYPE_P (TREE_TYPE (fd->loops[i].v)))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (fd->loops[i].v)))
 	    t = fold_build_pointer_plus (fd->loops[i].v, fd->loops[i].step);
 	  else
 	    {
@@ -6785,7 +6785,7 @@ expand_omp_simd (struct omp_region *region, struct omp_for_data *fd)
 	}
       if (cond_var)
 	{
-	  if (POINTER_TYPE_P (type)
+	  if (INDIRECT_TYPE_P (type)
 	      || TREE_CODE (n1) != INTEGER_CST
 	      || fd->loop.cond_code != LT_EXPR
 	      || tree_int_cst_sgn (n1) != 1)
@@ -6854,7 +6854,7 @@ expand_omp_simd (struct omp_region *region, struct omp_for_data *fd)
     {
       gsi = gsi_start_bb (l2_bb);
       step = fold_build2 (MINUS_EXPR, TREE_TYPE (step), orig_step, step);
-      if (POINTER_TYPE_P (type))
+      if (INDIRECT_TYPE_P (type))
 	t = fold_build_pointer_plus (fd->loop.v, step);
       else
 	t = fold_build2 (PLUS_EXPR, type, fd->loop.v, step);
@@ -6920,7 +6920,7 @@ expand_omp_simd (struct omp_region *region, struct omp_for_data *fd)
 	  else
 	    e = EDGE_SUCC (last_bb, 1);
 	  basic_block bb = split_edge (e);
-	  if (POINTER_TYPE_P (TREE_TYPE (fd->loops[i].v)))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (fd->loops[i].v)))
 	    t = fold_build_pointer_plus (fd->loops[i].v, fd->loops[i].step);
 	  else
 	    {
@@ -6973,7 +6973,7 @@ expand_omp_simd (struct omp_region *region, struct omp_for_data *fd)
 	      tree t2 = fold_convert (TREE_TYPE (fd->loops[i + 1].v),
 				      fd->loops[i + 1
 						- fd->loops[i + 1].outer].v);
-	      if (POINTER_TYPE_P (TREE_TYPE (t2)))
+	      if (INDIRECT_TYPE_P (TREE_TYPE (t2)))
 		t = fold_build_pointer_plus (t2, fd->loops[i + 1].n1);
 	      else
 		{
@@ -6998,7 +6998,7 @@ expand_omp_simd (struct omp_region *region, struct omp_for_data *fd)
 	      tree t2 = fold_convert (TREE_TYPE (fd->loops[i + 1].v),
 				      fd->loops[i + 1
 						- fd->loops[i + 1].outer].v);
-	      if (POINTER_TYPE_P (TREE_TYPE (t2)))
+	      if (INDIRECT_TYPE_P (TREE_TYPE (t2)))
 		t = fold_build_pointer_plus (t2, fd->loops[i + 1].n2);
 	      else
 		{
@@ -7024,7 +7024,7 @@ expand_omp_simd (struct omp_region *region, struct omp_for_data *fd)
 	      if (fd->loops[i + 1].m1 || fd->loops[i + 1].m2)
 		{
 		  tree itype = TREE_TYPE (fd->loops[i].v);
-		  if (POINTER_TYPE_P (itype))
+		  if (INDIRECT_TYPE_P (itype))
 		    itype = signed_type_for (itype);
 		  t = build_int_cst (itype, (fd->loops[i + 1].cond_code
 					     == LT_EXPR ? -1 : 1));
@@ -7035,7 +7035,7 @@ expand_omp_simd (struct omp_region *region, struct omp_for_data *fd)
 		    t = fold_build2 (PLUS_EXPR, itype, t,
 				     fold_convert (itype,
 						   fd->loops[i + 1].n2));
-		  else if (POINTER_TYPE_P (TREE_TYPE (n2v)))
+		  else if (INDIRECT_TYPE_P (TREE_TYPE (n2v)))
 		    {
 		      t = fold_build_pointer_plus (n2v, t);
 		      t = fold_convert (itype, t);
@@ -7079,7 +7079,7 @@ expand_omp_simd (struct omp_region *region, struct omp_for_data *fd)
 	      expand_omp_build_assign (&gsi, altv,
 				       build_zero_cst (TREE_TYPE (altv)));
 	      tree itype = TREE_TYPE (fd->loops[i + 1].v);
-	      if (POINTER_TYPE_P (itype))
+	      if (INDIRECT_TYPE_P (itype))
 		itype = signed_type_for (itype);
 	      t = build_int_cst (itype, (fd->loops[i + 1].cond_code == LT_EXPR
 					 ? -1 : 1));
@@ -7251,7 +7251,7 @@ expand_omp_taskloop_for_outer (struct omp_region *region,
   tree t0, t1;
   t1 = fd->loop.n2;
   t0 = fd->loop.n1;
-  if (POINTER_TYPE_P (TREE_TYPE (t0))
+  if (INDIRECT_TYPE_P (TREE_TYPE (t0))
       && TYPE_PRECISION (TREE_TYPE (t0))
 	 != TYPE_PRECISION (fd->iter_type))
     {
@@ -7345,7 +7345,7 @@ expand_omp_taskloop_for_inner (struct omp_region *region,
   tree n1, n2, step;
 
   itype = type = TREE_TYPE (fd->loop.v);
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     itype = signed_type_for (type);
 
   /* See if we need to bias by LLONG_MIN.  */
@@ -7485,7 +7485,7 @@ expand_omp_taskloop_for_inner (struct omp_region *region,
 
       if (!gimple_omp_for_combined_p (fd->for_stmt))
 	{
-	  if (POINTER_TYPE_P (type))
+	  if (INDIRECT_TYPE_P (type))
 	    t = fold_build_pointer_plus (vmain, step);
 	  else
 	    t = fold_build2 (PLUS_EXPR, type, vmain, step);
@@ -7641,7 +7641,7 @@ expand_oacc_for (struct omp_region *region, struct omp_for_data *fd)
   gcc_assert (!gimple_omp_for_combined_into_p (fd->for_stmt));
   gcc_assert (cond_code == LT_EXPR || cond_code == GT_EXPR);
 
-  if (POINTER_TYPE_P (iter_type))
+  if (INDIRECT_TYPE_P (iter_type))
     {
       plus_code = POINTER_PLUS_EXPR;
       plus_type = sizetype;
@@ -7652,7 +7652,7 @@ expand_oacc_for (struct omp_region *region, struct omp_for_data *fd)
       if (TYPE_PRECISION (diff_type) < TYPE_PRECISION (diff_type2))
 	diff_type = diff_type2;
     }
-  if (POINTER_TYPE_P (diff_type) || TYPE_UNSIGNED (diff_type))
+  if (INDIRECT_TYPE_P (diff_type) || TYPE_UNSIGNED (diff_type))
     diff_type = signed_type_for (diff_type);
   if (TYPE_PRECISION (diff_type) < TYPE_PRECISION (integer_type_node))
     diff_type = integer_type_node;
@@ -9328,7 +9328,7 @@ expand_omp_atomic_pipeline (basic_block load_bb, basic_block store_bb,
   /* For floating-point values, we'll need to view-convert them to integers
      so that we can perform the atomic compare and swap.  Simplify the
      following code by always setting up the "i"ntegral variables.  */
-  if (!INTEGRAL_TYPE_P (type) && !POINTER_TYPE_P (type))
+  if (!INTEGRAL_TYPE_P (type) && !INDIRECT_TYPE_P (type))
     {
       tree iaddr_val;
 
@@ -9601,7 +9601,7 @@ expand_omp_atomic (struct omp_region *region)
 	    return;
 
 	  /* When possible, use specialized atomic update functions.  */
-	  if ((INTEGRAL_TYPE_P (type) || POINTER_TYPE_P (type))
+	  if ((INTEGRAL_TYPE_P (type) || INDIRECT_TYPE_P (type))
 	      && store_bb == single_succ (load_bb)
 	      && expand_omp_atomic_fetch_op (load_bb, addr,
 					     loaded_val, stored_val, index))

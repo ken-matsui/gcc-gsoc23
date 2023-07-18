@@ -2846,7 +2846,7 @@ pass_omp_target_link::execute (function *fun)
 	    {
 	      tree dev = gimple_call_arg (gsi_stmt (gsi), 0);
 	      tree fn = gimple_call_arg (gsi_stmt (gsi), 1);
-	      if (POINTER_TYPE_P (TREE_TYPE (fn)))
+	      if (INDIRECT_TYPE_P (TREE_TYPE (fn)))
 		fn = TREE_OPERAND (fn, 0);
 	      if (TREE_CODE (dev) == INTEGER_CST
 		  && wi::to_wide (dev) == GOMP_DEVICE_HOST_FALLBACK

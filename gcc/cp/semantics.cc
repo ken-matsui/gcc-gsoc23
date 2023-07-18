@@ -6666,7 +6666,7 @@ cp_omp_finish_iterators (tree iter)
 	}
       if (type_dependent_expression_p (var))
 	continue;
-      if (!INTEGRAL_TYPE_P (type) && !POINTER_TYPE_P (type))
+      if (!INTEGRAL_TYPE_P (type) && !INDIRECT_TYPE_P (type))
 	{
 	  error_at (loc, "iterator %qD has neither integral nor pointer type",
 		    var);
@@ -6706,10 +6706,10 @@ cp_omp_finish_iterators (tree iter)
       orig_step = step;
       if (!processing_template_decl)
 	step = orig_step = save_expr (step);
-      tree stype = POINTER_TYPE_P (type) ? sizetype : type;
+      tree stype = INDIRECT_TYPE_P (type) ? sizetype : type;
       step = cp_build_c_cast (input_location, stype, step,
 			      tf_warning_or_error);
-      if (POINTER_TYPE_P (type) && !processing_template_decl)
+      if (INDIRECT_TYPE_P (type) && !processing_template_decl)
 	{
 	  begin = save_expr (begin);
 	  step = pointer_int_sum (loc, PLUS_EXPR, begin, step);
@@ -9637,7 +9637,7 @@ finish_omp_target_clauses_r (tree *tp, int *walk_subtrees, void *ptr)
 	}
 
       if (TREE_CODE (t) == COMPONENT_REF
-	  && POINTER_TYPE_P (TREE_TYPE (t))
+	  && INDIRECT_TYPE_P (TREE_TYPE (t))
 	  && operand_equal_p (TREE_OPERAND (t, 0), current_object)
 	  && TREE_CODE (TREE_OPERAND (t, 1)) == FIELD_DECL)
 	{

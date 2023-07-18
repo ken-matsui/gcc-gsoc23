@@ -245,7 +245,7 @@ const svalue *
 region_model_manager::get_or_create_null_ptr (tree pointer_type)
 {
   gcc_assert (pointer_type);
-  gcc_assert (POINTER_TYPE_P (pointer_type));
+  gcc_assert (INDIRECT_TYPE_P (pointer_type));
   return get_or_create_int_cst (pointer_type, 0);
 }
 
@@ -419,9 +419,9 @@ region_model_manager::maybe_fold_unaryop (tree type, enum tree_code op,
 	/* Avoid creating symbolic regions for pointer casts by
 	   simplifying (T*)(&REGION) to ((T*)&REGION).  */
 	if (const region_svalue *region_sval = arg->dyn_cast_region_svalue ())
-	  if (POINTER_TYPE_P (type)
+	  if (INDIRECT_TYPE_P (type)
 	      && region_sval->get_type ()
-	      && POINTER_TYPE_P (region_sval->get_type ()))
+	      && INDIRECT_TYPE_P (region_sval->get_type ()))
 	    return get_ptr_svalue (type, region_sval->get_pointee ());
       }
       break;

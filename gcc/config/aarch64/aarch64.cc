@@ -7501,7 +7501,7 @@ aarch64_function_arg_alignment (machine_mode mode, const_tree type,
 	 TYPE_MAIN_VARIANT, but not always; see PR108910 for a counterexample.
 	 For now we just handle the known exceptions explicitly.  */
       type = TYPE_MAIN_VARIANT (type);
-      if (POINTER_TYPE_P (type))
+      if (INDIRECT_TYPE_P (type))
 	{
 	  gcc_assert (known_eq (POINTER_SIZE, GET_MODE_BITSIZE (mode)));
 	  return POINTER_SIZE;
@@ -8071,7 +8071,7 @@ aarch64_function_arg_padding (machine_mode mode, const_tree type)
      byte address of the stack slot.  */
   if (type
       ? (INTEGRAL_TYPE_P (type) || SCALAR_FLOAT_TYPE_P (type)
-	 || POINTER_TYPE_P (type))
+	 || INDIRECT_TYPE_P (type))
       : (SCALAR_INT_MODE_P (mode) || SCALAR_FLOAT_MODE_P (mode)))
     return PAD_DOWNWARD;
 
@@ -27186,7 +27186,7 @@ aarch64_estimated_poly_value (poly_int64 val,
 static bool
 supported_simd_type (tree t)
 {
-  if (SCALAR_FLOAT_TYPE_P (t) || INTEGRAL_TYPE_P (t) || POINTER_TYPE_P (t))
+  if (SCALAR_FLOAT_TYPE_P (t) || INTEGRAL_TYPE_P (t) || INDIRECT_TYPE_P (t))
     {
       HOST_WIDE_INT s = tree_to_shwi (TYPE_SIZE_UNIT (t));
       return s == 1 || s == 2 || s == 4 || s == 8;

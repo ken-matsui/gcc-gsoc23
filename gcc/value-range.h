@@ -882,7 +882,7 @@ irange::varying_compatible_p () const
 
   unsigned prec = TYPE_PRECISION (t);
   signop sign = TYPE_SIGN (t);
-  if (INTEGRAL_TYPE_P (t) || POINTER_TYPE_P (t))
+  if (INTEGRAL_TYPE_P (t) || INDIRECT_TYPE_P (t))
     return (l == wi::min_value (prec, sign)
 	    && u == wi::max_value (prec, sign)
 	    && m_bitmask.unknown_p ());
@@ -922,7 +922,7 @@ irange::nonzero_p () const
 inline bool
 irange::supports_p (const_tree type)
 {
-  return INTEGRAL_TYPE_P (type) || POINTER_TYPE_P (type);
+  return INTEGRAL_TYPE_P (type) || INDIRECT_TYPE_P (type);
 }
 
 inline bool
@@ -1054,7 +1054,7 @@ irange::set_varying (tree type)
   m_num_ranges = 1;
   m_bitmask.set_unknown (TYPE_PRECISION (type));
 
-  if (INTEGRAL_TYPE_P (type) || POINTER_TYPE_P (type))
+  if (INTEGRAL_TYPE_P (type) || INDIRECT_TYPE_P (type))
     {
       m_type = type;
       // Strict enum's require varying to be not TYPE_MIN/MAX, but rather

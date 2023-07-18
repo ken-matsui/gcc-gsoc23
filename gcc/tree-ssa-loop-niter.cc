@@ -1038,7 +1038,7 @@ number_of_iterations_ne (class loop *loop, tree type, affine_iv *iv,
      will fit a signed type as well as an unsigned we can safely do
      this using the type of the IV if it is not pointer typed.  */
   tree mtype = type;
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     mtype = niter_type;
   if (!niter->control.no_overflow
       && (integer_onep (s)
@@ -1155,7 +1155,7 @@ number_of_iterations_lt_to_ne (tree type, affine_iv *iv0, affine_iv *iv1,
   tree assumption = boolean_true_node, bound, noloop;
   bool fv_comp_no_overflow;
   tree type1 = type;
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     type1 = sizetype;
 
   if (TREE_CODE (mod) != INTEGER_CST)
@@ -1175,7 +1175,7 @@ number_of_iterations_lt_to_ne (tree type, affine_iv *iv0, affine_iv *iv1,
      as the code cannot rely on the object to that the pointer points being
      placed at the end of the address space (and more pragmatically,
      TYPE_{MIN,MAX}_VALUE is not defined for pointers).  */
-  if (integer_zerop (mod) || POINTER_TYPE_P (type))
+  if (integer_zerop (mod) || INDIRECT_TYPE_P (type))
     fv_comp_no_overflow = true;
   else if (!exit_must_be_taken)
     fv_comp_no_overflow = false;
@@ -1200,7 +1200,7 @@ number_of_iterations_lt_to_ne (tree type, affine_iv *iv0, affine_iv *iv1,
 	}
       if (mpz_cmp (mmod, bnds->below) < 0)
 	noloop = boolean_false_node;
-      else if (POINTER_TYPE_P (type))
+      else if (INDIRECT_TYPE_P (type))
 	noloop = fold_build2 (GT_EXPR, boolean_type_node,
 			      iv0->base,
 			      fold_build_pointer_plus (iv1->base, tmod));
@@ -1226,7 +1226,7 @@ number_of_iterations_lt_to_ne (tree type, affine_iv *iv0, affine_iv *iv1,
 	}
       if (mpz_cmp (mmod, bnds->below) < 0)
 	noloop = boolean_false_node;
-      else if (POINTER_TYPE_P (type))
+      else if (INDIRECT_TYPE_P (type))
 	noloop = fold_build2 (GT_EXPR, boolean_type_node,
 			      fold_build_pointer_plus (iv0->base,
 						       fold_build1 (NEGATE_EXPR,
@@ -1383,7 +1383,7 @@ assert_loop_rolls_lt (tree type, affine_iv *iv0, affine_iv *iv1,
 		      Gcc in general does not allow or handle objects larger
 		      than half of the address space, hence the upper bound
 		      is satisfied for pointers.  */
-		   || POINTER_TYPE_P (type));
+		   || INDIRECT_TYPE_P (type));
   mpz_clear (mstep);
   mpz_clear (max);
 
@@ -1391,7 +1391,7 @@ assert_loop_rolls_lt (tree type, affine_iv *iv0, affine_iv *iv1,
     return;
 
   type1 = type;
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     type1 = sizetype;
 
   /* Now the hard part; we must formulate the assumption(s) as expressions, and
@@ -1405,7 +1405,7 @@ assert_loop_rolls_lt (tree type, affine_iv *iv0, affine_iv *iv1,
       /* We need to know that iv0->base >= MIN + iv0->step - 1.  Since
 	 0 address never belongs to any object, we can assume this for
 	 pointers.  */
-      if (!POINTER_TYPE_P (type))
+      if (!INDIRECT_TYPE_P (type))
 	{
 	  bound = fold_build2 (PLUS_EXPR, type1,
 			       TYPE_MIN_VALUE (type), diff);
@@ -1424,7 +1424,7 @@ assert_loop_rolls_lt (tree type, affine_iv *iv0, affine_iv *iv1,
       diff = fold_build2 (PLUS_EXPR, type1,
 			  iv1->step, build_int_cst (type1, 1));
 
-      if (!POINTER_TYPE_P (type))
+      if (!INDIRECT_TYPE_P (type))
 	{
 	  bound = fold_build2 (PLUS_EXPR, type1,
 			       TYPE_MAX_VALUE (type), diff);
@@ -1556,7 +1556,7 @@ number_of_iterations_until_wrap (class loop *loop, tree type, affine_iv *iv0,
      Here, biasing IVbase by 1 step makes 'bound' be the value before wrap.
      */
   tree base_type = TREE_TYPE (niter->control.base);
-  if (POINTER_TYPE_P (base_type))
+  if (INDIRECT_TYPE_P (base_type))
     {
       tree utype = unsigned_type_for (base_type);
       niter->control.base
@@ -1711,7 +1711,7 @@ number_of_iterations_le (class loop *loop, tree type, affine_iv *iv0,
 {
   tree assumption;
   tree type1 = type;
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     type1 = sizetype;
 
   /* Say that IV0 is the control variable.  Then IV0 <= IV1 iff
@@ -1723,7 +1723,7 @@ number_of_iterations_le (class loop *loop, tree type, affine_iv *iv0,
      the address space (and more pragmatically, TYPE_{MIN,MAX}_VALUE is
      not defined for pointers).  */
 
-  if (!exit_must_be_taken && !POINTER_TYPE_P (type))
+  if (!exit_must_be_taken && !INDIRECT_TYPE_P (type))
     {
       if (integer_nonzerop (iv0->step))
 	assumption = fold_build2 (NE_EXPR, boolean_type_node,
@@ -1741,13 +1741,13 @@ number_of_iterations_le (class loop *loop, tree type, affine_iv *iv0,
 
   if (integer_nonzerop (iv0->step))
     {
-      if (POINTER_TYPE_P (type))
+      if (INDIRECT_TYPE_P (type))
 	iv1->base = fold_build_pointer_plus_hwi (iv1->base, 1);
       else
 	iv1->base = fold_build2 (PLUS_EXPR, type1, iv1->base,
 				 build_int_cst (type1, 1));
     }
-  else if (POINTER_TYPE_P (type))
+  else if (INDIRECT_TYPE_P (type))
     iv0->base = fold_build_pointer_plus_hwi (iv0->base, -1);
   else
     iv0->base = fold_build2 (MINUS_EXPR, type1,
@@ -1838,7 +1838,7 @@ number_of_iterations_cond (class loop *loop,
       code = swap_tree_comparison (code);
     }
 
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     {
       /* Comparison of pointers is undefined unless both iv0 and iv1 point
 	 to the same object.  If they do, the control variable cannot wrap
@@ -1876,7 +1876,7 @@ number_of_iterations_cond (class loop *loop,
      This rarely occurs in practice, but it is simple enough to manage.  */
   if (!integer_zerop (iv0->step) && !integer_zerop (iv1->step))
     {
-      tree step_type = POINTER_TYPE_P (type) ? sizetype : type;
+      tree step_type = INDIRECT_TYPE_P (type) ? sizetype : type;
       tree step = fold_binary_to_constant (MINUS_EXPR, step_type,
 					   iv0->step, iv1->step);
 
@@ -1896,7 +1896,7 @@ number_of_iterations_cond (class loop *loop,
 	       || wi::gtu_p (wi::abs (wi::to_widest (step)),
 			     wi::abs (wi::to_widest (iv0->step))))
 	{
-	  if (POINTER_TYPE_P (type) && code != NE_EXPR)
+	  if (INDIRECT_TYPE_P (type) && code != NE_EXPR)
 	    /* For relational pointer compares we have further guarantees
 	       that the pointers always point to the same object (or one
 	       after it) and that objects do not cross the zero page.  So
@@ -3155,7 +3155,7 @@ number_of_iterations_exit_assumptions (class loop *loop, edge exit,
   type = TREE_TYPE (op0);
 
   if (TREE_CODE (type) != INTEGER_TYPE
-      && !POINTER_TYPE_P (type))
+      && !INDIRECT_TYPE_P (type))
     return false;
 
   tree iv0_niters = NULL_TREE;
@@ -5176,7 +5176,7 @@ nowrap_type_p (tree type)
       && TYPE_OVERFLOW_UNDEFINED (type))
     return true;
 
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     return true;
 
   return false;
@@ -5289,7 +5289,7 @@ loop_exits_before_overflow (tree base, tree step,
 
 	     by proving the reverse conditions are false using loop's initial
 	     condition.  */
-	  if (POINTER_TYPE_P (TREE_TYPE (base)))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (base)))
 	    code = POINTER_PLUS_EXPR;
 	  else
 	    code = PLUS_EXPR;

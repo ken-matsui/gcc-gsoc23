@@ -4883,7 +4883,7 @@ initializer_constant_valid_p_1 (tree value, tree endtype, tree *cache)
 	tree dest_type = TREE_TYPE (value);
 
 	/* Allow conversions between pointer types and offset types.  */
-	if ((POINTER_TYPE_P (dest_type) && POINTER_TYPE_P (src_type))
+	if ((INDIRECT_TYPE_P (dest_type) && INDIRECT_TYPE_P (src_type))
 	    || (TREE_CODE (dest_type) == OFFSET_TYPE
 		&& TREE_CODE (src_type) == OFFSET_TYPE))
 	  return initializer_constant_valid_p_1 (src, endtype, cache);
@@ -4914,13 +4914,13 @@ initializer_constant_valid_p_1 (tree value, tree endtype, tree *cache)
 	  }
 
 	/* Allow (int) &foo provided int is as wide as a pointer.  */
-	if (INTEGRAL_TYPE_P (dest_type) && POINTER_TYPE_P (src_type)
+	if (INTEGRAL_TYPE_P (dest_type) && INDIRECT_TYPE_P (src_type)
 	    && (TYPE_PRECISION (dest_type) >= TYPE_PRECISION (src_type)))
 	  return initializer_constant_valid_p_1 (src, endtype, cache);
 
 	/* Likewise conversions from int to pointers, but also allow
 	   conversions from 0.  */
-	if ((POINTER_TYPE_P (dest_type)
+	if ((INDIRECT_TYPE_P (dest_type)
 	     || TREE_CODE (dest_type) == OFFSET_TYPE)
 	    && INTEGRAL_TYPE_P (src_type))
 	  {
@@ -5172,7 +5172,7 @@ output_constant (tree exp, unsigned HOST_WIDE_INT size, unsigned int align,
      the mode is valid for pointers, assume the target has a way of
      resolving it.  */
   if (TREE_CODE (exp) == NOP_EXPR
-      && POINTER_TYPE_P (TREE_TYPE (exp))
+      && INDIRECT_TYPE_P (TREE_TYPE (exp))
       && targetm.addr_space.valid_pointer_mode
 	   (SCALAR_INT_TYPE_MODE (TREE_TYPE (exp)),
 	    TYPE_ADDR_SPACE (TREE_TYPE (TREE_TYPE (exp)))))
@@ -5182,7 +5182,7 @@ output_constant (tree exp, unsigned HOST_WIDE_INT size, unsigned int align,
       /* Peel off any intermediate conversions-to-pointer for valid
 	 pointer modes.  */
       while (TREE_CODE (exp) == NOP_EXPR
-	     && POINTER_TYPE_P (TREE_TYPE (exp))
+	     && INDIRECT_TYPE_P (TREE_TYPE (exp))
 	     && targetm.addr_space.valid_pointer_mode
 		  (SCALAR_INT_TYPE_MODE (TREE_TYPE (exp)),
 		   TYPE_ADDR_SPACE (TREE_TYPE (TREE_TYPE (exp)))))

@@ -4002,7 +4002,7 @@ parser_build_binary_op (location_t location, enum tree_code code,
 	warning_at (location, OPT_Waddress,
 		    "comparison with string literal results in unspecified behavior");
       /* Warn for ptr == '\0', it's likely that it should've been ptr[0].  */
-      if (POINTER_TYPE_P (type1)
+      if (INDIRECT_TYPE_P (type1)
 	  && null_pointer_constant_p (arg2.value)
 	  && char_type_p (type2))
 	{
@@ -4013,7 +4013,7 @@ parser_build_binary_op (location_t location, enum tree_code code,
 	    inform (arg1.get_start (),
 		      "did you mean to dereference the pointer?");
 	}
-      else if (POINTER_TYPE_P (type2)
+      else if (INDIRECT_TYPE_P (type2)
 	       && null_pointer_constant_p (arg1.value)
 	       && char_type_p (type1))
 	{
@@ -4309,7 +4309,7 @@ build_atomic_assign (location_t loc, tree lhs, enum tree_code modifycode,
   /* Attempt to implement the atomic operation as an __atomic_fetch_* or
      __atomic_*_fetch built-in rather than a CAS loop.  atomic_bool type
      isn't applicable for such builtins.  ??? Do we want to handle enums?  */
-  if ((TREE_CODE (lhs_type) == INTEGER_TYPE || POINTER_TYPE_P (lhs_type))
+  if ((TREE_CODE (lhs_type) == INTEGER_TYPE || INDIRECT_TYPE_P (lhs_type))
       && TREE_CODE (rhs_type) == INTEGER_TYPE)
     {
       built_in_function fncode;
@@ -4353,7 +4353,7 @@ build_atomic_assign (location_t loc, tree lhs, enum tree_code modifycode,
 
       /* If this is a pointer type, we need to multiply by the size of
 	 the pointer target type.  */
-      if (POINTER_TYPE_P (lhs_type))
+      if (INDIRECT_TYPE_P (lhs_type))
 	{
 	  if (!COMPLETE_TYPE_P (TREE_TYPE (lhs_type))
 	      /* ??? This would introduce -Wdiscarded-qualifiers
@@ -4977,7 +4977,7 @@ build_unary_op (location_t location, enum tree_code code, tree xarg,
 	  if (TYPE_REVERSE_STORAGE_ORDER (TREE_TYPE (TREE_OPERAND (arg, 0))))
 	    {
 	      if (!AGGREGATE_TYPE_P (TREE_TYPE (arg))
-		  && !POINTER_TYPE_P (TREE_TYPE (arg))
+		  && !INDIRECT_TYPE_P (TREE_TYPE (arg))
 		  && !VECTOR_TYPE_P (TREE_TYPE (arg)))
 		{
 		  error_at (location, "cannot take address of scalar with "
@@ -6607,11 +6607,11 @@ convert_to_anonymous_field (location_t location, tree type, tree rhs)
   bool found_sub_field;
   tree ret;
 
-  gcc_assert (POINTER_TYPE_P (TREE_TYPE (rhs)));
+  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (rhs)));
   rhs_struct_type = TREE_TYPE (TREE_TYPE (rhs));
   gcc_assert (RECORD_OR_UNION_TYPE_P (rhs_struct_type));
 
-  gcc_assert (POINTER_TYPE_P (type));
+  gcc_assert (INDIRECT_TYPE_P (type));
   lhs_main_type = (TYPE_ATOMIC (TREE_TYPE (type))
 		   ? c_build_qualified_type (TREE_TYPE (type),
 					     TYPE_QUAL_ATOMIC)
@@ -8161,7 +8161,7 @@ static void
 check_constexpr_init (location_t loc, tree type, tree init,
 		      bool int_const_expr, bool arith_const_expr)
 {
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     {
       /* The initializer must be null.  */
       if (TREE_CODE (init) != INTEGER_CST || !integer_zerop (init))
@@ -11216,7 +11216,7 @@ c_finish_goto_ptr (location_t loc, c_expr val)
   tree t;
   pedwarn (loc, OPT_Wpedantic, "ISO C forbids %<goto *expr;%>");
   if (expr != error_mark_node
-      && !POINTER_TYPE_P (TREE_TYPE (expr))
+      && !INDIRECT_TYPE_P (TREE_TYPE (expr))
       && !null_pointer_constant_p (expr))
     {
       error_at (val.get_location (),
@@ -11348,12 +11348,12 @@ c_finish_return (location_t loc, tree retval, tree origtype)
 	      {
 		tree op1 = TREE_OPERAND (inner, 1);
 
-		while (!POINTER_TYPE_P (TREE_TYPE (op1))
+		while (!INDIRECT_TYPE_P (TREE_TYPE (op1))
 		       && (CONVERT_EXPR_P (op1)
 			   || TREE_CODE (op1) == NON_LVALUE_EXPR))
 		  op1 = TREE_OPERAND (op1, 0);
 
-		if (POINTER_TYPE_P (TREE_TYPE (op1)))
+		if (INDIRECT_TYPE_P (TREE_TYPE (op1)))
 		  break;
 
 		inner = TREE_OPERAND (inner, 0);
@@ -11371,7 +11371,7 @@ c_finish_return (location_t loc, tree retval, tree origtype)
 		  && !DECL_EXTERNAL (inner)
 		  && !TREE_STATIC (inner)
 		  && DECL_CONTEXT (inner) == current_function_decl
-		  && POINTER_TYPE_P (TREE_TYPE (TREE_TYPE (current_function_decl))))
+		  && INDIRECT_TYPE_P (TREE_TYPE (TREE_TYPE (current_function_decl))))
 		{
 		  if (TREE_CODE (inner) == LABEL_DECL)
 		    warning_at (loc, OPT_Wreturn_local_addr,
@@ -13729,7 +13729,7 @@ handle_omp_array_sections_1 (tree c, tree t, vec<tree> &types,
       if ((OMP_CLAUSE_CODE (c) == OMP_CLAUSE_AFFINITY
 	   || OMP_CLAUSE_CODE (c) == OMP_CLAUSE_DEPEND)
 	  && TYPE_ATOMIC (TREE_TYPE (t))
-	  && POINTER_TYPE_P (TREE_TYPE (t)))
+	  && INDIRECT_TYPE_P (TREE_TYPE (t)))
 	{
 	  /* If the array section is pointer based and the pointer
 	     itself is _Atomic qualified, we need to atomically load
@@ -14266,7 +14266,7 @@ handle_omp_array_sections (tree c, enum c_omp_region_type ort)
       t = build_fold_addr_expr (first);
       t = fold_convert_loc (OMP_CLAUSE_LOCATION (c), ptrdiff_type_node, t);
       tree ptr = OMP_CLAUSE_DECL (c2);
-      if (!POINTER_TYPE_P (TREE_TYPE (ptr)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (ptr)))
 	ptr = build_fold_addr_expr (ptr);
       t = fold_build2_loc (OMP_CLAUSE_LOCATION (c), MINUS_EXPR,
 			   ptrdiff_type_node, t,
@@ -14381,7 +14381,7 @@ c_omp_finish_iterators (tree iter)
 	  ret = true;
 	  continue;
 	}
-      if (!INTEGRAL_TYPE_P (type) && !POINTER_TYPE_P (type))
+      if (!INTEGRAL_TYPE_P (type) && !INDIRECT_TYPE_P (type))
 	{
 	  error_at (loc, "iterator %qD has neither integral nor pointer type",
 		    var);
@@ -14416,9 +14416,9 @@ c_omp_finish_iterators (tree iter)
       begin = c_fully_fold (build_c_cast (loc, type, begin), false, NULL);
       end = c_fully_fold (build_c_cast (loc, type, end), false, NULL);
       orig_step = save_expr (c_fully_fold (step, false, NULL));
-      tree stype = POINTER_TYPE_P (type) ? sizetype : type;
+      tree stype = INDIRECT_TYPE_P (type) ? sizetype : type;
       step = c_fully_fold (build_c_cast (loc, stype, orig_step), false, NULL);
-      if (POINTER_TYPE_P (type))
+      if (INDIRECT_TYPE_P (type))
 	{
 	  begin = save_expr (begin);
 	  step = pointer_int_sum (loc, PLUS_EXPR, begin, step);
@@ -15119,7 +15119,7 @@ c_finish_omp_clauses (tree clauses, enum c_omp_region_type ort)
 			"%qE is not a variable in %<aligned%> clause", t);
 	      remove = true;
 	    }
-	  else if (!POINTER_TYPE_P (TREE_TYPE (t))
+	  else if (!INDIRECT_TYPE_P (TREE_TYPE (t))
 		   && TREE_CODE (TREE_TYPE (t)) != ARRAY_TYPE)
 	    {
 	      error_at (OMP_CLAUSE_LOCATION (c),
@@ -16312,10 +16312,10 @@ c_build_qualified_type (tree type, int type_quals, tree orig_qual_type,
     }
 
   /* A restrict-qualified pointer type must be a pointer to object or
-     incomplete type.  Note that the use of POINTER_TYPE_P also allows
+     incomplete type.  Note that the use of INDIRECT_TYPE_P also allows
      REFERENCE_TYPEs, which is appropriate for C++.  */
   if ((type_quals & TYPE_QUAL_RESTRICT)
-      && (!POINTER_TYPE_P (type)
+      && (!INDIRECT_TYPE_P (type)
 	  || !C_TYPE_OBJECT_OR_INCOMPLETE_P (TREE_TYPE (type))))
     {
       error ("invalid use of %<restrict%>");

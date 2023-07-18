@@ -97,7 +97,7 @@ get_scalar_to_descriptor_type (tree scalar, symbol_attribute attr)
   else
     akind = GFC_ARRAY_ASSUMED_SHAPE_CONT;
 
-  if (POINTER_TYPE_P (TREE_TYPE (scalar)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (scalar)))
     scalar = TREE_TYPE (scalar);
   return gfc_get_array_type_bounds (TREE_TYPE (scalar), 0, 0, NULL, NULL, 1,
 				    akind, !(attr.pointer || attr.target));
@@ -120,7 +120,7 @@ gfc_conv_scalar_to_descriptor (gfc_se *se, tree scalar, symbol_attribute attr)
       gfc_add_modify (&se->pre, tmp, scalar);
       scalar = tmp;
     }
-  if (!POINTER_TYPE_P (TREE_TYPE (scalar)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (scalar)))
     scalar = gfc_build_addr_expr (NULL_TREE, scalar);
   else if (TREE_TYPE (etype) && TREE_CODE (TREE_TYPE (etype)) == ARRAY_TYPE)
     etype = TREE_TYPE (etype);
@@ -228,7 +228,7 @@ tree
 gfc_class_data_get (tree decl)
 {
   tree data;
-  if (POINTER_TYPE_P (TREE_TYPE (decl)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (decl)))
     decl = build_fold_indirect_ref_loc (input_location, decl);
   data = gfc_advance_chain (TYPE_FIELDS (TREE_TYPE (decl)),
 			    CLASS_DATA_FIELD);
@@ -247,7 +247,7 @@ gfc_class_vptr_get (tree decl)
   if (VAR_P (decl) && DECL_LANG_SPECIFIC (decl)
       && GFC_DECL_SAVED_DESCRIPTOR (decl))
     decl = GFC_DECL_SAVED_DESCRIPTOR (decl);
-  if (POINTER_TYPE_P (TREE_TYPE (decl)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (decl)))
     decl = build_fold_indirect_ref_loc (input_location, decl);
   vptr = gfc_advance_chain (TYPE_FIELDS (TREE_TYPE (decl)),
 			    CLASS_VPTR_FIELD);
@@ -266,7 +266,7 @@ gfc_class_len_get (tree decl)
   if (VAR_P (decl) && DECL_LANG_SPECIFIC (decl)
       && GFC_DECL_SAVED_DESCRIPTOR (decl))
     decl = GFC_DECL_SAVED_DESCRIPTOR (decl);
-  if (POINTER_TYPE_P (TREE_TYPE (decl)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (decl)))
     decl = build_fold_indirect_ref_loc (input_location, decl);
   len = gfc_advance_chain (TYPE_FIELDS (TREE_TYPE (decl)),
 			   CLASS_LEN_FIELD);
@@ -288,7 +288,7 @@ gfc_class_len_or_zero_get (tree decl)
   if (VAR_P (decl) && DECL_LANG_SPECIFIC (decl)
       && GFC_DECL_SAVED_DESCRIPTOR (decl))
     decl = GFC_DECL_SAVED_DESCRIPTOR (decl);
-  if (POINTER_TYPE_P (TREE_TYPE (decl)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (decl)))
     decl = build_fold_indirect_ref_loc (input_location, decl);
   len = gfc_advance_chain (TYPE_FIELDS (TREE_TYPE (decl)),
 			   CLASS_LEN_FIELD);
@@ -645,7 +645,7 @@ gfc_get_class_from_expr (tree expr)
 	break;
     }
 
-  if (POINTER_TYPE_P (TREE_TYPE (tmp)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (tmp)))
     tmp = build_fold_indirect_ref_loc (input_location, tmp);
 
   if (GFC_CLASS_TYPE_P (TREE_TYPE (tmp)))
@@ -751,7 +751,7 @@ gfc_conv_derived_to_class (gfc_se *parmse, gfc_expr *e,
   if (optional)
     cond_optional = gfc_conv_expr_present (e->symtree->n.sym);
 
-  if (parmse->expr && POINTER_TYPE_P (TREE_TYPE (parmse->expr)))
+  if (parmse->expr && INDIRECT_TYPE_P (TREE_TYPE (parmse->expr)))
     {
       /* If there is a ready made pointer to a derived type, use it
 	 rather than evaluating the expression again.  */
@@ -1216,7 +1216,7 @@ gfc_conv_class_to_class (gfc_se *parmse, gfc_expr *e, gfc_typespec class_ts,
 			  gfc_get_dtype (type));
 
 	  tmp = gfc_class_data_get (parmse->expr);
-	  if (!POINTER_TYPE_P (TREE_TYPE (tmp)))
+	  if (!INDIRECT_TYPE_P (TREE_TYPE (tmp)))
 	    tmp = gfc_build_addr_expr (NULL_TREE, tmp);
 
 	  gfc_conv_descriptor_data_set (&block, ctree, tmp);
@@ -1470,7 +1470,7 @@ gfc_copy_class_to_class (tree from, tree to, tree nelems, bool unlimited)
 	{
 	  /* Check that from is a class.  When the class is part of a coarray,
 	     then from is a common pointer and is to be used as is.  */
-	  tmp = POINTER_TYPE_P (TREE_TYPE (from))
+	  tmp = INDIRECT_TYPE_P (TREE_TYPE (from))
 	      ? build_fold_indirect_ref (from) : from;
 	  from_data =
 	      (GFC_CLASS_TYPE_P (TREE_TYPE (tmp))
@@ -2271,7 +2271,7 @@ gfc_get_tree_for_caf_expr (gfc_expr *expr)
       {
 	gfc_component *comp = ref->u.c.component;
 
-	if (POINTER_TYPE_P (TREE_TYPE (caf_decl)))
+	if (INDIRECT_TYPE_P (TREE_TYPE (caf_decl)))
 	  caf_decl = build_fold_indirect_ref_loc (input_location, caf_decl);
 	caf_decl = fold_build3_loc (input_location, COMPONENT_REF,
 				    TREE_TYPE (comp->backend_decl), caf_decl,
@@ -2338,7 +2338,7 @@ gfc_get_caf_token_offset (gfc_se *se, tree *token, tree *offset, tree caf_decl,
   else
     *offset = build_int_cst (gfc_array_index_type, 0);
 
-  if (POINTER_TYPE_P (TREE_TYPE (se_expr))
+  if (INDIRECT_TYPE_P (TREE_TYPE (se_expr))
       && GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (TREE_TYPE (se_expr))))
     {
       tmp = build_fold_indirect_ref_loc (input_location, se_expr);
@@ -2348,7 +2348,7 @@ gfc_get_caf_token_offset (gfc_se *se, tree *token, tree *offset, tree caf_decl,
     tmp = gfc_conv_descriptor_data_get (se_expr);
   else
     {
-      gcc_assert (POINTER_TYPE_P (TREE_TYPE (se_expr)));
+      gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (se_expr)));
       tmp = se_expr;
     }
 
@@ -2399,7 +2399,7 @@ gfc_get_caf_token_offset (gfc_se *se, tree *token, tree *offset, tree caf_decl,
     tmp = gfc_conv_descriptor_data_get (caf_decl);
   else
    {
-     gcc_assert (POINTER_TYPE_P (TREE_TYPE (caf_decl)));
+     gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (caf_decl)));
      tmp = caf_decl;
    }
 
@@ -2899,7 +2899,7 @@ tree
 gfc_maybe_dereference_var (gfc_symbol *sym, tree var, bool descriptor_only_p,
 			   bool is_classarray)
 {
-  if (!POINTER_TYPE_P (TREE_TYPE (var)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (var)))
     return var;
   if (is_CFI_desc (sym, NULL))
     return build_fold_indirect_ref_loc (input_location, var);
@@ -3708,7 +3708,7 @@ gfc_conv_string_tmp (gfc_se * se, tree type, tree len)
     {
       /* Allocate a temporary to hold the result.  */
       var = gfc_create_var (type, "pstr");
-      gcc_assert (POINTER_TYPE_P (type));
+      gcc_assert (INDIRECT_TYPE_P (type));
       tmp = TREE_TYPE (type);
       if (TREE_CODE (tmp) == ARRAY_TYPE)
         tmp = TREE_TYPE (tmp);
@@ -3982,7 +3982,7 @@ gfc_string_to_single_character (tree len, tree str, int kind)
 
   if (len == NULL
       || !tree_fits_uhwi_p (len)
-      || !POINTER_TYPE_P (TREE_TYPE (str)))
+      || !INDIRECT_TYPE_P (TREE_TYPE (str)))
     return NULL_TREE;
 
   if (TREE_INT_CST_LOW (len) == 1)
@@ -4113,12 +4113,12 @@ build_memcmp_call (tree s1, tree s2, tree n)
 {
   tree tmp;
 
-  if (!POINTER_TYPE_P (TREE_TYPE (s1)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (s1)))
     s1 = gfc_build_addr_expr (pvoid_type_node, s1);
   else
     s1 = fold_convert (pvoid_type_node, s1);
 
-  if (!POINTER_TYPE_P (TREE_TYPE (s2)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (s2)))
     s2 = gfc_build_addr_expr (pvoid_type_node, s2);
   else
     s2 = fold_convert (pvoid_type_node, s2);
@@ -4143,8 +4143,8 @@ gfc_build_compare_string (tree len1, tree str1, tree len2, tree str2, int kind,
   tree sc2;
   tree fndecl;
 
-  gcc_assert (POINTER_TYPE_P (TREE_TYPE (str1)));
-  gcc_assert (POINTER_TYPE_P (TREE_TYPE (str2)));
+  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (str1)));
+  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (str2)));
 
   sc1 = gfc_string_to_single_character (len1, str1, kind);
   sc2 = gfc_string_to_single_character (len2, str2, kind);
@@ -4290,7 +4290,7 @@ conv_function_val (gfc_se * se, gfc_symbol * sym, gfc_expr * expr,
 	  tmp = gfc_evaluate_now (tmp, &se->pre);
 	}
 
-      if (!POINTER_TYPE_P (TREE_TYPE (tmp)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (tmp)))
 	{
 	  gcc_assert (TREE_CODE (tmp) == FUNCTION_DECL);
 	  tmp = gfc_build_addr_expr (NULL_TREE, tmp);
@@ -4539,7 +4539,7 @@ gfc_add_interface_mapping (gfc_interface_mapping * mapping,
 
   /* If the argument is an array descriptor, use it to determine
      information about the actual argument's shape.  */
-  else if (POINTER_TYPE_P (TREE_TYPE (se->expr))
+  else if (INDIRECT_TYPE_P (TREE_TYPE (se->expr))
 	   && GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (TREE_TYPE (se->expr))))
     {
       /* Get the actual argument's descriptor.  */
@@ -5260,7 +5260,7 @@ class_array_fcn:
       tree post_cond;
 
       type = TREE_TYPE (parmse->expr);
-      if (POINTER_TYPE_P (type) && GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (type)))
+      if (INDIRECT_TYPE_P (type) && GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (type)))
 	type = TREE_TYPE (type);
       pointer = gfc_create_var (type, "arg_ptr");
 
@@ -5401,7 +5401,7 @@ class_array_fcn:
       if (GFC_DESCRIPTOR_TYPE_P (type))
 	{
 	  type = TREE_TYPE (parmse->expr);
-	  if (POINTER_TYPE_P (type))
+	  if (INDIRECT_TYPE_P (type))
 	    {
 	      pointer = gfc_build_addr_expr (type, pointer);
 	      if (pass_optional)
@@ -5524,7 +5524,7 @@ set_dtype_for_unallocated (gfc_se *parmse, gfc_expr *e)
   if (desc == NULL_TREE)
     return;
 
-  if (POINTER_TYPE_P (TREE_TYPE (desc)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (desc)))
     desc = build_fold_indirect_ref_loc (input_location, desc);
   if (GFC_CLASS_TYPE_P (TREE_TYPE (desc)))
     desc = gfc_class_data_get (desc);
@@ -5578,7 +5578,7 @@ gfc_conv_gfc_desc_to_cfi_desc (gfc_se *parmse, gfc_expr *e, gfc_symbol *fsym)
       gfc_conv_expr (&se, e);
       gfc = se.expr;
       /* gfc_conv_constant ignores se.want_poiner, e.g. for string_cst.  */
-      if (!POINTER_TYPE_P (TREE_TYPE (gfc)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (gfc)))
 	gfc = gfc_build_addr_expr (NULL, gfc);
     }
   else
@@ -5612,7 +5612,7 @@ gfc_conv_gfc_desc_to_cfi_desc (gfc_se *parmse, gfc_expr *e, gfc_symbol *fsym)
 	 elem_len = sizeof(dt) and base_addr = dt(lb) instead.
 	 gfc_get_dataptr_offset fixes the base_addr; for elem_len, see below.
 	 While sm is fine as it uses span*stride and not elem_len.  */
-      if (POINTER_TYPE_P (TREE_TYPE (gfc)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (gfc)))
 	gfc = build_fold_indirect_ref_loc (input_location, gfc);
       else if (is_subref_array (e) && e->ts.type != BT_CHARACTER)
 	 gfc_get_dataptr_offset (&se.pre, gfc, gfc, NULL, true, e);
@@ -7456,7 +7456,7 @@ gfc_conv_procedure_call (gfc_se * se, gfc_symbol * sym,
 	      tmp = parmse.expr;
 	      if (fsym && fsym->ts.type == BT_CLASS)
 		{
-		  if (POINTER_TYPE_P (TREE_TYPE (tmp)))
+		  if (INDIRECT_TYPE_P (TREE_TYPE (tmp)))
 		    tmp = build_fold_indirect_ref_loc (input_location, tmp);
 		  tmp = gfc_class_data_get (tmp);
 		  if (GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (tmp)))
@@ -7465,7 +7465,7 @@ gfc_conv_procedure_call (gfc_se * se, gfc_symbol * sym,
 
 	      /* If the argument is passed by value, we need to strip the
 		 INDIRECT_REF.  */
-	      if (!POINTER_TYPE_P (TREE_TYPE (tmp)))
+	      if (!INDIRECT_TYPE_P (TREE_TYPE (tmp)))
 		tmp = gfc_build_addr_expr (NULL_TREE, tmp);
 
 	      cond = fold_build2_loc (input_location, EQ_EXPR,
@@ -7592,7 +7592,7 @@ gfc_conv_procedure_call (gfc_se * se, gfc_symbol * sym,
 	    tmp = gfc_conv_descriptor_data_get (caf_decl);
 	  else
 	    {
-	      gcc_assert (POINTER_TYPE_P (caf_type));
+	      gcc_assert (INDIRECT_TYPE_P (caf_type));
 	      tmp = caf_decl;
 	    }
 
@@ -7606,10 +7606,10 @@ gfc_conv_procedure_call (gfc_se * se, gfc_symbol * sym,
 		      || CLASS_DATA (fsym)->as->type == AS_ASSUMED_RANK)))
 	    {
 	      if (fsym->ts.type == BT_CLASS)
-		gcc_assert (!POINTER_TYPE_P (TREE_TYPE (tmp2)));
+		gcc_assert (!INDIRECT_TYPE_P (TREE_TYPE (tmp2)));
 	      else
 		{
-		  gcc_assert (POINTER_TYPE_P (TREE_TYPE (tmp2)));
+		  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (tmp2)));
 		  tmp2 = build_fold_indirect_ref_loc (input_location, tmp2);
 		}
 	      gcc_assert (GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (tmp2)));
@@ -7619,7 +7619,7 @@ gfc_conv_procedure_call (gfc_se * se, gfc_symbol * sym,
 	    tmp2 = gfc_conv_descriptor_data_get (tmp2);
 	  else
 	    {
-	      gcc_assert (POINTER_TYPE_P (TREE_TYPE (tmp2)));
+	      gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (tmp2)));
 	    }
 
 	  tmp = fold_build2_loc (input_location, MINUS_EXPR,
@@ -8299,12 +8299,12 @@ gfc_trans_string_copy (stmtblock_t * block, tree dlength, tree dest,
 			  fold_convert (TREE_TYPE (dlen),
 					TYPE_SIZE_UNIT (chartype)));
 
-  if (dlength && POINTER_TYPE_P (TREE_TYPE (dest)))
+  if (dlength && INDIRECT_TYPE_P (TREE_TYPE (dest)))
     dest = fold_convert (pvoid_type_node, dest);
   else
     dest = gfc_build_addr_expr (pvoid_type_node, dest);
 
-  if (slength && POINTER_TYPE_P (TREE_TYPE (src)))
+  if (slength && INDIRECT_TYPE_P (TREE_TYPE (src)))
     src = fold_convert (pvoid_type_node, src);
   else
     src = gfc_build_addr_expr (pvoid_type_node, src);
@@ -8594,7 +8594,7 @@ gfc_conv_initializer (gfc_expr * expr, gfc_typespec * ts, tree type,
     {
       if (TREE_CODE (type) == ARRAY_TYPE)
 	return build_constructor (type, NULL);
-      else if (POINTER_TYPE_P (type))
+      else if (INDIRECT_TYPE_P (type))
 	return build_int_cst (type, 0);
       else
 	gcc_unreachable ();
@@ -10639,7 +10639,7 @@ gfc_conv_string_parameter (gfc_se * se)
 	}
     }
 
-  gcc_assert (POINTER_TYPE_P (TREE_TYPE (se->expr)));
+  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (se->expr)));
 }
 
 
@@ -10994,7 +10994,7 @@ fcncall_realloc_result (gfc_se *se, int rank)
   /* Use the allocation done by the library.  Substitute the lhs
      descriptor with a copy, whose data field is nulled.*/
   desc = build_fold_indirect_ref_loc (input_location, se->expr);
-  if (POINTER_TYPE_P (TREE_TYPE (desc)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (desc)))
     desc = build_fold_indirect_ref_loc (input_location, desc);
 
   /* Unallocated, the descriptor does not have a dtype.  */
@@ -11256,7 +11256,7 @@ gfc_trans_zero_assign (gfc_expr * expr)
   dest = gfc_get_symbol_decl (sym);
 
   type = TREE_TYPE (dest);
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     type = TREE_TYPE (type);
   if (!GFC_ARRAY_TYPE_P (type))
     return NULL_TREE;
@@ -11272,7 +11272,7 @@ gfc_trans_zero_assign (gfc_expr * expr)
 
   /* If we are zeroing a local array avoid taking its address by emitting
      a = {} instead.  */
-  if (!POINTER_TYPE_P (TREE_TYPE (dest)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (dest)))
     return build2_loc (input_location, MODIFY_EXPR, void_type_node,
 		       dest, build_constructor (TREE_TYPE (dest),
 					      NULL));
@@ -11298,12 +11298,12 @@ gfc_build_memcpy_call (tree dst, tree src, tree len)
   tree tmp;
 
   /* Convert arguments to the correct types.  */
-  if (!POINTER_TYPE_P (TREE_TYPE (dst)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (dst)))
     dst = gfc_build_addr_expr (pvoid_type_node, dst);
   else
     dst = fold_convert (pvoid_type_node, dst);
 
-  if (!POINTER_TYPE_P (TREE_TYPE (src)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (src)))
     src = gfc_build_addr_expr (pvoid_type_node, src);
   else
     src = fold_convert (pvoid_type_node, src);
@@ -11334,10 +11334,10 @@ gfc_trans_array_copy (gfc_expr * expr1, gfc_expr * expr2)
   src = gfc_get_symbol_decl (expr2->symtree->n.sym);
 
   dtype = TREE_TYPE (dst);
-  if (POINTER_TYPE_P (dtype))
+  if (INDIRECT_TYPE_P (dtype))
     dtype = TREE_TYPE (dtype);
   stype = TREE_TYPE (src);
-  if (POINTER_TYPE_P (stype))
+  if (INDIRECT_TYPE_P (stype))
     stype = TREE_TYPE (stype);
 
   if (!GFC_ARRAY_TYPE_P (dtype) || !GFC_ARRAY_TYPE_P (stype))
@@ -11386,7 +11386,7 @@ gfc_trans_array_constructor_copy (gfc_expr * expr1, gfc_expr * expr2)
 
   dst = gfc_get_symbol_decl (expr1->symtree->n.sym);
   dtype = TREE_TYPE (dst);
-  if (POINTER_TYPE_P (dtype))
+  if (INDIRECT_TYPE_P (dtype))
     dtype = TREE_TYPE (dtype);
   if (!GFC_ARRAY_TYPE_P (dtype))
     return NULL_TREE;
@@ -11794,7 +11794,7 @@ trans_class_assignment (stmtblock_t *block, gfc_expr *lhs, gfc_expr *rhs,
       class_han = GFC_CLASS_TYPE_P (TREE_TYPE (tmp))
 	  ? gfc_class_data_get (tmp) : tmp;
 
-      if (!POINTER_TYPE_P (TREE_TYPE (class_han)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (class_han)))
 	class_han = gfc_build_addr_expr (NULL_TREE, class_han);
 
       /* Allocate block.  */
@@ -11835,7 +11835,7 @@ trans_class_assignment (stmtblock_t *block, gfc_expr *lhs, gfc_expr *rhs,
       ? gfc_class_data_get (rse->expr) : rse->expr;
   if (use_vptr_copy)
     {
-      if (!POINTER_TYPE_P (TREE_TYPE (tmp))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (tmp))
 	  || INDIRECT_REF_P (tmp)
 	  || (rhs->ts.type == BT_DERIVED
 	      && rhs->ts.u.derived->attr.unlimited_polymorphic
@@ -11849,7 +11849,7 @@ trans_class_assignment (stmtblock_t *block, gfc_expr *lhs, gfc_expr *rhs,
 	vec_safe_push (args, tmp);
       tmp = GFC_CLASS_TYPE_P (TREE_TYPE (lse->expr))
 	  ? gfc_class_data_get (lse->expr) : lse->expr;
-      if (!POINTER_TYPE_P (TREE_TYPE (tmp))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (tmp))
 	  || INDIRECT_REF_P (tmp)
 	  || (lhs->ts.type == BT_DERIVED
 	      && lhs->ts.u.derived->attr.unlimited_polymorphic
@@ -11887,9 +11887,9 @@ trans_class_assignment (stmtblock_t *block, gfc_expr *lhs, gfc_expr *rhs,
 	  ? gfc_class_data_get (lse->expr) : lse->expr;
       stmtblock_t tblock;
       gfc_init_block (&tblock);
-      if (!POINTER_TYPE_P (TREE_TYPE (tmp)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (tmp)))
 	tmp = gfc_build_addr_expr (NULL_TREE, tmp);
-      if (!POINTER_TYPE_P (TREE_TYPE (rhst)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (rhst)))
 	rhst = gfc_build_addr_expr (NULL_TREE, rhst);
       /* When coming from a ptr_copy lhs and rhs are swapped.  */
       gfc_add_modify_loc (input_location, &tblock, rhst,
@@ -12288,7 +12288,7 @@ gfc_trans_assignment_1 (gfc_expr * expr1, gfc_expr * expr2, bool init_flag,
       if (tmp != NULL_TREE)
 	{
 	  tree fcn = gfc_vptr_copy_get (tmp);
-	  if (POINTER_TYPE_P (TREE_TYPE (fcn)))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (fcn)))
 	    fcn = build_fold_indirect_ref_loc (input_location, fcn);
 	  tmp = build_call_expr_loc (input_location,
 				     fcn, 2,

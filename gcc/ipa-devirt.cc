@@ -417,7 +417,7 @@ static tree
 compound_type_base (const_tree t)
 {
   if (TREE_CODE (t) == ARRAY_TYPE
-      || POINTER_TYPE_P (t)
+      || INDIRECT_TYPE_P (t)
       || TREE_CODE (t) == COMPLEX_TYPE
       || VECTOR_TYPE_P (t))
     return TREE_TYPE (t);
@@ -1123,7 +1123,7 @@ warn_types_mismatch (tree t1, tree t2, location_t loc1, location_t loc2)
 		  return;
 		}
 	    }
-	  if ((POINTER_TYPE_P (t1) || TREE_CODE (t1) == ARRAY_TYPE)
+	  if ((INDIRECT_TYPE_P (t1) || TREE_CODE (t1) == ARRAY_TYPE)
 	      && type_mismatch_p (TREE_TYPE (t1), TREE_TYPE (t2)))
 	    warn_types_mismatch (TREE_TYPE (t1), TREE_TYPE (t2), loc_t1, loc_t2);
 	  else if (TREE_CODE (t1) == METHOD_TYPE
@@ -1255,7 +1255,7 @@ odr_types_equivalent_p (tree t1, tree t2, bool warn, bool *warned,
       || VECTOR_TYPE_P (t1)
       || TREE_CODE (t1) == COMPLEX_TYPE
       || TREE_CODE (t1) == OFFSET_TYPE
-      || POINTER_TYPE_P (t1))
+      || INDIRECT_TYPE_P (t1))
     {
       if (TYPE_PRECISION (t1) != TYPE_PRECISION (t2))
 	{
@@ -1286,7 +1286,7 @@ odr_types_equivalent_p (tree t1, tree t2, bool warn, bool *warned,
 	 so we cannot compare pointed-to types.  But we can, for now,
 	 require the same pointed-to type kind and match what
 	 useless_type_conversion_p would do.  */
-      if (POINTER_TYPE_P (t1))
+      if (INDIRECT_TYPE_P (t1))
 	{
 	  if (TYPE_ADDR_SPACE (TREE_TYPE (t1))
 	      != TYPE_ADDR_SPACE (TREE_TYPE (t2)))

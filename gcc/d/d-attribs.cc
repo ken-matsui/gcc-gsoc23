@@ -518,7 +518,7 @@ tree
 handle_malloc_attribute (tree *node, tree, tree, int, bool *)
 {
   gcc_assert (TREE_CODE (*node) == FUNCTION_DECL
-	      && POINTER_TYPE_P (TREE_TYPE (TREE_TYPE (*node))));
+	      && INDIRECT_TYPE_P (TREE_TYPE (TREE_TYPE (*node))));
   DECL_IS_MALLOC (*node) = 1;
   return NULL_TREE;
 }
@@ -1320,7 +1320,7 @@ d_handle_alloc_size_attribute (tree *node, tree name, tree args, int,
 {
   tree fntype = *node;
   tree rettype = TREE_TYPE (fntype);
-  if (!POINTER_TYPE_P (rettype))
+  if (!INDIRECT_TYPE_P (rettype))
     {
       warning (OPT_Wattributes,
 	       "%qE attribute ignored on a function returning %qT",
@@ -1477,7 +1477,7 @@ static tree
 d_handle_restrict_attribute (tree *node, tree name, tree, int,
 			     bool *no_add_attrs)
 {
-  if (TREE_CODE (*node) == PARM_DECL && POINTER_TYPE_P (TREE_TYPE (*node)))
+  if (TREE_CODE (*node) == PARM_DECL && INDIRECT_TYPE_P (TREE_TYPE (*node)))
     {
       TREE_TYPE (*node) = build_qualified_type (TREE_TYPE (*node),
 						TYPE_QUAL_RESTRICT);

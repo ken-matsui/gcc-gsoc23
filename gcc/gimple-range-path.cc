@@ -301,7 +301,7 @@ path_range_query::range_defined_in_block (vrange &r, tree name, basic_block bb)
 	r.set_varying (TREE_TYPE (name));
     }
 
-  if (bb && POINTER_TYPE_P (TREE_TYPE (name)))
+  if (bb && INDIRECT_TYPE_P (TREE_TYPE (name)))
     m_ranger.m_cache.m_exit.maybe_adjust_range (r, name, bb);
 
   if (DEBUG_SOLVER && (bb || !r.varying_p ()))
@@ -451,7 +451,7 @@ path_range_query::adjust_for_non_null_uses (basic_block bb)
     {
       tree name = ssa_name (i);
 
-      if (!POINTER_TYPE_P (TREE_TYPE (name)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (name)))
 	continue;
 
       if (get_cache (r, name))

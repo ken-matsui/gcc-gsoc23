@@ -450,7 +450,7 @@ get_pointer_alignment_1 (tree exp, unsigned int *alignp,
       return res;
     }
   else if (TREE_CODE (exp) == SSA_NAME
-	   && POINTER_TYPE_P (TREE_TYPE (exp)))
+	   && INDIRECT_TYPE_P (TREE_TYPE (exp)))
     {
       unsigned int ptr_align, ptr_misalign;
       struct ptr_info_def *pi = SSA_NAME_PTR_INFO (exp);
@@ -1375,7 +1375,7 @@ get_memory_rtx (tree exp, tree len)
   /* Get an expression we can use to find the attributes to assign to MEM.
      First remove any nops.  */
   while (CONVERT_EXPR_P (exp)
-	 && POINTER_TYPE_P (TREE_TYPE (TREE_OPERAND (exp, 0))))
+	 && INDIRECT_TYPE_P (TREE_TYPE (TREE_OPERAND (exp, 0))))
     exp = TREE_OPERAND (exp, 0);
 
   /* Build a MEM_REF representing the whole accessed area as a byte blob,
@@ -5112,7 +5112,7 @@ std_canonical_va_list_type (tree type)
 	 In that case, unwrap both types so that we can compare the
 	 underlying records.  */
       if (TREE_CODE (htype) == ARRAY_TYPE
-	  || POINTER_TYPE_P (htype))
+	  || INDIRECT_TYPE_P (htype))
 	{
 	  wtype = TREE_TYPE (wtype);
 	  htype = TREE_TYPE (htype);
@@ -5980,7 +5980,7 @@ static rtx
 get_builtin_sync_mem (tree loc, machine_mode mode)
 {
   rtx addr, mem;
-  int addr_space = TYPE_ADDR_SPACE (POINTER_TYPE_P (TREE_TYPE (loc))
+  int addr_space = TYPE_ADDR_SPACE (INDIRECT_TYPE_P (TREE_TYPE (loc))
 				    ? TREE_TYPE (TREE_TYPE (loc))
 				    : TREE_TYPE (loc));
   scalar_int_mode addr_mode = targetm.addr_space.address_mode (addr_space);
@@ -6821,13 +6821,13 @@ fold_builtin_atomic_always_lock_free (tree arg0, tree arg1)
 	 parameter at this point is usually cast to a void *, so check for that
 	 and look past the cast.  */
       if (CONVERT_EXPR_P (arg1)
-	  && POINTER_TYPE_P (ttype)
+	  && INDIRECT_TYPE_P (ttype)
 	  && VOID_TYPE_P (TREE_TYPE (ttype))
-	  && POINTER_TYPE_P (TREE_TYPE (TREE_OPERAND (arg1, 0))))
+	  && INDIRECT_TYPE_P (TREE_TYPE (TREE_OPERAND (arg1, 0))))
 	arg1 = TREE_OPERAND (arg1, 0);
 
       ttype = TREE_TYPE (arg1);
-      gcc_assert (POINTER_TYPE_P (ttype));
+      gcc_assert (INDIRECT_TYPE_P (ttype));
 
       /* Get the underlying type of the object.  */
       ttype = TREE_TYPE (ttype);
@@ -8523,9 +8523,9 @@ builtin_mathfn_code (const_tree t)
 	  if (! COMPLEX_FLOAT_TYPE_P (argtype))
 	    return END_BUILTINS;
 	}
-      else if (POINTER_TYPE_P (parmtype))
+      else if (INDIRECT_TYPE_P (parmtype))
 	{
-	  if (! POINTER_TYPE_P (argtype))
+	  if (! INDIRECT_TYPE_P (argtype))
 	    return END_BUILTINS;
 	}
       else if (INTEGRAL_TYPE_P (parmtype))
@@ -8576,7 +8576,7 @@ fold_builtin_constant_p (tree arg)
      more optimization done.  */
   if (TREE_SIDE_EFFECTS (arg)
       || AGGREGATE_TYPE_P (TREE_TYPE (arg))
-      || POINTER_TYPE_P (TREE_TYPE (arg))
+      || INDIRECT_TYPE_P (TREE_TYPE (arg))
       || cfun == 0
       || folding_initializer
       || force_folding_builtin_constant_p)
@@ -10162,7 +10162,7 @@ validate_arg (const_tree arg, enum tree_code code)
   if (!arg)
     return false;
   else if (code == POINTER_TYPE)
-    return POINTER_TYPE_P (TREE_TYPE (arg));
+    return INDIRECT_TYPE_P (TREE_TYPE (arg));
   else if (code == INTEGER_TYPE)
     return INTEGRAL_TYPE_P (TREE_TYPE (arg));
   return code == TREE_CODE (TREE_TYPE (arg));
@@ -10801,7 +10801,7 @@ maybe_emit_sprintf_chk_warning (tree exp, enum built_in_function fcode)
       if (nargs < 5)
 	return;
       arg = CALL_EXPR_ARG (exp, 4);
-      if (! POINTER_TYPE_P (TREE_TYPE (arg)))
+      if (! INDIRECT_TYPE_P (TREE_TYPE (arg)))
 	return;
 
       len = c_strlen (arg, 1);

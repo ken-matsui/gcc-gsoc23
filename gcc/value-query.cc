@@ -269,7 +269,7 @@ static inline void
 get_ssa_name_range_info (vrange &r, const_tree name)
 {
   tree type = TREE_TYPE (name);
-  gcc_checking_assert (!POINTER_TYPE_P (type));
+  gcc_checking_assert (!INDIRECT_TYPE_P (type));
   gcc_checking_assert (TREE_CODE (name) == SSA_NAME);
 
   vrange_storage *ri = SSA_NAME_RANGE_INFO (name);
@@ -285,7 +285,7 @@ get_ssa_name_range_info (vrange &r, const_tree name)
 static inline bool
 get_ssa_name_ptr_info_nonnull (const_tree name)
 {
-  gcc_assert (POINTER_TYPE_P (TREE_TYPE (name)));
+  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (name)));
   struct ptr_info_def *pi = SSA_NAME_PTR_INFO (name);
   if (pi == NULL)
     return false;
@@ -319,11 +319,11 @@ get_range_global (vrange &r, tree name, struct function *fun = cfun)
 	  // Try to use the "nonnull" attribute to create ~[0, 0]
 	  // anti-ranges for pointers.  Note that this is only valid with
 	  // default definitions of PARM_DECLs.
-	  if (POINTER_TYPE_P (type)
+	  if (INDIRECT_TYPE_P (type)
 	      && ((cfun && fun == cfun && nonnull_arg_p (sym))
 		  || get_ssa_name_ptr_info_nonnull (name)))
 	    r.set_nonzero (type);
-	  else if (!POINTER_TYPE_P (type))
+	  else if (!INDIRECT_TYPE_P (type))
 	    {
 	      get_ssa_name_range_info (r, name);
 	      if (r.undefined_p ())
@@ -338,13 +338,13 @@ get_range_global (vrange &r, tree name, struct function *fun = cfun)
       else
 	r.set_varying (type);
    }
-  else if (!POINTER_TYPE_P (type) && SSA_NAME_RANGE_INFO (name))
+  else if (!INDIRECT_TYPE_P (type) && SSA_NAME_RANGE_INFO (name))
     {
       get_ssa_name_range_info (r, name);
       if (r.undefined_p ())
 	r.set_varying (type);
     }
-  else if (POINTER_TYPE_P (type) && SSA_NAME_PTR_INFO (name))
+  else if (INDIRECT_TYPE_P (type) && SSA_NAME_PTR_INFO (name))
     {
       if (get_ssa_name_ptr_info_nonnull (name))
 	r.set_nonzero (type);

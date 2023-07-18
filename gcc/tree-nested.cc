@@ -1605,7 +1605,7 @@ convert_nonlocal_omp_clauses (tree *pclauses, struct walk_stmt_info *wi)
 static void
 note_nonlocal_vla_type (struct nesting_info *info, tree type)
 {
-  while (POINTER_TYPE_P (type) && !TYPE_NAME (type))
+  while (INDIRECT_TYPE_P (type) && !TYPE_NAME (type))
     type = TREE_TYPE (type);
 
   if (TYPE_NAME (type)
@@ -1613,7 +1613,7 @@ note_nonlocal_vla_type (struct nesting_info *info, tree type)
       && DECL_ORIGINAL_TYPE (TYPE_NAME (type)))
     type = DECL_ORIGINAL_TYPE (TYPE_NAME (type));
 
-  while (POINTER_TYPE_P (type)
+  while (INDIRECT_TYPE_P (type)
 	 || VECTOR_TYPE_P (type)
 	 || TREE_CODE (type) == FUNCTION_TYPE
 	 || TREE_CODE (type) == METHOD_TYPE)
@@ -3292,7 +3292,7 @@ remap_vla_decls (tree block, struct nesting_info *root)
 	id.cb.src_cfun = DECL_STRUCT_FUNCTION (root->context);
 
 	TREE_TYPE (var) = newt = remap_type (type, &id.cb);
-	while (POINTER_TYPE_P (newt) && !TYPE_NAME (newt))
+	while (INDIRECT_TYPE_P (newt) && !TYPE_NAME (newt))
 	  {
 	    newt = TREE_TYPE (newt);
 	    type = TREE_TYPE (type);
@@ -3605,7 +3605,7 @@ finalize_nesting_tree_1 (struct nesting_info *root)
 		id.cb.src_cfun = DECL_STRUCT_FUNCTION (root->context);
 
 		TREE_TYPE (debug_var) = newt = remap_type (type, &id.cb);
-		while (POINTER_TYPE_P (newt) && !TYPE_NAME (newt))
+		while (INDIRECT_TYPE_P (newt) && !TYPE_NAME (newt))
 		  {
 		    newt = TREE_TYPE (newt);
 		    t = TREE_TYPE (t);

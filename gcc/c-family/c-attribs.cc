@@ -2145,7 +2145,7 @@ handle_mode_attribute (tree *node, tree name, tree args,
 	  return NULL_TREE;
 	}
 
-      if (POINTER_TYPE_P (type))
+      if (INDIRECT_TYPE_P (type))
 	{
 	  scalar_int_mode addr_mode;
 	  addr_space_t as = TYPE_ADDR_SPACE (TREE_TYPE (type));
@@ -2953,7 +2953,7 @@ handle_copy_attribute (tree *node, tree name, tree args,
      which copies type attributes from struct T to the declaration
      of struct U.  */
   if ((CONSTANT_CLASS_P (ref) || EXPR_P (ref))
-      && POINTER_TYPE_P (TREE_TYPE (ref))
+      && INDIRECT_TYPE_P (TREE_TYPE (ref))
       && !FUNCTION_POINTER_TYPE_P (TREE_TYPE (ref)))
     ref = TREE_TYPE (ref);
 
@@ -2964,13 +2964,13 @@ handle_copy_attribute (tree *node, tree name, tree args,
       if ((VAR_P (decl)
 	   && (TREE_CODE (ref) == FUNCTION_DECL
 	       || (EXPR_P (ref)
-		   && POINTER_TYPE_P (reftype)
+		   && INDIRECT_TYPE_P (reftype)
 		   && FUNC_OR_METHOD_TYPE_P (TREE_TYPE (reftype)))))
 	  || (TREE_CODE (decl) == FUNCTION_DECL
 	      && (VAR_P (ref)
 		  || (EXPR_P (ref)
 		      && !FUNC_OR_METHOD_TYPE_P (reftype)
-		      && (!POINTER_TYPE_P (reftype)
+		      && (!INDIRECT_TYPE_P (reftype)
 			  || !FUNC_OR_METHOD_TYPE_P (TREE_TYPE (reftype)))))))
 	{
 	  /* It makes no sense to try to copy function attributes
@@ -3046,7 +3046,7 @@ handle_copy_attribute (tree *node, tree name, tree args,
       && FUNC_OR_METHOD_TYPE_P (reftype))
     TREE_THIS_VOLATILE (decl) = true;
 
-  if (POINTER_TYPE_P (reftype))
+  if (INDIRECT_TYPE_P (reftype))
     reftype = TREE_TYPE (reftype);
 
   if (!TYPE_P (reftype))
@@ -3389,7 +3389,7 @@ handle_malloc_attribute (tree *node, tree name, tree args, int flags,
     }
 
   tree rettype = TREE_TYPE (TREE_TYPE (*node));
-  if (!POINTER_TYPE_P (rettype))
+  if (!INDIRECT_TYPE_P (rettype))
     {
       warning (OPT_Wattributes, "%qE attribute ignored on functions "
 	       "returning %qT; valid only for pointer return types",
@@ -3587,7 +3587,7 @@ handle_alloc_size_attribute (tree *node, tree name, tree args,
 {
   tree fntype = *node;
   tree rettype = TREE_TYPE (fntype);
-  if (!POINTER_TYPE_P (rettype))
+  if (!INDIRECT_TYPE_P (rettype))
     {
       warning (OPT_Wattributes,
 	       "%qE attribute ignored on a function returning %qT",
@@ -3635,7 +3635,7 @@ handle_alloc_align_attribute (tree *node, tree name, tree args, int,
 {
   tree fntype = *node;
   tree rettype = TREE_TYPE (fntype);
-  if (!POINTER_TYPE_P (rettype))
+  if (!INDIRECT_TYPE_P (rettype))
     {
       warning (OPT_Wattributes,
 	       "%qE attribute ignored on a function returning %qT",
@@ -4332,7 +4332,7 @@ type_for_vector_size (tree type)
      In this case, the mode is SI, but the type being modified is
      HI, so we need to look further.  */
 
-  while (POINTER_TYPE_P (type)
+  while (INDIRECT_TYPE_P (type)
 	 || TREE_CODE (type) == FUNCTION_TYPE
 	 || TREE_CODE (type) == METHOD_TYPE
 	 || TREE_CODE (type) == ARRAY_TYPE
@@ -4625,7 +4625,7 @@ handle_nonstring_attribute (tree *node, tree name, tree ARG_UNUSED (args),
     {
       tree type = TREE_TYPE (*node);
 
-      if (POINTER_TYPE_P (type) || TREE_CODE (type) == ARRAY_TYPE)
+      if (INDIRECT_TYPE_P (type) || TREE_CODE (type) == ARRAY_TYPE)
 	{
 	  /* Accept the attribute on arrays and pointers to all three
 	     narrow character types.  */
@@ -4942,7 +4942,7 @@ handle_access_attribute (tree node[3], tree name, tree args, int flags,
 {
   tree attrs = TYPE_ATTRIBUTES (*node);
   tree type = *node;
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     {
       tree ptype = TREE_TYPE (type);
       if (FUNC_OR_METHOD_TYPE_P (ptype))
@@ -5153,7 +5153,7 @@ handle_access_attribute (tree node[3], tree name, tree args, int flags,
       return NULL_TREE;
     }
 
-  if (!POINTER_TYPE_P (argtypes[0]))
+  if (!INDIRECT_TYPE_P (argtypes[0]))
     {
       /* The first argument must have a pointer or reference type.  */
       error ("attribute %qs positional argument 1 references "
@@ -5292,7 +5292,7 @@ build_attr_access_from_parms (tree parms, bool skip_voidptr)
       if (!argspec)
 	continue;
 
-      if (POINTER_TYPE_P (argtype))
+      if (INDIRECT_TYPE_P (argtype))
 	{
 	  /* void* arguments in user-defined functions could point to
 	     anything; skip them.  */
@@ -5879,7 +5879,7 @@ handle_nsobject_attribute (tree *node, tree name, tree args,
   /* The original implementation only allowed pointers to records, however
      recent implementations also allow void *.  */
   tree type = TREE_TYPE (*node);
-  if (!type || !POINTER_TYPE_P (type)
+  if (!type || !INDIRECT_TYPE_P (type)
       || (TREE_CODE (TREE_TYPE (type)) != RECORD_TYPE
           && !VOID_TYPE_P (TREE_TYPE (type))))
     {
@@ -5923,7 +5923,7 @@ handle_objc_nullability_attribute (tree *node, tree name, tree args,
   if (TREE_CODE (*node) == FUNCTION_DECL)
     type = TREE_TYPE (type);
 
-  if (type && !POINTER_TYPE_P (type))
+  if (type && !INDIRECT_TYPE_P (type))
     {
       error ("%qE cannot be applied to non-pointer type %qT", name, type);
       return NULL_TREE;

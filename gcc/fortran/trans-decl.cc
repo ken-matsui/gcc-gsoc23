@@ -1107,7 +1107,7 @@ gfc_build_qualified_array (tree decl, gfc_symbol * sym)
       suppress_warning (GFC_TYPE_ARRAY_SIZE (type));
     }
 
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     {
       gcc_assert (GFC_ARRAY_TYPE_P (TREE_TYPE (type)));
       gcc_assert (TYPE_LANG_SPECIFIC (type)
@@ -1232,7 +1232,7 @@ gfc_build_dummy_array_decl (gfc_symbol * sym, tree dummy)
 				  : TREE_TYPE (dummy));
   /* type now is the array descriptor w/o any indirection.  */
   gcc_assert (TREE_CODE (dummy) == PARM_DECL
-	  && POINTER_TYPE_P (TREE_TYPE (dummy)));
+	  && INDIRECT_TYPE_P (TREE_TYPE (dummy)));
 
   /* Do we know the element size?  */
   known_size = sym->ts.type != BT_CHARACTER
@@ -1604,7 +1604,7 @@ gfc_get_symbol_decl (gfc_symbol * sym)
 	&& TREE_CODE (sym->ts.u.cl->backend_decl) == PARM_DECL)
     {
       sym->ts.u.cl->passed_length = sym->ts.u.cl->backend_decl;
-      gcc_assert (POINTER_TYPE_P (TREE_TYPE (sym->ts.u.cl->passed_length)));
+      gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (sym->ts.u.cl->passed_length)));
       sym->ts.u.cl->backend_decl = build_fold_indirect_ref (sym->ts.u.cl->backend_decl);
     }
 
@@ -1671,7 +1671,7 @@ gfc_get_symbol_decl (gfc_symbol * sym)
 		       && sym->ts.u.cl->backend_decl)
 		{
 		  sym->ts.u.cl->passed_length = sym->ts.u.cl->backend_decl;
-		  if (POINTER_TYPE_P (TREE_TYPE (sym->ts.u.cl->passed_length)))
+		  if (INDIRECT_TYPE_P (TREE_TYPE (sym->ts.u.cl->passed_length)))
 		    sym->ts.u.cl->backend_decl
 			= build_fold_indirect_ref (sym->ts.u.cl->backend_decl);
 		  else
@@ -1970,7 +1970,7 @@ gfc_get_symbol_decl (gfc_symbol * sym)
     }
 
   if (!TREE_STATIC (decl)
-      && POINTER_TYPE_P (TREE_TYPE (decl))
+      && INDIRECT_TYPE_P (TREE_TYPE (decl))
       && !sym->attr.pointer
       && !sym->attr.allocatable
       && !sym->attr.proc_pointer
@@ -2580,7 +2580,7 @@ create_function_arglist (gfc_symbol * sym)
 			       PARM_DECL,
 			       get_identifier (".__result"),
 			       len_type);
-	  if (POINTER_TYPE_P (len_type))
+	  if (INDIRECT_TYPE_P (len_type))
 	    {
 	      sym->ts.u.cl->passed_length = length;
 	      TREE_USED (length) = 1;
@@ -2677,7 +2677,7 @@ create_function_arglist (gfc_symbol * sym)
 	  if (!f->sym->ts.deferred)
 	    gcc_assert (len_type == gfc_charlen_type_node);
 	  else
-	    gcc_assert (POINTER_TYPE_P (len_type));
+	    gcc_assert (INDIRECT_TYPE_P (len_type));
 
 	  strcpy (&name[1], f->sym->name);
 	  name[0] = '_';
@@ -2725,7 +2725,7 @@ create_function_arglist (gfc_symbol * sym)
 	  if (f->sym->ts.u.cl->backend_decl == NULL
 	      || f->sym->ts.u.cl->backend_decl == length)
 	    {
-	      if (POINTER_TYPE_P (len_type))
+	      if (INDIRECT_TYPE_P (len_type))
 		f->sym->ts.u.cl->backend_decl
 		  = build_fold_indirect_ref_loc (input_location, length);
 	      else if (f->sym->ts.u.cl->backend_decl == NULL)
@@ -2811,7 +2811,7 @@ create_function_arglist (gfc_symbol * sym)
       /* All implementation args except for VALUE are read-only.  */
       if (!f->sym->attr.value)
 	TREE_READONLY (parm) = 1;
-      if (POINTER_TYPE_P (type)
+      if (INDIRECT_TYPE_P (type)
 	  && (!f->sym->attr.proc_pointer
 	      && f->sym->attr.flavor != FL_PROCEDURE))
 	DECL_BY_REFERENCE (parm) = 1;
@@ -4299,14 +4299,14 @@ gfc_trans_vla_type_sizes (gfc_symbol *sym, stmtblock_t *body)
       type = TREE_TYPE (TREE_VALUE (current_fake_result_decl));
     }
 
-  while (POINTER_TYPE_P (type))
+  while (INDIRECT_TYPE_P (type))
     type = TREE_TYPE (type);
 
   if (GFC_DESCRIPTOR_TYPE_P (type))
     {
       tree etype = GFC_TYPE_ARRAY_DATAPTR_TYPE (type);
 
-      while (POINTER_TYPE_P (etype))
+      while (INDIRECT_TYPE_P (etype))
 	etype = TREE_TYPE (etype);
 
       gfc_trans_vla_type_sizes_1 (etype, body);
@@ -7062,7 +7062,7 @@ gfc_conv_cfi_to_gfc (stmtblock_t *init, stmtblock_t *finally,
       tree data;
       if (GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (gfc_desc)))
 	data = gfc_conv_descriptor_data_get (gfc_desc);
-      else if (!POINTER_TYPE_P (TREE_TYPE (gfc_desc)))
+      else if (!INDIRECT_TYPE_P (TREE_TYPE (gfc_desc)))
 	data = gfc_build_addr_expr (NULL, gfc_desc);
       else
 	data = gfc_desc;
@@ -7368,7 +7368,7 @@ done:
       tree data, call;
       if (GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (gfc_desc)))
 	data = gfc_conv_descriptor_data_get (gfc_desc);
-      else if (!POINTER_TYPE_P (TREE_TYPE (gfc_desc)))
+      else if (!INDIRECT_TYPE_P (TREE_TYPE (gfc_desc)))
 	data = gfc_build_addr_expr (NULL, gfc_desc);
       else
 	data = gfc_desc;
@@ -7644,8 +7644,8 @@ gfc_generate_function_code (gfc_namespace * ns)
 	tree tmp = fsym->backend_decl;
 	fsym->backend_decl = NULL;
 	tree type = gfc_sym_type (fsym);
-	gcc_assert (POINTER_TYPE_P (type));
-	if (POINTER_TYPE_P (TREE_TYPE (type)))
+	gcc_assert (INDIRECT_TYPE_P (type));
+	if (INDIRECT_TYPE_P (TREE_TYPE (type)))
 	  /* For instance, allocatable scalars.  */
 	  type = TREE_TYPE (type);
 	if (TYPE_REF_P (type))

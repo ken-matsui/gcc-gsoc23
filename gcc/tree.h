@@ -700,7 +700,7 @@ extern void omp_clause_range_check_failed (const_tree, const char *, int,
 
 /* Nonzero if TYPE represents a pointer to function.  */
 #define FUNCTION_POINTER_TYPE_P(TYPE) \
-  (POINTER_TYPE_P (TYPE) && TREE_CODE (TREE_TYPE (TYPE)) == FUNCTION_TYPE)
+  (INDIRECT_TYPE_P (TYPE) && TREE_CODE (TREE_TYPE (TYPE)) == FUNCTION_TYPE)
 
 /* Nonzero if this type is a complete type.  */
 #define COMPLETE_TYPE_P(NODE) (TYPE_SIZE (NODE) != NULL_TREE)
@@ -952,7 +952,7 @@ extern void omp_clause_range_check_failed (const_tree, const char *, int,
 /* True if overflow wraps around for the given integral or pointer type.  That
    is, TYPE_MAX + 1 == TYPE_MIN.  */
 #define TYPE_OVERFLOW_WRAPS(TYPE) \
-  (POINTER_TYPE_P (TYPE)					\
+  (INDIRECT_TYPE_P (TYPE)					\
    ? flag_wrapv_pointer						\
    : (ANY_INTEGRAL_TYPE_CHECK(TYPE)->base.u.bits.unsigned_flag	\
       || flag_wrapv))
@@ -966,7 +966,7 @@ extern void omp_clause_range_check_failed (const_tree, const char *, int,
    other cases it will be appropriate to simply set a flag and let the
    caller decide whether a warning is appropriate or not.  */
 #define TYPE_OVERFLOW_UNDEFINED(TYPE)				\
-  (POINTER_TYPE_P (TYPE)					\
+  (INDIRECT_TYPE_P (TYPE)					\
    ? !flag_wrapv_pointer					\
    : (!ANY_INTEGRAL_TYPE_CHECK(TYPE)->base.u.bits.unsigned_flag	\
       && !flag_wrapv && !flag_trapv))
@@ -5272,7 +5272,7 @@ reverse_storage_order_for_component_p (tree t)
 {
   /* The storage order only applies to scalar components.  */
   if (AGGREGATE_TYPE_P (TREE_TYPE (t))
-      || POINTER_TYPE_P (TREE_TYPE (t))
+      || INDIRECT_TYPE_P (TREE_TYPE (t))
       || VECTOR_TYPE_P (TREE_TYPE (t)))
     return false;
 
@@ -5721,7 +5721,7 @@ tree_code_for_canonical_type_merging (enum tree_code code)
 inline bool
 canonical_type_used_p (const_tree t)
 {
-  return !(POINTER_TYPE_P (t)
+  return !(INDIRECT_TYPE_P (t)
 	   || TREE_CODE (t) == ARRAY_TYPE
 	   || TREE_CODE (t) == VECTOR_TYPE);
 }

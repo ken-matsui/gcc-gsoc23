@@ -56,7 +56,7 @@ private:
 inline bool
 supported_pointer_equiv_p (tree expr)
 {
-  return TREE_CODE (expr) == SSA_NAME && POINTER_TYPE_P (TREE_TYPE (expr));
+  return TREE_CODE (expr) == SSA_NAME && INDIRECT_TYPE_P (TREE_TYPE (expr));
 }
 
 #endif // GCC_VALUE_POINTER_EQUIV_H

@@ -1353,7 +1353,7 @@ simplify_peeled_chrec (class loop *loop, tree arg, tree init_cond)
     }
 
   /* The affine code only deals with pointer and integer types.  */
-  if (!POINTER_TYPE_P (type)
+  if (!INDIRECT_TYPE_P (type)
       && !INTEGRAL_TYPE_P (type))
     return chrec_dont_know;
 
@@ -3198,7 +3198,7 @@ simple_iv_with_niters (class loop *wrto_loop, class loop *use_loop,
   iv->no_overflow = false;
 
   type = TREE_TYPE (op);
-  if (!POINTER_TYPE_P (type)
+  if (!INDIRECT_TYPE_P (type)
       && !INTEGRAL_TYPE_P (type))
     return false;
 
@@ -3311,7 +3311,7 @@ simple_iv_with_niters (class loop *wrto_loop, class loop *use_loop,
   if (!integer_zerop (e))
     return true;
 
-  if (POINTER_TYPE_P (TREE_TYPE (base)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (base)))
     code = POINTER_PLUS_EXPR;
   else
     code = PLUS_EXPR;
@@ -3738,7 +3738,7 @@ final_value_replacement_loop (class loop *loop)
 	  continue;
 	}
 
-      if (!POINTER_TYPE_P (TREE_TYPE (def))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (def))
 	  && !INTEGRAL_TYPE_P (TREE_TYPE (def)))
 	{
 	  gsi_next (&psi);

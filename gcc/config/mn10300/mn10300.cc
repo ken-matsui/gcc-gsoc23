@@ -1634,7 +1634,7 @@ mn10300_function_value (const_tree valtype,
   rtx rv;
   machine_mode mode = TYPE_MODE (valtype);
 
-  if (! POINTER_TYPE_P (valtype))
+  if (! INDIRECT_TYPE_P (valtype))
     return gen_rtx_REG (mode, FIRST_DATA_REGNUM);
   else if (! TARGET_PTR_A0D0 || ! outgoing
 	   || cfun->returns_struct)

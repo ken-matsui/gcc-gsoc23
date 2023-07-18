@@ -1105,7 +1105,7 @@ determine_base_object_1 (tree *tp, int *walk_subtrees, void *wdata)
       else if (TREE_CODE (base) != MEM_REF)
 	obj = fold_convert (ptr_type_node, build_fold_addr_expr (base));
     }
-  else if (code == SSA_NAME && POINTER_TYPE_P (TREE_TYPE (*tp)))
+  else if (code == SSA_NAME && INDIRECT_TYPE_P (TREE_TYPE (*tp)))
 	obj = fold_convert (ptr_type_node, *tp);
 
   if (!obj)
@@ -1241,7 +1241,7 @@ get_iv (struct ivopts_data *data, tree var)
   basic_block bb;
   tree type = TREE_TYPE (var);
 
-  if (!POINTER_TYPE_P (type)
+  if (!INDIRECT_TYPE_P (type)
       && !INTEGRAL_TYPE_P (type))
     return NULL;
 
@@ -1252,7 +1252,7 @@ get_iv (struct ivopts_data *data, tree var)
       if (!bb
 	  || !flow_bb_inside_loop_p (data->current_loop, bb))
 	{
-	  if (POINTER_TYPE_P (type))
+	  if (INDIRECT_TYPE_P (type))
 	    type = sizetype;
 	  set_iv (data, var, var, build_int_cst (type, 0), true);
 	}
@@ -1333,7 +1333,7 @@ find_bivs (struct ivopts_data *data)
       base = fold_convert (type, base);
       if (step)
 	{
-	  if (POINTER_TYPE_P (type))
+	  if (INDIRECT_TYPE_P (type))
 	    step = convert_to_ptrofftype (step);
 	  else
 	    step = fold_convert (type, step);
@@ -1606,7 +1606,7 @@ record_group_use (struct ivopts_data *data, tree *use_p,
     {
       unsigned int i;
 
-      gcc_assert (POINTER_TYPE_P (TREE_TYPE (iv->base)));
+      gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (iv->base)));
       tree addr_toffset;
       split_constant_offset (iv->base, &addr_base, &addr_toffset);
       addr_offset = int_cst_value (addr_toffset);
@@ -2969,7 +2969,7 @@ strip_offset (tree expr, poly_uint64_pod *offset)
 static tree
 generic_type_for (tree type)
 {
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     return unsigned_type_for (type);
 
   if (TYPE_UNSIGNED (type))
@@ -3011,7 +3011,7 @@ find_inv_vars_cb (tree *expr_p, int *ws ATTRIBUTE_UNUSED, void *data)
       if (!bb || !flow_bb_inside_loop_p (idata->current_loop, bb))
 	{
 	  tree steptype = TREE_TYPE (op);
-	  if (POINTER_TYPE_P (steptype))
+	  if (INDIRECT_TYPE_P (steptype))
 	    steptype = sizetype;
 	  set_iv (idata, op, op, build_int_cst (steptype, 0), true);
 	  record_invariant (idata, op, false);
@@ -3125,7 +3125,7 @@ add_candidate_1 (struct ivopts_data *data, tree base, tree step, bool important,
      better to actually force the pointer live and still use ivopts;
      for example, it would be enough to write the pointer into memory
      and keep it there until after the loop.  */
-  if (flag_keep_gc_roots_live && POINTER_TYPE_P (TREE_TYPE (base)))
+  if (flag_keep_gc_roots_live && INDIRECT_TYPE_P (TREE_TYPE (base)))
     return NULL;
 
   /* If BASE contains undefined SSA names make sure we only record
@@ -3287,7 +3287,7 @@ add_autoinc_candidates (struct ivopts_data *data, tree base, tree step,
       tree new_base;
       tree new_step = step;
 
-      if (POINTER_TYPE_P (TREE_TYPE (base)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (base)))
 	{
 	  new_step = fold_build1 (NEGATE_EXPR, TREE_TYPE (step), step);
 	  code = POINTER_PLUS_EXPR;
@@ -3380,7 +3380,7 @@ add_iv_candidate_for_biv (struct ivopts_data *data, struct iv *iv)
     add_candidate (data, iv->base, iv->step, true, NULL);
 
   /* The same, but with initial value zero.  */
-  if (POINTER_TYPE_P (TREE_TYPE (iv->base)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (iv->base)))
     add_candidate (data, size_int (0), iv->step, true, NULL);
   else
     add_candidate (data, build_int_cst (TREE_TYPE (iv->base), 0),
@@ -3531,7 +3531,7 @@ add_iv_candidate_for_use (struct ivopts_data *data, struct iv_use *use)
   /* Don't add candidate for iv_use with non integer, pointer or non-mode
      precision types, instead, add candidate for the corresponding scev in
      unsigned type with the same precision.  See PR93674 for more info.  */
-  if ((TREE_CODE (basetype) != INTEGER_TYPE && !POINTER_TYPE_P (basetype))
+  if ((TREE_CODE (basetype) != INTEGER_TYPE && !INDIRECT_TYPE_P (basetype))
       || !type_has_mode_precision_p (basetype))
     {
       basetype = lang_hooks.types.type_for_mode (TYPE_MODE (basetype),
@@ -3548,7 +3548,7 @@ add_iv_candidate_for_use (struct ivopts_data *data, struct iv_use *use)
 
   /* Record common candidate with initial value zero.  */
   basetype = TREE_TYPE (iv->base);
-  if (POINTER_TYPE_P (basetype))
+  if (INDIRECT_TYPE_P (basetype))
     basetype = sizetype;
   record_common_cand (data, build_int_cst (basetype, 0), iv->step, use);
 
@@ -4211,7 +4211,7 @@ get_debug_computation_at (class loop *loop, gimple *at,
 
   var = var_at_stmt (loop, cand, at);
 
-  if (POINTER_TYPE_P (ctype))
+  if (INDIRECT_TYPE_P (ctype))
     {
       ctype = unsigned_type_for (ctype);
       cbase = fold_convert (ctype, cbase);
@@ -4226,7 +4226,7 @@ get_debug_computation_at (class loop *loop, gimple *at,
   var = fold_build2 (MINUS_EXPR, TREE_TYPE (var), var, cbase);
   var = fold_build2 (EXACT_DIV_EXPR, TREE_TYPE (var), var,
 		     wide_int_to_tree (TREE_TYPE (var), rat));
-  if (POINTER_TYPE_P (utype))
+  if (INDIRECT_TYPE_P (utype))
     {
       var = fold_convert (sizetype, var);
       if (neg_p)
@@ -4898,8 +4898,8 @@ get_computation_cost (struct ivopts_data *data, struct iv_use *use,
   if (address_p
       || (use->iv->base_object
 	  && cand->iv->base_object
-	  && POINTER_TYPE_P (TREE_TYPE (use->iv->base_object))
-	  && POINTER_TYPE_P (TREE_TYPE (cand->iv->base_object))))
+	  && INDIRECT_TYPE_P (TREE_TYPE (use->iv->base_object))
+	  && INDIRECT_TYPE_P (TREE_TYPE (cand->iv->base_object))))
     {
       /* Do not try to express address of an object with computation based
 	 on address of a different object.  This may cause problems in rtl
@@ -5095,7 +5095,7 @@ cand_value_at (class loop *loop, struct iv_cand *cand, gimple *at,
   bool after_adjust = stmt_after_increment (loop, cand, at);
   tree steptype;
 
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     steptype = sizetype;
   else
     steptype = unsigned_type_for (type);
@@ -5135,7 +5135,7 @@ cand_value_at (class loop *loop, struct iv_cand *cand, gimple *at,
     aff_combination_add (&delta, &step);
 
   tree_to_aff_combination (iv->base, type, val);
-  if (!POINTER_TYPE_P (type))
+  if (!INDIRECT_TYPE_P (type))
     aff_combination_convert (val, steptype);
   aff_combination_add (val, &delta);
 }
@@ -6155,7 +6155,7 @@ determine_set_costs (struct ivopts_data *data)
       if (get_iv (data, op))
 	continue;
 
-      if (!POINTER_TYPE_P (TREE_TYPE (op))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (op))
 	  && !INTEGRAL_TYPE_P (TREE_TYPE (op)))
 	continue;
 
@@ -7414,10 +7414,10 @@ rewrite_use_nonlinear_expr (struct ivopts_data *data,
   comp_op2 = force_gimple_operand (comp_op2, &seq, true, NULL);
   gimple_seq_add_seq (&stmt_list, seq);
 
-  if (POINTER_TYPE_P (TREE_TYPE (comp_op2)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (comp_op2)))
     std::swap (comp_op1, comp_op2);
 
-  if (POINTER_TYPE_P (TREE_TYPE (comp_op1)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (comp_op1)))
     {
       comp = fold_build_pointer_plus (comp_op1,
 				      fold_convert (sizetype, comp_op2));
@@ -7443,7 +7443,7 @@ rewrite_use_nonlinear_expr (struct ivopts_data *data,
     {
       comp = force_gimple_operand (comp, &seq, true, NULL);
       gimple_seq_add_seq (&stmt_list, seq);
-      if (POINTER_TYPE_P (TREE_TYPE (tgt)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (tgt)))
 	{
 	  duplicate_ssa_name_ptr_info (comp, SSA_NAME_PTR_INFO (tgt));
 	  /* As this isn't a plain copy we have to reset alignment

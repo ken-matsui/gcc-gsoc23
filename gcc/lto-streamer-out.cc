@@ -1081,7 +1081,7 @@ DFS::DFS_write_tree_body (struct output_block *ob,
       else if (FUNC_OR_METHOD_TYPE_P (expr))
 	DFS_follow_tree_edge (TYPE_ARG_TYPES (expr));
 
-      if (!POINTER_TYPE_P (expr))
+      if (!INDIRECT_TYPE_P (expr))
 	DFS_follow_tree_edge (TYPE_MIN_VALUE_RAW (expr));
       DFS_follow_tree_edge (TYPE_MAX_VALUE_RAW (expr));
     }
@@ -1494,7 +1494,7 @@ hash_tree (struct streamer_tree_cache_d *cache, hash_map<tree, hashval_t> *map, 
       else if (code == FUNCTION_TYPE
 	       || code == METHOD_TYPE)
 	visit (TYPE_ARG_TYPES (t));
-      if (!POINTER_TYPE_P (t))
+      if (!INDIRECT_TYPE_P (t))
 	visit (TYPE_MIN_VALUE_RAW (t));
       visit (TYPE_MAX_VALUE_RAW (t));
     }

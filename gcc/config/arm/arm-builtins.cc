@@ -2919,7 +2919,7 @@ neon_dereference_pointer (tree exp, tree type, machine_mode mem_mode,
   nvectors = reg_size / vector_size;
 
   /* Work out the type of each element.  */
-  gcc_assert (POINTER_TYPE_P (type));
+  gcc_assert (INDIRECT_TYPE_P (type));
   elem_type = TREE_TYPE (type);
 
   /* Work out how many elements are being loaded or stored.
@@ -2966,7 +2966,7 @@ mve_dereference_pointer (tree exp, tree type, machine_mode reg_mode,
   reg_size = GET_MODE_SIZE (reg_mode);
 
   /* Work out the type of each element.  */
-  gcc_assert (POINTER_TYPE_P (type));
+  gcc_assert (INDIRECT_TYPE_P (type));
   elem_type = TREE_TYPE (type);
 
   nelems = reg_size / vector_size;
@@ -3042,7 +3042,7 @@ arm_general_expand_builtin_args (rtx target, machine_mode map_mode, int fcode,
 	    {
 	    case ARG_BUILTIN_MEMORY:
 	    case ARG_BUILTIN_COPY_TO_REG:
-	      if (POINTER_TYPE_P (TREE_TYPE (arg[argc])))
+	      if (INDIRECT_TYPE_P (TREE_TYPE (arg[argc])))
 		op[argc] = convert_memory_address (Pmode, op[argc]);
 
 	      /* MVE uses mve_pred16_t (aka HImode) for vectors of

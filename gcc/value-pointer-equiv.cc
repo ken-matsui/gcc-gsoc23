@@ -185,7 +185,7 @@ pointer_equiv_analyzer::enter (basic_block bb)
     {
       gphi *phi = iter.phi ();
       tree lhs = gimple_phi_result (phi);
-      if (!POINTER_TYPE_P (TREE_TYPE (lhs)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (lhs)))
 	continue;
       tree arg0 = gimple_phi_arg_def (phi, 0);
       if (TREE_CODE (arg0) == SSA_NAME && !is_gimple_min_invariant (arg0))
@@ -308,7 +308,7 @@ pointer_equiv_analyzer::visit_edge (edge e)
   if (stmt
       && ((lhs = gimple_cond_lhs (stmt)), true)
       && TREE_CODE (lhs) == SSA_NAME
-      && POINTER_TYPE_P (TREE_TYPE (lhs))
+      && INDIRECT_TYPE_P (TREE_TYPE (lhs))
       && TREE_CODE (gimple_cond_rhs (stmt)) == ADDR_EXPR)
     {
       tree_code code = gimple_cond_code (stmt);

@@ -561,7 +561,7 @@ ubsan_maybe_instrument_reference_or_call (location_t loc, tree op, tree ptype,
 	instrument = true;
       if (mina && mina > 1)
 	{
-	  if (!POINTER_TYPE_P (TREE_TYPE (op))
+	  if (!INDIRECT_TYPE_P (TREE_TYPE (op))
 	      || mina > get_pointer_alignment (op) / BITS_PER_UNIT)
 	    instrument = true;
 	}
@@ -569,7 +569,7 @@ ubsan_maybe_instrument_reference_or_call (location_t loc, tree op, tree ptype,
   if (!instrument)
     return NULL_TREE;
   op = save_expr (orig_op);
-  gcc_assert (POINTER_TYPE_P (ptype));
+  gcc_assert (INDIRECT_TYPE_P (ptype));
   if (TYPE_REF_P (ptype))
     ptype = build_pointer_type (TREE_TYPE (ptype));
   tree kind = build_int_cst (ptype, ckind);
@@ -612,7 +612,7 @@ ubsan_maybe_instrument_member_call (tree stmt, bool is_ctor)
     return;
   tree op = CALL_EXPR_ARG (stmt, 0);
   if (op == error_mark_node
-      || !POINTER_TYPE_P (TREE_TYPE (op)))
+      || !INDIRECT_TYPE_P (TREE_TYPE (op)))
     return;
   op = ubsan_maybe_instrument_reference_or_call (EXPR_LOCATION (stmt), op,
 						 TREE_TYPE (op),

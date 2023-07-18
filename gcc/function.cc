@@ -2858,7 +2858,7 @@ assign_parm_adjust_stack_rtl (struct assign_parm_data_one *data)
   else if (crtl->stack_protect_guard
 	   && (flag_stack_protect == SPCT_FLAG_ALL
 	       || data->arg.pass_by_reference
-	       || POINTER_TYPE_P (data->nominal_type)))
+	       || INDIRECT_TYPE_P (data->nominal_type)))
     stack_parm = NULL;
 
   data->stack_parm = stack_parm;
@@ -3447,7 +3447,7 @@ assign_parm_setup_reg (struct assign_parm_data_all *all, tree parm,
     }
 
   /* For pointer data type, suggest pointer register.  */
-  if (POINTER_TYPE_P (TREE_TYPE (parm)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (parm)))
     mark_reg_pointer (parmreg,
 		      TYPE_ALIGN (TREE_TYPE (TREE_TYPE (parm))));
 }
@@ -6414,7 +6414,7 @@ used_types_insert_helper (tree type, struct function *func)
 void
 used_types_insert (tree t)
 {
-  while (POINTER_TYPE_P (t) || TREE_CODE (t) == ARRAY_TYPE)
+  while (INDIRECT_TYPE_P (t) || TREE_CODE (t) == ARRAY_TYPE)
     if (TYPE_NAME (t))
       break;
     else

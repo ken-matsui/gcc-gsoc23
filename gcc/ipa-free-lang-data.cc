@@ -242,7 +242,7 @@ fld_incomplete_type_of (tree t, class free_lang_data_d *fld)
 {
   if (!t)
     return NULL;
-  if (POINTER_TYPE_P (t))
+  if (INDIRECT_TYPE_P (t))
     {
       tree t2 = fld_incomplete_type_of (TREE_TYPE (t), fld);
       if (t2 != TREE_TYPE (t))
@@ -340,7 +340,7 @@ fld_simplified_type (tree t, class free_lang_data_d *fld)
 {
   if (!t)
     return t;
-  if (POINTER_TYPE_P (t))
+  if (INDIRECT_TYPE_P (t))
     return fld_incomplete_type_of (t, fld);
   /* FIXME: This triggers verification error, see PR88140.  */
 #if 0
@@ -773,7 +773,7 @@ find_decls_types_r (tree *tp, int *ws, void *data)
 	fld_worklist_push (TYPE_NEXT_PTR_TO (t), fld);
       if (TYPE_REF_P (t))
 	fld_worklist_push (TYPE_NEXT_REF_TO (t), fld);
-      if (!POINTER_TYPE_P (t))
+      if (!INDIRECT_TYPE_P (t))
 	fld_worklist_push (TYPE_MIN_VALUE_RAW (t), fld);
       /* TYPE_MAX_VALUE_RAW is TYPE_BINFO for record types.  */
       if (!RECORD_OR_UNION_TYPE_P (t))

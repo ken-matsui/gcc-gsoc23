@@ -502,7 +502,7 @@ build_vindex_ref (tree object, tree fntype, size_t index)
   tree result = build_deref (object);
   result = component_ref (result, TYPE_FIELDS (TREE_TYPE (result)));
 
-  gcc_assert (POINTER_TYPE_P (fntype));
+  gcc_assert (INDIRECT_TYPE_P (fntype));
 
   return build_memref (fntype, result, size_int (target.ptrsize * index));
 }
@@ -1464,9 +1464,9 @@ build_boolop (tree_code code, tree arg0, tree arg1)
   if (code == EQ_EXPR || code == NE_EXPR)
     {
       /* Check if comparing the address of a variable to null.  */
-      if (POINTER_TYPE_P (TREE_TYPE (arg0)) && integer_zerop (arg1))
+      if (INDIRECT_TYPE_P (TREE_TYPE (arg0)) && integer_zerop (arg1))
 	warn_for_null_address (arg0);
-      if (POINTER_TYPE_P (TREE_TYPE (arg1)) && integer_zerop (arg0))
+      if (INDIRECT_TYPE_P (TREE_TYPE (arg1)) && integer_zerop (arg0))
 	warn_for_null_address (arg1);
     }
 
@@ -1647,7 +1647,7 @@ build_deref (tree exp)
   /* Maybe rewrite: *(e1, e2) => (e1, *e2)  */
   tree init = stabilize_expr (&exp);
 
-  gcc_assert (POINTER_TYPE_P (TREE_TYPE (exp)));
+  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (exp)));
 
   if (TREE_CODE (exp) == ADDR_EXPR)
     exp = TREE_OPERAND (exp, 0);
@@ -2150,7 +2150,7 @@ d_build_call (TypeFunction *tf, tree callable, tree object,
   tree ctype = TREE_TYPE (callable);
   tree callee = callable;
 
-  if (POINTER_TYPE_P (ctype))
+  if (INDIRECT_TYPE_P (ctype))
     ctype = TREE_TYPE (ctype);
   else
     callee = build_address (callable);

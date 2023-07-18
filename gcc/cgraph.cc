@@ -3501,7 +3501,7 @@ cgraph_node::verify_node (void)
 	}
     }
   if (DECL_IS_MALLOC (decl)
-      && !POINTER_TYPE_P (TREE_TYPE (TREE_TYPE (decl))))
+      && !INDIRECT_TYPE_P (TREE_TYPE (TREE_TYPE (decl))))
     {
       error ("malloc attribute should be used for a function that "
 	     "returns a pointer");

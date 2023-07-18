@@ -1121,7 +1121,7 @@ compute_builtin_object_size (tree ptr, int object_size_type,
     return addr_object_size (NULL, ptr, object_size_type, psize);
 
   if (TREE_CODE (ptr) != SSA_NAME
-      || !POINTER_TYPE_P (TREE_TYPE (ptr)))
+      || !INDIRECT_TYPE_P (TREE_TYPE (ptr)))
       return false;
 
   if (computed[object_size_type] == NULL)
@@ -1306,7 +1306,7 @@ expr_object_size (struct object_size_info *osi, tree ptr, tree value)
 
   /* Pointer variables should have been handled by merge_object_sizes.  */
   gcc_assert (TREE_CODE (value) != SSA_NAME
-	      || !POINTER_TYPE_P (TREE_TYPE (value)));
+	      || !INDIRECT_TYPE_P (TREE_TYPE (value)));
 
   if (TREE_CODE (value) == ADDR_EXPR)
     addr_object_size (osi, value, object_size_type, &bytes, &wholesize);
@@ -1561,7 +1561,7 @@ parm_object_size (struct object_size_info *osi, tree var)
   int object_size_type = osi->object_size_type;
   tree parm = SSA_NAME_VAR (var);
 
-  if (!(object_size_type & OST_DYNAMIC) || !POINTER_TYPE_P (TREE_TYPE (parm)))
+  if (!(object_size_type & OST_DYNAMIC) || !INDIRECT_TYPE_P (TREE_TYPE (parm)))
     {
       expr_object_size (osi, var, parm);
       return;
@@ -1749,7 +1749,7 @@ collect_object_sizes_for (struct object_size_info *osi, tree var)
                  || gimple_assign_unary_nop_p (stmt))
           {
             if (TREE_CODE (rhs) == SSA_NAME
-                && POINTER_TYPE_P (TREE_TYPE (rhs)))
+                && INDIRECT_TYPE_P (TREE_TYPE (rhs)))
 	      reexamine = merge_object_sizes (osi, var, rhs);
             else
               expr_object_size (osi, var, rhs);
@@ -1766,7 +1766,7 @@ collect_object_sizes_for (struct object_size_info *osi, tree var)
         if (arg)
           {
             if (TREE_CODE (arg) == SSA_NAME
-                && POINTER_TYPE_P (TREE_TYPE (arg)))
+                && INDIRECT_TYPE_P (TREE_TYPE (arg)))
 	      reexamine = merge_object_sizes (osi, var, arg);
             else
               expr_object_size (osi, var, arg);

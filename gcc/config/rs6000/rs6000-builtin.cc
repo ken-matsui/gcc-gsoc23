@@ -435,7 +435,7 @@ const char *rs6000_type_string (tree type_node)
     return "__ieee128";
   else if (type_node == opaque_V4SI_type_node)
     return "opaque";
-  else if (POINTER_TYPE_P (type_node))
+  else if (INDIRECT_TYPE_P (type_node))
     return "void*";
   else if (type_node == intQI_type_node || type_node == char_type_node)
     return "sc";
@@ -2462,7 +2462,7 @@ rs6000_expand_ldst_mask (rtx target, tree arg0)
 
   gcc_assert (TARGET_ALTIVEC);
 
-  gcc_assert (POINTER_TYPE_P (TREE_TYPE (arg0)));
+  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (arg0)));
   rtx op = expand_expr (arg0, NULL_RTX, Pmode, EXPAND_NORMAL);
   rtx addr = memory_address (mode, op);
   /* We need to negate the address.  */

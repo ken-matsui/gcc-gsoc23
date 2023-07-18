@@ -383,7 +383,7 @@ create_mem_ref_raw (tree type, tree alias_ptr_type, struct mem_address *addr,
       index2 = addr->base;
     }
   else if (addr->base
-	   && POINTER_TYPE_P (TREE_TYPE (addr->base)))
+	   && INDIRECT_TYPE_P (TREE_TYPE (addr->base)))
     {
       base = addr->base;
       index2 = NULL_TREE;
@@ -494,7 +494,7 @@ move_pointer_to_base (struct mem_address *parts, aff_tree *addr)
 	continue;
 
       val = addr->elts[i].val;
-      if (POINTER_TYPE_P (TREE_TYPE (val)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (val)))
 	break;
     }
 
@@ -551,7 +551,7 @@ add_to_parts (struct mem_address *parts, tree elt)
 
   /* Add ELT to base.  */
   type = TREE_TYPE (parts->base);
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     parts->base = fold_build_pointer_plus (parts->base, elt);
   else
     parts->base = fold_build2 (PLUS_EXPR, type, parts->base, elt);

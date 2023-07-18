@@ -3791,7 +3791,7 @@ ix86_handle_interrupt_attribute (tree *node, tree, tree, int, bool *)
     {
       if (nargs == 0)
 	{
-	  if (! POINTER_TYPE_P (TREE_VALUE (current_arg_type)))
+	  if (! INDIRECT_TYPE_P (TREE_VALUE (current_arg_type)))
 	    error ("interrupt service routine should have a pointer "
 		   "as the first argument");
 	}

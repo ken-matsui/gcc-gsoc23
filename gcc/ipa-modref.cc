@@ -1515,7 +1515,7 @@ modref_access_analysis::process_fnspec (gcall *call)
   else
     {
       for (unsigned int i = 0; i < gimple_call_num_args (call); i++)
-	if (!POINTER_TYPE_P (TREE_TYPE (gimple_call_arg (call, i))))
+	if (!INDIRECT_TYPE_P (TREE_TYPE (gimple_call_arg (call, i))))
 	  ;
 	else if (!fnspec.arg_specified_p (i)
 		 || fnspec.arg_maybe_read_p (i))
@@ -1552,7 +1552,7 @@ modref_access_analysis::process_fnspec (gcall *call)
   else
     {
       for (unsigned int i = 0; i < gimple_call_num_args (call); i++)
-	if (!POINTER_TYPE_P (TREE_TYPE (gimple_call_arg (call, i))))
+	if (!INDIRECT_TYPE_P (TREE_TYPE (gimple_call_arg (call, i))))
 	  ;
 	else if (!fnspec.arg_specified_p (i)
 		 || fnspec.arg_maybe_written_p (i))
@@ -4551,7 +4551,7 @@ propagate_unknown_call (cgraph_node *node,
 	  tree t = TYPE_ARG_TYPES (TREE_TYPE (e->callee->decl));
 	  for (unsigned i = 0; i < parm_map.length () && t;
 	       i++, t = TREE_CHAIN (t))
-	    if (!POINTER_TYPE_P (TREE_VALUE (t)))
+	    if (!INDIRECT_TYPE_P (TREE_VALUE (t)))
 	      ;
 	  else if (!fnspec.arg_specified_p (i)
 		   || fnspec.arg_maybe_read_p (i))
@@ -4583,7 +4583,7 @@ propagate_unknown_call (cgraph_node *node,
 	  tree t = TYPE_ARG_TYPES (TREE_TYPE (e->callee->decl));
 	  for (unsigned i = 0; i < parm_map.length () && t;
 	       i++, t = TREE_CHAIN (t))
-	    if (!POINTER_TYPE_P (TREE_VALUE (t)))
+	    if (!INDIRECT_TYPE_P (TREE_VALUE (t)))
 	      ;
 	  else if (!fnspec.arg_specified_p (i)
 		   || fnspec.arg_maybe_written_p (i))

@@ -116,7 +116,7 @@ dump_variable (FILE *file, tree var)
 {
   if (TREE_CODE (var) == SSA_NAME)
     {
-      if (POINTER_TYPE_P (TREE_TYPE (var)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (var)))
 	dump_points_to_info_for (file, var);
       var = SSA_NAME_VAR (var);
     }

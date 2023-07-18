@@ -360,7 +360,7 @@ builtin_call_nomodifying_p (gimple *stmt)
 
       ++argno;
 
-      if (!POINTER_TYPE_P (argtype))
+      if (!INDIRECT_TYPE_P (argtype))
 	continue;
 
       if (TYPE_READONLY (TREE_TYPE (argtype)))
@@ -382,7 +382,7 @@ builtin_call_nomodifying_p (gimple *stmt)
     {
       tree arg = gimple_call_arg (stmt, argno);
       argtype = TREE_TYPE (arg);
-      if (!POINTER_TYPE_P (argtype))
+      if (!INDIRECT_TYPE_P (argtype))
 	continue;
 
       if (TYPE_READONLY (TREE_TYPE (argtype)))
@@ -717,7 +717,7 @@ maybe_warn_operand (ao_ref &ref, gimple *stmt, tree lhs, tree rhs,
      The first_field() test is important for C++ where the predicate
      alone isn't always sufficient.  */
   tree rhstype = TREE_TYPE (rhs);
-  if (POINTER_TYPE_P (rhstype))
+  if (INDIRECT_TYPE_P (rhstype))
     rhstype = TREE_TYPE (rhstype);
   if (is_empty_type (rhstype))
     return NULL_TREE;
@@ -803,7 +803,7 @@ maybe_warn_pass_by_reference (gcall *stmt, wlimits &wlims)
       if (argno > nargs)
 	break;
 
-      if (!POINTER_TYPE_P (argtype))
+      if (!INDIRECT_TYPE_P (argtype))
 	continue;
 
       tree access_size = NULL_TREE;
@@ -846,7 +846,7 @@ maybe_warn_pass_by_reference (gcall *stmt, wlimits &wlims)
 	continue;
 
       tree arg = gimple_call_arg (stmt, argno - 1);
-      if (!POINTER_TYPE_P (TREE_TYPE (arg)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (arg)))
 	/* Avoid actual arguments with invalid types.  */
 	continue;
 

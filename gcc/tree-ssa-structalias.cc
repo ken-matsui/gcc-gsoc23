@@ -5813,7 +5813,7 @@ var_can_have_subvars (const_tree v)
 static bool
 type_must_have_pointers (tree type)
 {
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     return true;
 
   if (TREE_CODE (type) == ARRAY_TYPE)
@@ -5924,7 +5924,7 @@ push_fields_onto_fieldstack (tree type, vec<fieldoff_s> *fieldstack,
 		e.may_have_pointers = true;
 		e.only_restrict_pointers
 		  = (!has_unknown_size
-		     && POINTER_TYPE_P (field_type)
+		     && INDIRECT_TYPE_P (field_type)
 		     && TYPE_RESTRICT (field_type));
 		if (e.only_restrict_pointers)
 		  e.restrict_pointed_type = TREE_TYPE (field_type);
@@ -6284,7 +6284,7 @@ create_variable_info_for_1 (tree decl, const char *name, bool add_id,
       vi->fullsize = tree_to_uhwi (declsize);
       vi->size = vi->fullsize;
       vi->is_full_var = true;
-      if (POINTER_TYPE_P (decl_type)
+      if (INDIRECT_TYPE_P (decl_type)
 	  && (TYPE_RESTRICT (decl_type) || add_restrict))
 	vi->only_restrict_pointers = 1;
       if (vi->only_restrict_pointers
@@ -6420,7 +6420,7 @@ create_variable_info_for (tree decl, const char *name, bool add_id)
 	continue;
 
       /* Mark global restrict qualified pointers.  */
-      if ((POINTER_TYPE_P (TREE_TYPE (decl))
+      if ((INDIRECT_TYPE_P (TREE_TYPE (decl))
 	   && TYPE_RESTRICT (TREE_TYPE (decl)))
 	  || vi->only_restrict_pointers)
 	{
@@ -7640,7 +7640,7 @@ compute_points_to_sets (void)
 
   FOR_EACH_SSA_NAME (i, ptr, cfun)
     {
-      if (POINTER_TYPE_P (TREE_TYPE (ptr)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (ptr)))
 	find_what_p_points_to (cfun->decl, ptr);
     }
 
@@ -7931,7 +7931,7 @@ compute_dependence_clique (void)
   for (unsigned i = 0; i < num_ssa_names; ++i)
     {
       tree ptr = ssa_name (i);
-      if (!ptr || !POINTER_TYPE_P (TREE_TYPE (ptr)))
+      if (!ptr || !INDIRECT_TYPE_P (TREE_TYPE (ptr)))
 	continue;
 
       /* Avoid all this when ptr is not dereferenced?  */
@@ -8560,7 +8560,7 @@ ipa_pta_execute (void)
       FOR_EACH_VEC_ELT (*fn->gimple_df->ssa_names, i, ptr)
 	{
 	  if (ptr
-	      && POINTER_TYPE_P (TREE_TYPE (ptr)))
+	      && INDIRECT_TYPE_P (TREE_TYPE (ptr)))
 	    find_what_p_points_to (node->decl, ptr);
 	}
 

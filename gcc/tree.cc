@@ -3048,7 +3048,7 @@ unsigned int
 tree_ctz (const_tree expr)
 {
   if (!INTEGRAL_TYPE_P (TREE_TYPE (expr))
-      && !POINTER_TYPE_P (TREE_TYPE (expr)))
+      && !INDIRECT_TYPE_P (TREE_TYPE (expr)))
     return 0;
 
   unsigned int ret1, ret2, prec = TYPE_PRECISION (TREE_TYPE (expr));
@@ -4188,7 +4188,7 @@ type_contains_placeholder_1 (const_tree type)
      the case of arrays) type involves a placeholder, this type does.  */
   if (CONTAINS_PLACEHOLDER_P (TYPE_SIZE (type))
       || CONTAINS_PLACEHOLDER_P (TYPE_SIZE_UNIT (type))
-      || (!POINTER_TYPE_P (type)
+      || (!INDIRECT_TYPE_P (type)
 	  && TREE_TYPE (type)
 	  && type_contains_placeholder_p (TREE_TYPE (type))))
     return true;
@@ -4597,7 +4597,7 @@ substitute_placeholder_in_expr (tree exp, tree obj)
 		     || VL_EXP_CLASS_P (elt)
 		     || EXPRESSION_CLASS_P (elt))
 		  ? TREE_OPERAND (elt, 0) : 0))
-	if (POINTER_TYPE_P (TREE_TYPE (elt))
+	if (INDIRECT_TYPE_P (TREE_TYPE (elt))
 	    && (TYPE_MAIN_VARIANT (TREE_TYPE (TREE_TYPE (elt)))
 		== need_type))
 	  return fold_build1 (INDIRECT_REF, need_type, elt);
@@ -5086,7 +5086,7 @@ build2 (enum tree_code code, tree tt, tree arg0, tree arg1 MEM_STAT_DECL)
   gcc_assert (TREE_CODE_LENGTH (code) == 2);
 
   if ((code == MINUS_EXPR || code == PLUS_EXPR || code == MULT_EXPR)
-      && arg0 && arg1 && tt && POINTER_TYPE_P (tt)
+      && arg0 && arg1 && tt && INDIRECT_TYPE_P (tt)
       /* When sizetype precision doesn't match that of pointers
          we need to be able to build explicit extensions or truncations
 	 of the offset argument.  */
@@ -5095,7 +5095,7 @@ build2 (enum tree_code code, tree tt, tree arg0, tree arg1 MEM_STAT_DECL)
 		&& TREE_CODE (arg1) == INTEGER_CST);
 
   if (code == POINTER_PLUS_EXPR && arg0 && arg1 && tt)
-    gcc_assert (POINTER_TYPE_P (tt) && POINTER_TYPE_P (TREE_TYPE (arg0))
+    gcc_assert (INDIRECT_TYPE_P (tt) && INDIRECT_TYPE_P (TREE_TYPE (arg0))
 		&& ptrofftype_p (TREE_TYPE (arg1)));
 
   t = make_node (code PASS_MEM_STAT);
@@ -8187,7 +8187,7 @@ retry:
 void
 get_type_static_bounds (const_tree type, mpz_t min, mpz_t max)
 {
-  if (!POINTER_TYPE_P (type) && TYPE_MIN_VALUE (type)
+  if (!INDIRECT_TYPE_P (type) && TYPE_MIN_VALUE (type)
       && TREE_CODE (TYPE_MIN_VALUE (type)) == INTEGER_CST)
     wi::to_mpz (wi::to_wide (TYPE_MIN_VALUE (type)), min, TYPE_SIGN (type));
   else
@@ -8201,7 +8201,7 @@ get_type_static_bounds (const_tree type, mpz_t min, mpz_t max)
 	}
     }
 
-  if (!POINTER_TYPE_P (type) && TYPE_MAX_VALUE (type)
+  if (!INDIRECT_TYPE_P (type) && TYPE_MAX_VALUE (type)
       && TREE_CODE (TYPE_MAX_VALUE (type)) == INTEGER_CST)
     wi::to_mpz (wi::to_wide (TYPE_MAX_VALUE (type)), max, TYPE_SIGN (type));
   else
@@ -8553,8 +8553,8 @@ tree_builtin_call_types_compatible_p (const_tree call, tree fndecl)
 	     FILE * vs. fileptr_type_node, or say char * vs. const char *
 	     differences etc.  */
 	  if (!gimple_form
-	      && POINTER_TYPE_P (type)
-	      && POINTER_TYPE_P (TREE_TYPE (arg))
+	      && INDIRECT_TYPE_P (type)
+	      && INDIRECT_TYPE_P (TREE_TYPE (arg))
 	      && tree_nop_conversion_p (type, TREE_TYPE (arg)))
 	    continue;
 	  /* char/short integral arguments are promoted to int
@@ -11033,7 +11033,7 @@ signed_or_unsigned_type_for (int unsignedp, tree type)
 
   unsigned int bits;
   if (INTEGRAL_TYPE_P (type)
-      || POINTER_TYPE_P (type)
+      || INDIRECT_TYPE_P (type)
       || TREE_CODE (type) == OFFSET_TYPE)
     bits = TYPE_PRECISION (type);
   else if (TREE_CODE (type) == REAL_TYPE)
@@ -11250,9 +11250,9 @@ walk_type_fields (tree type, walk_tree_fn func, void *data,
 	 points to another pointer, that one does too, and we have no htab.
 	 If so, get a hash table.  We check three levels deep to avoid
 	 the cost of the hash table if we don't need one.  */
-      if (POINTER_TYPE_P (TREE_TYPE (type))
-	  && POINTER_TYPE_P (TREE_TYPE (TREE_TYPE (type)))
-	  && POINTER_TYPE_P (TREE_TYPE (TREE_TYPE (TREE_TYPE (type))))
+      if (INDIRECT_TYPE_P (TREE_TYPE (type))
+	  && INDIRECT_TYPE_P (TREE_TYPE (TREE_TYPE (type)))
+	  && INDIRECT_TYPE_P (TREE_TYPE (TREE_TYPE (TREE_TYPE (type))))
 	  && !pset)
 	{
 	  result = walk_tree_without_duplicates (&TREE_TYPE (type),
@@ -11290,7 +11290,7 @@ walk_type_fields (tree type, walk_tree_fn func, void *data,
 	 we'll have infinite recursion.  If we have a PSET, then we
 	 need not fear.  */
       if (pset
-	  || (!POINTER_TYPE_P (TREE_TYPE (type))
+	  || (!INDIRECT_TYPE_P (TREE_TYPE (type))
 	      && TREE_CODE (TREE_TYPE (type)) != OFFSET_TYPE))
 	WALK_SUBTREE (TREE_TYPE (type));
       WALK_SUBTREE (TYPE_DOMAIN (type));
@@ -11513,7 +11513,7 @@ walk_tree_1 (tree *tp, walk_tree_fn func, void *data,
 
 	  /* But do not walk a pointed-to type since it may itself need to
 	     be walked in the declaration case if it isn't anonymous.  */
-	  if (!POINTER_TYPE_P (type))
+	  if (!INDIRECT_TYPE_P (type))
 	    {
 	      result = walk_type_fields (type, func, data, pset, lh);
 	      if (result)
@@ -11930,15 +11930,15 @@ bool
 tree_nop_conversion_p (const_tree outer_type, const_tree inner_type)
 {
   /* Do not strip casts into or out of differing address spaces.  */
-  if (POINTER_TYPE_P (outer_type)
+  if (INDIRECT_TYPE_P (outer_type)
       && TYPE_ADDR_SPACE (TREE_TYPE (outer_type)) != ADDR_SPACE_GENERIC)
     {
-      if (!POINTER_TYPE_P (inner_type)
+      if (!INDIRECT_TYPE_P (inner_type)
 	  || (TYPE_ADDR_SPACE (TREE_TYPE (outer_type))
 	      != TYPE_ADDR_SPACE (TREE_TYPE (inner_type))))
 	return false;
     }
-  else if (POINTER_TYPE_P (inner_type)
+  else if (INDIRECT_TYPE_P (inner_type)
 	   && TYPE_ADDR_SPACE (TREE_TYPE (inner_type)) != ADDR_SPACE_GENERIC)
     {
       /* We already know that outer_type is not a pointer with
@@ -11949,10 +11949,10 @@ tree_nop_conversion_p (const_tree outer_type, const_tree inner_type)
   /* Use precision rather then machine mode when we can, which gives
      the correct answer even for submode (bit-field) types.  */
   if ((INTEGRAL_TYPE_P (outer_type)
-       || POINTER_TYPE_P (outer_type)
+       || INDIRECT_TYPE_P (outer_type)
        || TREE_CODE (outer_type) == OFFSET_TYPE)
       && (INTEGRAL_TYPE_P (inner_type)
-	  || POINTER_TYPE_P (inner_type)
+	  || INDIRECT_TYPE_P (inner_type)
 	  || TREE_CODE (inner_type) == OFFSET_TYPE))
     return TYPE_PRECISION (outer_type) == TYPE_PRECISION (inner_type);
 
@@ -11999,7 +11999,7 @@ tree_sign_nop_conversion (const_tree exp)
   inner_type = TREE_TYPE (TREE_OPERAND (exp, 0));
 
   return (TYPE_UNSIGNED (outer_type) == TYPE_UNSIGNED (inner_type)
-	  && POINTER_TYPE_P (outer_type) == POINTER_TYPE_P (inner_type));
+	  && INDIRECT_TYPE_P (outer_type) == INDIRECT_TYPE_P (inner_type));
 }
 
 /* Strip conversions from EXP according to tree_nop_conversion and
@@ -13382,7 +13382,7 @@ verify_type_variant (const_tree t, tree tv)
   if (TYPE_ARTIFICIAL (tv))
     verify_variant_match (TYPE_ARTIFICIAL);
 #endif
-  if (POINTER_TYPE_P (tv))
+  if (INDIRECT_TYPE_P (tv))
     verify_variant_match (TYPE_REF_CAN_ALIAS_ALL);
   /* FIXME: TYPE_SIZES_GIMPLIFIED may differs for Ada build.  */
   verify_variant_match (TYPE_UNSIGNED);
@@ -13528,7 +13528,7 @@ verify_type_variant (const_tree t, tree tv)
 		   referring non-variant pointer.  We may change it to
 		   produce types as variants, too, like
 		   objc_get_protocol_qualified_type does.  */
-		&& !POINTER_TYPE_P (TREE_TYPE (f1)))
+		&& !INDIRECT_TYPE_P (TREE_TYPE (f1)))
 	    || DECL_FIELD_OFFSET (f1) != DECL_FIELD_OFFSET (f2)
 	    || DECL_FIELD_BIT_OFFSET (f1) != DECL_FIELD_BIT_OFFSET (f2))
 	  break;
@@ -13551,7 +13551,7 @@ verify_type_variant (const_tree t, tree tv)
      in objc_get_protocol_qualified_type.  */
   if (TREE_TYPE (t) != TREE_TYPE (tv)
       && ((TREE_CODE (t) != ARRAY_TYPE
-	   && !POINTER_TYPE_P (t))
+	   && !INDIRECT_TYPE_P (t))
 	  || TYPE_MAIN_VARIANT (TREE_TYPE (t))
 	     != TYPE_MAIN_VARIANT (TREE_TYPE (tv))))
     {
@@ -13699,7 +13699,7 @@ gimple_canonical_types_compatible_p (const_tree t1, const_tree t2,
       || VECTOR_TYPE_P (t1)
       || TREE_CODE (t1) == COMPLEX_TYPE
       || TREE_CODE (t1) == OFFSET_TYPE
-      || POINTER_TYPE_P (t1))
+      || INDIRECT_TYPE_P (t1))
     {
       /* Can't be the same type if they have different precision.  */
       if (TYPE_PRECISION_RAW (t1) != TYPE_PRECISION_RAW (t2))
@@ -13718,7 +13718,7 @@ gimple_canonical_types_compatible_p (const_tree t1, const_tree t2,
       /* Fortran standard define C_PTR type that is compatible with every
  	 C pointer.  For this reason we need to glob all pointers into one.
 	 Still pointers in different address spaces are not compatible.  */
-      if (POINTER_TYPE_P (t1))
+      if (INDIRECT_TYPE_P (t1))
 	{
 	  if (TYPE_ADDR_SPACE (TREE_TYPE (t1))
 	      != TYPE_ADDR_SPACE (TREE_TYPE (t2)))
@@ -14381,7 +14381,7 @@ nonnull_arg_p (const_tree arg)
   unsigned HOST_WIDE_INT arg_num;
 
   gcc_assert (TREE_CODE (arg) == PARM_DECL
-	      && (POINTER_TYPE_P (TREE_TYPE (arg))
+	      && (INDIRECT_TYPE_P (TREE_TYPE (arg))
 		  || TREE_CODE (TREE_TYPE (arg)) == OFFSET_TYPE));
 
   /* The static chain decl is always non null.  */

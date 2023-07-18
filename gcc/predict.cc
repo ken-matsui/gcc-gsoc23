@@ -2755,7 +2755,7 @@ tree_predict_by_opcode (basic_block bb)
   /* Try "pointer heuristic."
      A comparison ptr == 0 is predicted as false.
      Similarly, a comparison ptr1 == ptr2 is predicted as false.  */
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     {
       if (cmp == EQ_EXPR)
 	predict_edge_def (then_edge, PRED_TREE_POINTER, NOT_TAKEN);
@@ -2860,7 +2860,7 @@ return_prediction (tree val, enum prediction *prediction)
   if (!val)
     return PRED_NO_PREDICTION;
   /* Different heuristics for pointers and scalars.  */
-  if (POINTER_TYPE_P (TREE_TYPE (val)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (val)))
     {
       /* NULL is usually not returned.  */
       if (integer_zerop (val))

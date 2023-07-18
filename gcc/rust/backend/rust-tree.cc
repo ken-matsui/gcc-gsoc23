@@ -3648,7 +3648,7 @@ fold_offsetof (tree expr, tree type, enum tree_code ctx)
       gcc_unreachable ();
     }
 
-  if (!POINTER_TYPE_P (type))
+  if (!INDIRECT_TYPE_P (type))
     return size_binop (PLUS_EXPR, base, convert (type, off));
   return fold_build_pointer_plus (base, off);
 }

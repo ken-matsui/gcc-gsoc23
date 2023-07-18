@@ -774,8 +774,8 @@ start_cfg_edge_event::maybe_describe_condition (bool can_colorize,
     return label_text::borrow (NULL);
 
   /* Special cases for pointer comparisons against NULL.  */
-  if (POINTER_TYPE_P (TREE_TYPE (lhs))
-      && POINTER_TYPE_P (TREE_TYPE (rhs))
+  if (INDIRECT_TYPE_P (TREE_TYPE (lhs))
+      && INDIRECT_TYPE_P (TREE_TYPE (rhs))
       && zerop (rhs))
     {
       if (op == EQ_EXPR)

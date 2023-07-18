@@ -53,12 +53,12 @@ d_build_truthvalue_op (tree_code code, tree op0, tree op1)
   STRIP_TYPE_NOPS (op1);
 
   /* Also need to convert pointer/int comparison.  */
-  if (POINTER_TYPE_P (type0) && TREE_CODE (op1) == INTEGER_CST
+  if (INDIRECT_TYPE_P (type0) && TREE_CODE (op1) == INTEGER_CST
       && integer_zerop (op1))
     {
       result_type = type0;
     }
-  else if (POINTER_TYPE_P (type1) && TREE_CODE (op0) == INTEGER_CST
+  else if (INDIRECT_TYPE_P (type1) && TREE_CODE (op0) == INTEGER_CST
 	   && integer_zerop (op0))
     {
       result_type = type1;
@@ -270,7 +270,7 @@ convert (tree type, tree expr)
 
     case INTEGER_TYPE:
     case ENUMERAL_TYPE:
-      if (POINTER_TYPE_P (etype))
+      if (INDIRECT_TYPE_P (etype))
 	{
 	  if (integer_zerop (e))
 	    return build_int_cst (type, 0);
@@ -767,7 +767,7 @@ convert_for_argument (tree expr, Parameter *arg)
   if (valist_array_p (arg->type))
     {
       /* Do nothing if the va_list has already been decayed to a pointer.  */
-      if (!POINTER_TYPE_P (TREE_TYPE (expr)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (expr)))
 	return build_address (expr);
     }
   else if (parameter_reference_p (arg))

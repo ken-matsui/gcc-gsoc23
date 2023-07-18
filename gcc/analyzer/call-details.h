@@ -45,7 +45,7 @@ public:
   unsigned num_args () const;
   bool arg_is_pointer_p (unsigned idx) const
   {
-    return POINTER_TYPE_P (get_arg_type (idx));
+    return INDIRECT_TYPE_P (get_arg_type (idx));
   }
   bool arg_is_size_p (unsigned idx) const;
 

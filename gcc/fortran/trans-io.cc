@@ -1628,7 +1628,7 @@ nml_get_addr_expr (gfc_symbol * sym, gfc_component * c,
 
   /* Build indirect reference, if dummy argument.  */
 
-  if (POINTER_TYPE_P (TREE_TYPE(tmp)))
+  if (INDIRECT_TYPE_P (TREE_TYPE(tmp)))
     tmp = build_fold_indirect_ref_loc (input_location, tmp);
 
   /* Treat the component of a derived type, using base_addr for
@@ -1646,18 +1646,18 @@ nml_get_addr_expr (gfc_symbol * sym, gfc_component * c,
     tmp = gfc_conv_array_data (tmp);
   else
     {
-      if (!POINTER_TYPE_P (TREE_TYPE (tmp)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (tmp)))
 	tmp = gfc_build_addr_expr (NULL_TREE, tmp);
 
       if (TREE_CODE (TREE_TYPE (tmp)) == ARRAY_TYPE)
          tmp = gfc_build_array_ref (tmp, gfc_index_zero_node, NULL);
 
-      if (!POINTER_TYPE_P (TREE_TYPE (tmp)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (tmp)))
 	tmp = build_fold_indirect_ref_loc (input_location,
 				   tmp);
     }
 
-  gcc_assert (tmp && POINTER_TYPE_P (TREE_TYPE (tmp)));
+  gcc_assert (tmp && INDIRECT_TYPE_P (TREE_TYPE (tmp)));
 
   return tmp;
 }

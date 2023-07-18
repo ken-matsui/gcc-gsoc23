@@ -2873,7 +2873,7 @@ expand_call (tree exp, rtx target, int ignore)
 
   /* Operand 0 is a pointer-to-function; get the type of the function.  */
   funtype = TREE_TYPE (addr);
-  gcc_assert (POINTER_TYPE_P (funtype));
+  gcc_assert (INDIRECT_TYPE_P (funtype));
   funtype = TREE_TYPE (funtype);
 
   /* Count whether there are actual complex arguments that need to be split

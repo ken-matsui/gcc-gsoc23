@@ -1731,7 +1731,7 @@ static bool
 types_close_enough_to_match (tree t1, tree t2)
 {
   return (TYPE_MODE (t1) == TYPE_MODE (t2)
-	  && POINTER_TYPE_P (t1) == POINTER_TYPE_P (t2)
+	  && INDIRECT_TYPE_P (t1) == INDIRECT_TYPE_P (t2)
 	  && FUNCTION_POINTER_TYPE_P (t1) == FUNCTION_POINTER_TYPE_P (t2));
 }
 
@@ -1789,7 +1789,7 @@ match_builtin_function_types (tree newtype, tree oldtype,
 	return NULL_TREE;
 
       unsigned j = nbst;
-      if (POINTER_TYPE_P (oldtype))
+      if (INDIRECT_TYPE_P (oldtype))
 	/* Iterate over well-known struct types like FILE (whose types
 	   aren't known to us) and compare the pointer to each to
 	   the pointer argument.  */
@@ -1816,7 +1816,7 @@ match_builtin_function_types (tree newtype, tree oldtype,
 
       if (j == nbst && !comptypes (oldtype, newtype))
 	{
-	  if (POINTER_TYPE_P (oldtype))
+	  if (INDIRECT_TYPE_P (oldtype))
 	    {
 	      /* For incompatible pointers, only reject differences in
 		 the unqualified variants of the referenced types but
@@ -7474,7 +7474,7 @@ grokdeclarator (const struct c_declarator *declarator,
 		   this.  */
 		if (flag_isoc11
 		    && (type_quals & TYPE_QUAL_RESTRICT)
-		    && (!POINTER_TYPE_P (type)
+		    && (!INDIRECT_TYPE_P (type)
 			|| !C_TYPE_OBJECT_OR_INCOMPLETE_P (TREE_TYPE (type))))
 		  error_at (loc, "invalid use of %<restrict%>");
 		type = c_build_qualified_type (type, quals_used);

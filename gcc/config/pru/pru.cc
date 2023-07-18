@@ -2080,7 +2080,7 @@ pru_nongeneric_pointer_addrspace (tree typ)
   while (ARRAY_TYPE == TREE_CODE (typ))
     typ = TREE_TYPE (typ);
 
-  if (POINTER_TYPE_P (typ))
+  if (INDIRECT_TYPE_P (typ))
     {
       addr_space_t as;
       tree target = TREE_TYPE (typ);

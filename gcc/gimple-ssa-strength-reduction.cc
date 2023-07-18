@@ -1462,7 +1462,7 @@ slsr_process_add (gimple *gs, tree rhs1, tree rhs2, bool speed)
       /* First record an interpretation assuming RHS1 is the base expression
 	 and RHS2 is the stride.  But it doesn't make sense for the
 	 stride to be a pointer, so don't record a candidate in that case.  */
-      if (!POINTER_TYPE_P (TREE_TYPE (rhs2)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (rhs2)))
 	{
 	  c = create_add_ssa_cand (gs, rhs1, rhs2, subtract_p, speed);
 
@@ -1479,7 +1479,7 @@ slsr_process_add (gimple *gs, tree rhs1, tree rhs2, bool speed)
       /* Otherwise, record another interpretation assuming RHS2 is the
 	 base expression and RHS1 is the stride, again provided that the
 	 stride is not a pointer.  */
-      if (!POINTER_TYPE_P (TREE_TYPE (rhs1)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (rhs1)))
 	{
 	  c2 = create_add_ssa_cand (gs, rhs2, rhs1, false, speed);
 	  if (c)
@@ -1756,7 +1756,7 @@ find_candidates_dom_walker::before_dom_children (basic_block bb)
 
       else if (is_gimple_assign (gs)
 	       && (INTEGRAL_TYPE_P (TREE_TYPE (gimple_assign_lhs (gs)))
-		   || POINTER_TYPE_P (TREE_TYPE (gimple_assign_lhs (gs)))))
+		   || INDIRECT_TYPE_P (TREE_TYPE (gimple_assign_lhs (gs)))))
 	{
 	  tree rhs1 = NULL_TREE, rhs2 = NULL_TREE;
 
@@ -2293,27 +2293,27 @@ create_add_on_incoming_edge (slsr_cand_t c, tree basis_name,
   /* Occasionally people convert integers to pointers without a 
      cast, leading us into trouble if we aren't careful.  */
   enum tree_code plus_code
-    = POINTER_TYPE_P (basis_type) ? POINTER_PLUS_EXPR : PLUS_EXPR;
+    = INDIRECT_TYPE_P (basis_type) ? POINTER_PLUS_EXPR : PLUS_EXPR;
 
   if (known_stride)
     {
       tree bump_tree;
       enum tree_code code = plus_code;
       widest_int bump = increment * wi::to_widest (c->stride);
-      if (wi::neg_p (bump) && !POINTER_TYPE_P (basis_type))
+      if (wi::neg_p (bump) && !INDIRECT_TYPE_P (basis_type))
 	{
 	  code = MINUS_EXPR;
 	  bump = -bump;
 	}
 
-      tree stride_type = POINTER_TYPE_P (basis_type) ? sizetype : basis_type;
+      tree stride_type = INDIRECT_TYPE_P (basis_type) ? sizetype : basis_type;
       bump_tree = wide_int_to_tree (stride_type, bump);
       new_stmt = gimple_build_assign (lhs, code, basis_name, bump_tree);
     }
   else
     {
       int i;
-      bool negate_incr = !POINTER_TYPE_P (basis_type) && wi::neg_p (increment);
+      bool negate_incr = !INDIRECT_TYPE_P (basis_type) && wi::neg_p (increment);
       i = incr_vec_index (negate_incr ? -increment : increment);
       gcc_assert (i >= 0);
 
@@ -3092,7 +3092,7 @@ analyze_increments (slsr_cand_t first_dep, machine_mode mode, bool speed)
       else if (incr == 0
 	       || incr == 1
 	       || (incr == -1
-		   && !POINTER_TYPE_P (first_dep->cand_type)))
+		   && !INDIRECT_TYPE_P (first_dep->cand_type)))
 	incr_vec[i].cost = COST_NEUTRAL;
 
       /* If we need to add an initializer, give up if a cast from the
@@ -3123,7 +3123,7 @@ analyze_increments (slsr_cand_t first_dep, machine_mode mode, bool speed)
 	 scenarios.  */
       else if (!incr_vec[i].initializer
 	       && TREE_CODE (first_dep->stride) != INTEGER_CST
-	       && POINTER_TYPE_P (first_dep->stride_type))
+	       && INDIRECT_TYPE_P (first_dep->stride_type))
 	incr_vec[i].cost = COST_INFINITE;
 
       /* For any other increment, if this is a multiply candidate, we
@@ -3390,7 +3390,7 @@ insert_initializers (slsr_cand_t c)
       if (!profitable_increment_p (i)
 	  || incr == 1
 	  || (incr == -1
-	      && (!POINTER_TYPE_P (lookup_cand (c->basis)->cand_type)))
+	      && (!INDIRECT_TYPE_P (lookup_cand (c->basis)->cand_type)))
 	  || incr == 0)
 	continue;
 
@@ -3946,7 +3946,7 @@ analyze_candidates_and_replace (void)
 	  /* Determine whether we'll be generating pointer arithmetic
 	     when replacing candidates.  */
 	  address_arithmetic_p = (c->kind == CAND_ADD
-				  && POINTER_TYPE_P (c->cand_type));
+				  && INDIRECT_TYPE_P (c->cand_type));
 
 	  /* If all candidates have already been replaced under other
 	     interpretations, nothing remains to be done.  */

@@ -1456,7 +1456,7 @@ maybe_diag_incompatible_alias (tree alias, tree target)
 
       targtype = TREE_TYPE (targtype);
 
-      if (POINTER_TYPE_P (targtype))
+      if (INDIRECT_TYPE_P (targtype))
 	{
 	  targtype = TREE_TYPE (targtype);
 

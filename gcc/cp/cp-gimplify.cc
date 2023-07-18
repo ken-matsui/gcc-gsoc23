@@ -1226,7 +1226,7 @@ predeclare_vla (tree expr)
 
   /* We need to strip pointers for gimplify_type_sizes.  */
   tree vla = type;
-  while (POINTER_TYPE_P (vla))
+  while (INDIRECT_TYPE_P (vla))
     {
       if (TYPE_NAME (vla))
 	return expr;

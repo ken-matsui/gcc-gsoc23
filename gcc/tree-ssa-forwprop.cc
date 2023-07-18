@@ -638,7 +638,7 @@ forward_propagate_addr_expr_1 (tree name, tree def_rhs,
 
       /* Else recurse if the conversion preserves the address value.  */
       if ((INTEGRAL_TYPE_P (TREE_TYPE (lhs))
-	   || POINTER_TYPE_P (TREE_TYPE (lhs)))
+	   || INDIRECT_TYPE_P (TREE_TYPE (lhs)))
 	  && (TYPE_PRECISION (TREE_TYPE (lhs))
 	      >= TYPE_PRECISION (TREE_TYPE (def_rhs))))
 	return forward_propagate_addr_expr (lhs, def_rhs, single_use_p);
@@ -1108,7 +1108,7 @@ constant_pointer_difference (tree p1, tree p2)
       j = 0;
       do
 	{
-	  if (!POINTER_TYPE_P (TREE_TYPE (p)))
+	  if (!INDIRECT_TYPE_P (TREE_TYPE (p)))
 	    break;
 	  if (TREE_CODE (p) == ADDR_EXPR)
 	    {
@@ -3613,7 +3613,7 @@ pass_forwprop::execute (function *fun)
 		  as well, as this is valid gimple.  */
 	       || (CONVERT_EXPR_CODE_P (code)
 		   && TREE_CODE (rhs) == ADDR_EXPR
-		   && POINTER_TYPE_P (TREE_TYPE (lhs))))
+		   && INDIRECT_TYPE_P (TREE_TYPE (lhs))))
 	      && TREE_CODE (TREE_OPERAND (rhs, 0)) != TARGET_MEM_REF)
 	    {
 	      tree base = get_base_address (TREE_OPERAND (rhs, 0));

@@ -108,7 +108,7 @@ call_summary::get_user_facing_desc (pretty_printer *pp) const
 		const constant_svalue *constant_sval
 		  = as_a <const constant_svalue *> (result_sval);
 		tree cst = constant_sval->get_constant ();
-		if (POINTER_TYPE_P (TREE_TYPE (result))
+		if (INDIRECT_TYPE_P (TREE_TYPE (result))
 		    && zerop (cst))
 		  pp_printf (pp, "when %qE returns NULL", fndecl);
 		else

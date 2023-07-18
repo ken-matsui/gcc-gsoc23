@@ -7003,7 +7003,7 @@ arc_expand_builtin_aligned (tree exp)
 	    return const1_rtx;
 	  /* Another attempt to ascertain alignment.  Check the type
 	     we are pointing to.  */
-	  if (POINTER_TYPE_P (TREE_TYPE (arg0))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (arg0))
 	      && TYPE_ALIGN (TREE_TYPE (TREE_TYPE (arg0))) >= numBits)
 	    return const1_rtx;
 	}

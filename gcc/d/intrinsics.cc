@@ -310,7 +310,7 @@ maybe_warn_intrinsic_mismatch (tree function, tree callexp)
 
 	tree ptr = TREE_TYPE (CALL_EXPR_ARG (callexp, 0));
 	if (!VECTOR_TYPE_P (TREE_TYPE (callexp))
-	    || !POINTER_TYPE_P (ptr) || !VECTOR_TYPE_P (TREE_TYPE (ptr)))
+	    || !INDIRECT_TYPE_P (ptr) || !VECTOR_TYPE_P (TREE_TYPE (ptr)))
 	  return warn_mismatched_return_type (callexp, "__vector(T)");
 
 	return false;
@@ -325,7 +325,7 @@ maybe_warn_intrinsic_mismatch (tree function, tree callexp)
 	tree ptr = TREE_TYPE (CALL_EXPR_ARG (callexp, 0));
 	tree val = TREE_TYPE (CALL_EXPR_ARG (callexp, 1));
 	if (!VECTOR_TYPE_P (TREE_TYPE (callexp))
-	    || !POINTER_TYPE_P (ptr) || !VECTOR_TYPE_P (TREE_TYPE (ptr))
+	    || !INDIRECT_TYPE_P (ptr) || !VECTOR_TYPE_P (TREE_TYPE (ptr))
 	    || !VECTOR_TYPE_P (val))
 	  return warn_mismatched_return_type (callexp, "__vector(T)");
 
@@ -839,7 +839,7 @@ expand_intrinsic_vaarg (tree callexp)
 
       /* The `ref' argument to va_arg is either an address or reference,
 	 get the value of it.  */
-      if (TREE_CODE (parmn) == PARM_DECL && POINTER_TYPE_P (TREE_TYPE (parmn)))
+      if (TREE_CODE (parmn) == PARM_DECL && INDIRECT_TYPE_P (TREE_TYPE (parmn)))
 	parmn = build_deref (parmn);
       else
 	{
@@ -882,7 +882,7 @@ expand_intrinsic_vastart (tree callexp)
      warning.  Could be casting, so need to check type too?  */
   gcc_assert (TREE_CODE (ap) == ADDR_EXPR
 	      || (TREE_CODE (ap) == PARM_DECL
-		  && POINTER_TYPE_P (TREE_TYPE (ap))));
+		  && INDIRECT_TYPE_P (TREE_TYPE (ap))));
 
   /* Assuming nobody tries to change the return type.  */
   if (TREE_CODE (parmn) != PARM_DECL)
@@ -1001,7 +1001,7 @@ expand_volatile_load (tree callexp)
 {
   tree ptr = CALL_EXPR_ARG (callexp, 0);
   tree ptrtype = TREE_TYPE (ptr);
-  gcc_assert (POINTER_TYPE_P (ptrtype));
+  gcc_assert (INDIRECT_TYPE_P (ptrtype));
 
   /* (T) *(volatile T *) ptr;  */
   tree type = build_qualified_type (TREE_TYPE (ptrtype), TYPE_QUAL_VOLATILE);
@@ -1029,7 +1029,7 @@ expand_volatile_store (tree callexp)
 {
   tree ptr = CALL_EXPR_ARG (callexp, 0);
   tree ptrtype = TREE_TYPE (ptr);
-  gcc_assert (POINTER_TYPE_P (ptrtype));
+  gcc_assert (INDIRECT_TYPE_P (ptrtype));
 
   /* (T) *(volatile T *) ptr;  */
   tree type = build_qualified_type (TREE_TYPE (ptrtype), TYPE_QUAL_VOLATILE);

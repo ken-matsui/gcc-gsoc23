@@ -7486,7 +7486,7 @@ gfc_conv_intrinsic_ichar (gfc_se * se, gfc_expr * expr)
 
   nargs = gfc_intrinsic_argument_list_length (expr);
   gfc_conv_intrinsic_function_args (se, expr, args, nargs);
-  gcc_assert (POINTER_TYPE_P (TREE_TYPE (args[1])));
+  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (args[1])));
   pchartype = gfc_get_pchar_type (expr->value.function.actual->expr->ts.kind);
   args[1] = fold_build1_loc (input_location, NOP_EXPR, pchartype, args[1]);
   type = gfc_typenode_for_spec (&expr->ts);
@@ -8103,7 +8103,7 @@ gfc_conv_intrinsic_sizeof (gfc_se *se, gfc_expr *expr)
       tmp = DECL_LANG_SPECIFIC (tmp)
 	    && GFC_DECL_SAVED_DESCRIPTOR (tmp) != NULL_TREE
 	    ? GFC_DECL_SAVED_DESCRIPTOR (tmp) : tmp;
-      if (POINTER_TYPE_P (TREE_TYPE (tmp)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (tmp)))
 	tmp = build_fold_indirect_ref_loc (input_location, tmp);
 
       tmp = gfc_conv_descriptor_dtype (tmp);
@@ -8120,7 +8120,7 @@ gfc_conv_intrinsic_sizeof (gfc_se *se, gfc_expr *expr)
 	 class object.  The class object may be a non-pointer object, e.g.
 	 located on the stack, or a memory location pointed to, e.g. a
 	 parameter, i.e., an indirect_ref.  */
-      if (POINTER_TYPE_P (TREE_TYPE (argse.expr))
+      if (INDIRECT_TYPE_P (TREE_TYPE (argse.expr))
 	  && GFC_CLASS_TYPE_P (TREE_TYPE (TREE_TYPE (argse.expr))))
 	byte_size
 	  = gfc_class_vtab_size_get (build_fold_indirect_ref (argse.expr));
@@ -11853,7 +11853,7 @@ conv_intrinsic_atomic_op (gfc_code *code)
       else
 	image_index = integer_zero_node;
 
-      if (!POINTER_TYPE_P (TREE_TYPE (value)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (value)))
 	{
 	  tmp = gfc_create_var (TREE_TYPE (TREE_TYPE (atom)), "value");
 	  gfc_add_modify (&block, tmp, fold_convert (TREE_TYPE (tmp), value));
@@ -12015,7 +12015,7 @@ conv_intrinsic_atomic_ref (gfc_code *code)
       gfc_add_block_to_block (&block, &argse.pre);
 
       /* Different type, need type conversion.  */
-      if (!POINTER_TYPE_P (TREE_TYPE (value)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (value)))
 	{
 	  vardecl = gfc_create_var (TREE_TYPE (TREE_TYPE (atom)), "value");
           orig_value = value;
@@ -12139,7 +12139,7 @@ conv_intrinsic_atomic_cas (gfc_code *code)
 	}
 
       /* Convert a constant to a pointer.  */
-      if (!POINTER_TYPE_P (TREE_TYPE (comp)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (comp)))
 	{
 	  tmp = gfc_create_var (TREE_TYPE (TREE_TYPE (old)), "comp");
 	  gfc_add_modify (&block, tmp, fold_convert (TREE_TYPE (tmp), comp));

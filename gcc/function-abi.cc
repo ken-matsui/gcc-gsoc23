@@ -249,6 +249,6 @@ expr_callee_abi (const_tree exp)
   if (type == error_mark_node)
     return default_function_abi;
 
-  gcc_assert (POINTER_TYPE_P (type));
+  gcc_assert (INDIRECT_TYPE_P (type));
   return fntype_abi (TREE_TYPE (type));
 }

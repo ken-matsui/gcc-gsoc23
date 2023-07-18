@@ -840,8 +840,8 @@ convert_to_integer_1 (tree type, tree expr, bool dofold)
 	      if (ex_form == MINUS_EXPR
 		  && CONVERT_EXPR_P (arg0)
 		  && CONVERT_EXPR_P (arg1)
-		  && POINTER_TYPE_P (TREE_TYPE (TREE_OPERAND (arg0, 0)))
-		  && POINTER_TYPE_P (TREE_TYPE (TREE_OPERAND (arg1, 0))))
+		  && INDIRECT_TYPE_P (TREE_TYPE (TREE_OPERAND (arg0, 0)))
+		  && INDIRECT_TYPE_P (TREE_TYPE (TREE_OPERAND (arg1, 0))))
 		break;
 
 	      tree tem = do_narrow (loc, ex_form, type, arg0, arg1,

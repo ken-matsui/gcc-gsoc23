@@ -400,7 +400,7 @@ jump_threader::simplify_control_stmt_condition (edge e, gimple *stmt)
 	  tree op1 = gimple_cond_rhs (stmt);
 
 	  if ((INTEGRAL_TYPE_P (TREE_TYPE (op0))
-	       || POINTER_TYPE_P (TREE_TYPE (op0)))
+	       || INDIRECT_TYPE_P (TREE_TYPE (op0)))
 	      && TREE_CODE (op0) == SSA_NAME
 	      && TREE_CODE (op1) == INTEGER_CST)
 	    return op0;

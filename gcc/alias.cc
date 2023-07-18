@@ -1017,7 +1017,7 @@ get_alias_set (tree t)
      ptr_type_node but that is a bad idea, because it prevents disabiguations
      in between pointers.  For Firefox this accounts about 20% of all
      disambiguations in the program.  */
-  else if (POINTER_TYPE_P (t) && t != ptr_type_node)
+  else if (INDIRECT_TYPE_P (t) && t != ptr_type_node)
     {
       tree p;
       auto_vec <bool, 8> reference;
@@ -1025,7 +1025,7 @@ get_alias_set (tree t)
       /* Unnest all pointers and references.
 	 We also want to make pointer to array/vector equivalent to pointer to
 	 its element (see the reasoning above). Skip all those types, too.  */
-      for (p = t; POINTER_TYPE_P (p)
+      for (p = t; INDIRECT_TYPE_P (p)
 	   || (TREE_CODE (p) == ARRAY_TYPE
 	       && (!TYPE_NONALIASED_COMPONENT (p)
 		   || !COMPLETE_TYPE_P (p)
@@ -1136,7 +1136,7 @@ get_alias_set (tree t)
     record_component_aliases (t);
 
   /* We treat pointer types specially in alias_set_subset_of.  */
-  if (POINTER_TYPE_P (t) && set)
+  if (INDIRECT_TYPE_P (t) && set)
     {
       alias_set_entry *ase = get_alias_set_entry (set);
       if (!ase)
@@ -1276,12 +1276,12 @@ record_component_aliases (tree type, alias_set_type superset)
 		  /* VECTOR_TYPE and ARRAY_TYPE share the alias set with their
 		     element type and that type has to be normalized to void *,
 		     too, in the case it is a pointer. */
-		  while (!canonical_type_used_p (t) && !POINTER_TYPE_P (t))
+		  while (!canonical_type_used_p (t) && !INDIRECT_TYPE_P (t))
 		    {
 		      gcc_checking_assert (TYPE_STRUCTURAL_EQUALITY_P (t));
 		      t = TREE_TYPE (t);
 		    }
-		  if (POINTER_TYPE_P (t))
+		  if (INDIRECT_TYPE_P (t))
 		    t = ptr_type_node;
 		  else if (flag_checking)
 		    gcc_checking_assert (get_alias_set (t)

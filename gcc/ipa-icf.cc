@@ -515,12 +515,12 @@ sem_function::compatible_parm_types_p (tree parm1, tree parm2)
   if (!func_checker::compatible_types_p (parm1, parm2))
     return return_false_with_msg ("parameter type is not compatible");
 
-  if (POINTER_TYPE_P (parm1)
+  if (INDIRECT_TYPE_P (parm1)
       && (TYPE_RESTRICT (parm1) != TYPE_RESTRICT (parm2)))
     return return_false_with_msg ("argument restrict flag mismatch");
 
   /* nonnull_arg_p implies non-zero range to REFERENCE types.  */
-  if (POINTER_TYPE_P (parm1)
+  if (INDIRECT_TYPE_P (parm1)
       && TREE_CODE (parm1) != TREE_CODE (parm2)
       && opt_for_fn (decl, flag_delete_null_pointer_checks))
     return return_false_with_msg ("pointer wrt reference mismatch");
@@ -3501,7 +3501,7 @@ sem_item_optimizer::fixup_points_to_sets (void)
 	continue;
 
       FOR_EACH_SSA_NAME (i, name, fn)
-	if (POINTER_TYPE_P (TREE_TYPE (name))
+	if (INDIRECT_TYPE_P (TREE_TYPE (name))
 	    && SSA_NAME_PTR_INFO (name))
 	  fixup_pt_set (&SSA_NAME_PTR_INFO (name)->pt);
       fixup_pt_set (&fn->gimple_df->escaped);

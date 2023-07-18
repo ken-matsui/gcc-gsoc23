@@ -111,7 +111,7 @@ create_iv (tree base, tree_code incr_op, tree step, tree var, class loop *loop,
 	    }
 	}
     }
-  if (POINTER_TYPE_P (TREE_TYPE (base)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (base)))
     {
       if (TREE_CODE (base) == ADDR_EXPR)
 	mark_addressable (TREE_OPERAND (base, 0));
@@ -1482,10 +1482,10 @@ rewrite_phi_with_iv (loop_p loop,
   remove_phi_node (psi, false);
 
   atype = TREE_TYPE (res);
-  mtype = POINTER_TYPE_P (atype) ? sizetype : atype;
+  mtype = INDIRECT_TYPE_P (atype) ? sizetype : atype;
   val = fold_build2 (MULT_EXPR, mtype, unshare_expr (iv.step),
 		     fold_convert (mtype, main_iv));
-  val = fold_build2 (POINTER_TYPE_P (atype)
+  val = fold_build2 (INDIRECT_TYPE_P (atype)
 		     ? POINTER_PLUS_EXPR : PLUS_EXPR,
 		     atype, unshare_expr (iv.base), val);
   val = force_gimple_operand_gsi (gsi, val, false, NULL_TREE, true,
@@ -1551,11 +1551,11 @@ canonicalize_loop_ivs (class loop *loop, tree *nit, bool bump_in_latch)
       type = TREE_TYPE (res);
       if (virtual_operand_p (res)
 	  || (!INTEGRAL_TYPE_P (type)
-	      && !POINTER_TYPE_P (type))
+	      && !INDIRECT_TYPE_P (type))
 	  || TYPE_PRECISION (type) < precision)
 	continue;
 
-      uns = POINTER_TYPE_P (type) | TYPE_UNSIGNED (type);
+      uns = INDIRECT_TYPE_P (type) | TYPE_UNSIGNED (type);
 
       if (TYPE_PRECISION (type) > precision)
 	unsigned_p = uns;

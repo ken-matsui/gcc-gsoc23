@@ -3288,7 +3288,7 @@ verify_types_in_gimple_reference (tree expr, bool require_lvalue)
 	  return true;
 	}
       if (!poly_int_tree_p (TREE_OPERAND (expr, 1))
-	  || !POINTER_TYPE_P (TREE_TYPE (TREE_OPERAND (expr, 1))))
+	  || !INDIRECT_TYPE_P (TREE_TYPE (TREE_OPERAND (expr, 1))))
 	{
 	  error ("invalid offset operand in %qs", code_name);
 	  debug_generic_stmt (expr);
@@ -3314,7 +3314,7 @@ verify_types_in_gimple_reference (tree expr, bool require_lvalue)
 	}
       if (!TMR_OFFSET (expr)
 	  || !poly_int_tree_p (TMR_OFFSET (expr))
-	  || !POINTER_TYPE_P (TREE_TYPE (TMR_OFFSET (expr))))
+	  || !INDIRECT_TYPE_P (TREE_TYPE (TMR_OFFSET (expr))))
 	{
 	  error ("invalid offset operand in %qs", code_name);
 	  debug_generic_stmt (expr);
@@ -3429,7 +3429,7 @@ verify_gimple_call (gcall *stmt)
     }
 
   if (fn
-      && (!POINTER_TYPE_P (TREE_TYPE (fn))
+      && (!INDIRECT_TYPE_P (TREE_TYPE (fn))
 	  || (TREE_CODE (TREE_TYPE (TREE_TYPE (fn))) != FUNCTION_TYPE
 	      && TREE_CODE (TREE_TYPE (TREE_TYPE (fn))) != METHOD_TYPE)))
     {
@@ -3475,8 +3475,8 @@ verify_gimple_call (gcall *stmt)
       /* ???  At least C++ misses conversions at assignments from
 	 void * call results.
 	 For now simply allow arbitrary pointer type conversions.  */
-      && !(POINTER_TYPE_P (TREE_TYPE (lhs))
-	   && POINTER_TYPE_P (TREE_TYPE (fntype))))
+      && !(INDIRECT_TYPE_P (TREE_TYPE (lhs))
+	   && INDIRECT_TYPE_P (TREE_TYPE (fntype))))
     {
       error ("invalid conversion in gimple call");
       debug_generic_stmt (TREE_TYPE (lhs));
@@ -3714,9 +3714,9 @@ verify_gimple_assign_unary (gassign *stmt)
 	   For targets were the precision of ptrofftype doesn't match that
 	   of pointers we allow conversions to types where
 	   POINTERS_EXTEND_UNSIGNED specifies how that works.  */
-	if ((POINTER_TYPE_P (lhs_type)
+	if ((INDIRECT_TYPE_P (lhs_type)
 	     && INTEGRAL_TYPE_P (rhs1_type))
-	    || (POINTER_TYPE_P (rhs1_type)
+	    || (INDIRECT_TYPE_P (rhs1_type)
 		&& INTEGRAL_TYPE_P (lhs_type)
 		&& (TYPE_PRECISION (rhs1_type) >= TYPE_PRECISION (lhs_type)
 #if defined(POINTERS_EXTEND_UNSIGNED)
@@ -3751,7 +3751,7 @@ verify_gimple_assign_unary (gassign *stmt)
 
     case ADDR_SPACE_CONVERT_EXPR:
       {
-	if (!POINTER_TYPE_P (rhs1_type) || !POINTER_TYPE_P (lhs_type)
+	if (!INDIRECT_TYPE_P (rhs1_type) || !INDIRECT_TYPE_P (lhs_type)
 	    || (TYPE_ADDR_SPACE (TREE_TYPE (rhs1_type))
 		== TYPE_ADDR_SPACE (TREE_TYPE (lhs_type))))
 	  {
@@ -3853,7 +3853,7 @@ verify_gimple_assign_unary (gassign *stmt)
     case PAREN_EXPR:
     case CONJ_EXPR:
       /* Disallow pointer and offset types for many of the unary gimple. */
-      if (POINTER_TYPE_P (lhs_type)
+      if (INDIRECT_TYPE_P (lhs_type)
 	  || TREE_CODE (lhs_type) == OFFSET_TYPE)
 	{
 	  error ("invalid types for %qs", code_name);
@@ -4039,9 +4039,9 @@ verify_gimple_assign_binary (gassign *stmt)
 	    rhs1_etype = TREE_TYPE (rhs1_type);
 	    rhs2_etype = TREE_TYPE (rhs2_type);
 	  }
-	if (POINTER_TYPE_P (lhs_etype)
-	    || POINTER_TYPE_P (rhs1_etype)
-	    || POINTER_TYPE_P (rhs2_etype))
+	if (INDIRECT_TYPE_P (lhs_etype)
+	    || INDIRECT_TYPE_P (rhs1_etype)
+	    || INDIRECT_TYPE_P (rhs2_etype))
 	  {
 	    error ("invalid (pointer) operands %qs", code_name);
 	    return true;
@@ -4053,7 +4053,7 @@ verify_gimple_assign_binary (gassign *stmt)
 
     case POINTER_PLUS_EXPR:
       {
-	if (!POINTER_TYPE_P (rhs1_type)
+	if (!INDIRECT_TYPE_P (rhs1_type)
 	    || !useless_type_conversion_p (lhs_type, rhs1_type)
 	    || !ptrofftype_p (rhs2_type))
 	  {
@@ -4069,8 +4069,8 @@ verify_gimple_assign_binary (gassign *stmt)
 
     case POINTER_DIFF_EXPR:
       {
-	if (!POINTER_TYPE_P (rhs1_type)
-	    || !POINTER_TYPE_P (rhs2_type)
+	if (!INDIRECT_TYPE_P (rhs1_type)
+	    || !INDIRECT_TYPE_P (rhs2_type)
 	    /* Because we special-case pointers to void we allow difference
 	       of arbitrary pointers with the same mode.  */
 	    || TYPE_MODE (rhs1_type) != TYPE_MODE (rhs2_type)
@@ -4233,7 +4233,7 @@ verify_gimple_assign_binary (gassign *stmt)
     case BIT_IOR_EXPR:
     case BIT_XOR_EXPR:
       /* Disallow pointer and offset types for many of the binary gimple. */
-      if (POINTER_TYPE_P (lhs_type)
+      if (INDIRECT_TYPE_P (lhs_type)
 	  || TREE_CODE (lhs_type) == OFFSET_TYPE)
 	{
 	  error ("invalid types for %qs", code_name);
@@ -4251,11 +4251,11 @@ verify_gimple_assign_binary (gassign *stmt)
       break;
 
     case BIT_AND_EXPR:
-      if (POINTER_TYPE_P (lhs_type)
+      if (INDIRECT_TYPE_P (lhs_type)
 	  && TREE_CODE (rhs2) == INTEGER_CST)
 	break;
       /* Disallow pointer and offset types for many of the binary gimple. */
-      if (POINTER_TYPE_P (lhs_type)
+      if (INDIRECT_TYPE_P (lhs_type)
 	  || TREE_CODE (lhs_type) == OFFSET_TYPE)
 	{
 	  error ("invalid types for %qs", code_name);
@@ -4889,7 +4889,7 @@ verify_gimple_goto (ggoto *stmt)
      bare LABEL_DECL and an ADDR_EXPR of a LABEL_DECL.  */
   if (TREE_CODE (dest) != LABEL_DECL
       && (!is_gimple_val (dest)
-	  || !POINTER_TYPE_P (TREE_TYPE (dest))))
+	  || !INDIRECT_TYPE_P (TREE_TYPE (dest))))
     {
       error ("goto destination is neither a label nor a pointer");
       return true;

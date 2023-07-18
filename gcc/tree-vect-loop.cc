@@ -5302,7 +5302,7 @@ get_initial_def_for_reduction (loop_vec_info loop_vinfo,
 
   gcc_assert (vectype);
 
-  gcc_assert (POINTER_TYPE_P (scalar_type) || INTEGRAL_TYPE_P (scalar_type)
+  gcc_assert (INDIRECT_TYPE_P (scalar_type) || INTEGRAL_TYPE_P (scalar_type)
 	      || SCALAR_FLOAT_TYPE_P (scalar_type));
 
   gcc_assert (nested_in_vect_loop_p (loop, reduc_info)
@@ -7338,7 +7338,7 @@ vectorizable_reduction (loop_vec_info loop_vinfo,
 			    || op.code == WIDEN_SUM_EXPR
 			    || op.code == SAD_EXPR);
 
-  if (!POINTER_TYPE_P (op.type) && !INTEGRAL_TYPE_P (op.type)
+  if (!INDIRECT_TYPE_P (op.type) && !INTEGRAL_TYPE_P (op.type)
       && !SCALAR_FLOAT_TYPE_P (op.type))
     return false;
 

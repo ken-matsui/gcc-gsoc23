@@ -10569,12 +10569,12 @@ maybe_warn_about_returning_address_of_local (tree retval, location_t loc)
 			"returning local %<initializer_list%> variable %qD "
 			"does not extend the lifetime of the underlying array",
 			whats_returned);
-      else if (POINTER_TYPE_P (valtype)
+      else if (INDIRECT_TYPE_P (valtype)
 	       && TREE_CODE (whats_returned) == LABEL_DECL)
 	w = warning_at (loc, OPT_Wreturn_local_addr,
 			"address of label %qD returned",
 			whats_returned);
-      else if (POINTER_TYPE_P (valtype))
+      else if (INDIRECT_TYPE_P (valtype))
 	w = warning_at (loc, OPT_Wreturn_local_addr,
 			"address of local variable %qD returned",
 			whats_returned);

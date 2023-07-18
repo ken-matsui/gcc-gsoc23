@@ -411,7 +411,7 @@ gimple_build_call_from_tree (tree t, tree fnptrtype)
 	 to the gimple CALL insn.  */
       if (!fndecl)
 	{
-	  gcc_assert (POINTER_TYPE_P (fnptrtype));
+	  gcc_assert (INDIRECT_TYPE_P (fnptrtype));
 	  tree fntype = TREE_TYPE (fnptrtype);
 
 	  if (lookup_attribute ("nocf_check", TYPE_ATTRIBUTES (fntype)))
@@ -3048,7 +3048,7 @@ infer_nonnull_range_by_dereference (gimple *stmt, tree op)
   /* We can only assume that a pointer dereference will yield
      non-NULL if -fdelete-null-pointer-checks is enabled.  */
   if (!flag_delete_null_pointer_checks
-      || !POINTER_TYPE_P (TREE_TYPE (op))
+      || !INDIRECT_TYPE_P (TREE_TYPE (op))
       || gimple_code (stmt) == GIMPLE_ASM
       || gimple_clobber_p (stmt))
     return false;
@@ -3068,7 +3068,7 @@ infer_nonnull_range_by_attribute (gimple *stmt, tree op)
   /* We can only assume that a pointer dereference will yield
      non-NULL if -fdelete-null-pointer-checks is enabled.  */
   if (!flag_delete_null_pointer_checks
-      || !POINTER_TYPE_P (TREE_TYPE (op))
+      || !INDIRECT_TYPE_P (TREE_TYPE (op))
       || gimple_code (stmt) == GIMPLE_ASM)
     return false;
 
@@ -3091,7 +3091,7 @@ infer_nonnull_range_by_attribute (gimple *stmt, tree op)
 	    {
 	      for (unsigned int i = 0; i < gimple_call_num_args (stmt); i++)
 		{
-		  if (POINTER_TYPE_P (TREE_TYPE (gimple_call_arg (stmt, i)))
+		  if (INDIRECT_TYPE_P (TREE_TYPE (gimple_call_arg (stmt, i)))
 		      && operand_equal_p (op, gimple_call_arg (stmt, i), 0))
 		    return true;
 		}

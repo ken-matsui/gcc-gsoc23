@@ -2157,7 +2157,7 @@ epiphany_function_ok_for_sibcall (tree decl, tree exp)
     {
       tree fn_type = TREE_TYPE (CALL_EXPR_FN (exp));
 
-      gcc_assert (POINTER_TYPE_P (fn_type));
+      gcc_assert (INDIRECT_TYPE_P (fn_type));
       fn_type = TREE_TYPE (fn_type);
       gcc_assert (FUNC_OR_METHOD_TYPE_P (fn_type));
       call_interrupt_p

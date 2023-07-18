@@ -702,8 +702,8 @@ strict_aliasing_warning (location_t loc, tree type, tree expr)
   tree otype = TREE_TYPE (expr);
 
   if (!(flag_strict_aliasing
-	&& POINTER_TYPE_P (type)
-	&& POINTER_TYPE_P (otype)
+	&& INDIRECT_TYPE_P (type)
+	&& INDIRECT_TYPE_P (otype)
 	&& !VOID_TYPE_P (TREE_TYPE (type)))
       /* If the type we are casting to is a ref-all pointer
 	 dereferencing it is always valid.  */
@@ -879,7 +879,7 @@ sizeof_pointer_memaccess_warning (location_t *sizeof_arg_loc, tree callee,
   type = TYPE_P (sizeof_arg[idx])
 	 ? sizeof_arg[idx] : TREE_TYPE (sizeof_arg[idx]);
 
-  if (!POINTER_TYPE_P (type))
+  if (!INDIRECT_TYPE_P (type))
     {
       /* The argument type may be an array.  Diagnose bounded string
 	 copy functions that specify the bound in terms of the source
@@ -921,13 +921,13 @@ sizeof_pointer_memaccess_warning (location_t *sizeof_arg_loc, tree callee,
 
   if (dest
       && (tem = tree_strip_nop_conversions (dest))
-      && POINTER_TYPE_P (TREE_TYPE (tem))
+      && INDIRECT_TYPE_P (TREE_TYPE (tem))
       && comp_types (TREE_TYPE (TREE_TYPE (tem)), type))
     return;
 
   if (src
       && (tem = tree_strip_nop_conversions (src))
-      && POINTER_TYPE_P (TREE_TYPE (tem))
+      && INDIRECT_TYPE_P (TREE_TYPE (tem))
       && comp_types (TREE_TYPE (TREE_TYPE (tem)), type))
     return;
 
@@ -959,7 +959,7 @@ sizeof_pointer_memaccess_warning (location_t *sizeof_arg_loc, tree callee,
 	  return;
 	}
 
-      if (POINTER_TYPE_P (TREE_TYPE (dest))
+      if (INDIRECT_TYPE_P (TREE_TYPE (dest))
 	  && !strop
 	  && comp_types (TREE_TYPE (dest), type)
 	  && !VOID_TYPE_P (TREE_TYPE (type)))
@@ -999,7 +999,7 @@ sizeof_pointer_memaccess_warning (location_t *sizeof_arg_loc, tree callee,
 	  return;
 	}
 
-      if (POINTER_TYPE_P (TREE_TYPE (src))
+      if (INDIRECT_TYPE_P (TREE_TYPE (src))
 	  && !strop
 	  && comp_types (TREE_TYPE (src), type)
 	  && !VOID_TYPE_P (TREE_TYPE (type)))
@@ -1039,7 +1039,7 @@ sizeof_pointer_memaccess_warning (location_t *sizeof_arg_loc, tree callee,
 	  return;
 	}
 
-      if (POINTER_TYPE_P (TREE_TYPE (dest))
+      if (INDIRECT_TYPE_P (TREE_TYPE (dest))
 	  && !strop
 	  && comp_types (TREE_TYPE (dest), type)
 	  && !VOID_TYPE_P (TREE_TYPE (type)))
@@ -1079,7 +1079,7 @@ sizeof_pointer_memaccess_warning (location_t *sizeof_arg_loc, tree callee,
 	  return;
 	}
 
-      if (POINTER_TYPE_P (TREE_TYPE (src))
+      if (INDIRECT_TYPE_P (TREE_TYPE (src))
 	  && !strop
 	  && comp_types (TREE_TYPE (src), type)
 	  && !VOID_TYPE_P (TREE_TYPE (type)))
@@ -1116,7 +1116,7 @@ check_main_parameter_types (tree decl)
 	  pedwarn (input_location, OPT_Wmain,
 		   "%<_Atomic%>-qualified parameter type %qT of %q+D",
 		   type, decl);
-      while (POINTER_TYPE_P (t))
+      while (INDIRECT_TYPE_P (t))
 	{
 	  t = TREE_TYPE (t);
 	  if (TYPE_ATOMIC (t))
@@ -3012,7 +3012,7 @@ check_address_or_pointer_of_packed_member (tree type, tree rhs)
       rvalue = indirect;
     }
 
-  if (!POINTER_TYPE_P (type))
+  if (!INDIRECT_TYPE_P (type))
     return NULL_TREE;
 
   type = TREE_TYPE (type);
@@ -3030,15 +3030,15 @@ check_address_or_pointer_of_packed_member (tree type, tree rhs)
 	  rhs = TREE_TYPE (rhs);	/* Pointer type.  */
 	  /* We could be called while processing a template and RHS could be
 	     a functor.  In that case it's a class, not a pointer.  */
-	  if (!POINTER_TYPE_P (rhs))
+	  if (!INDIRECT_TYPE_P (rhs))
 	    return NULL_TREE;
 	  rhs = TREE_TYPE (rhs);	/* Function type.  */
 	  rhstype = TREE_TYPE (rhs);
-	  if (!rhstype || !POINTER_TYPE_P (rhstype))
+	  if (!rhstype || !INDIRECT_TYPE_P (rhstype))
 	    return NULL_TREE;
 	  rvalue = true;
 	}
-      if (rvalue && POINTER_TYPE_P (rhstype))
+      if (rvalue && INDIRECT_TYPE_P (rhstype))
 	rhstype = TREE_TYPE (rhstype);
       while (TREE_CODE (rhstype) == ARRAY_TYPE)
 	rhstype = TREE_TYPE (rhstype);
@@ -3168,7 +3168,7 @@ warn_for_address_or_pointer_of_packed_member (tree type, tree rhs)
     return;
 
   /* Don't warn if we don't assign RHS to a pointer.  */
-  if (!POINTER_TYPE_P (type))
+  if (!INDIRECT_TYPE_P (type))
     return;
 
   check_and_warn_address_or_pointer_of_packed_member (type, rhs);
@@ -3458,7 +3458,7 @@ warn_parm_array_mismatch (location_t origloc, tree fndecl, tree newparms)
       /* Only check pointers and C++ references.  */
       tree curptype = TREE_TYPE (curp);
       tree newptype = TREE_TYPE (newp);
-      if (!POINTER_TYPE_P (curptype) || !POINTER_TYPE_P (newptype))
+      if (!INDIRECT_TYPE_P (curptype) || !INDIRECT_TYPE_P (newptype))
 	continue;
 
       /* Skip mismatches in __builtin_va_list that is commonly

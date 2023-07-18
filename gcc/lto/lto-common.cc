@@ -261,7 +261,7 @@ hash_canonical_type (tree type)
       || SCALAR_FLOAT_TYPE_P (type)
       || FIXED_POINT_TYPE_P (type)
       || TREE_CODE (type) == OFFSET_TYPE
-      || POINTER_TYPE_P (type))
+      || INDIRECT_TYPE_P (type))
     {
       hstate.add_int (TYPE_PRECISION (type));
       if (!type_with_interoperable_signedness (type))
@@ -284,7 +284,7 @@ hash_canonical_type (tree type)
   /* Fortran standard define C_PTR type that is compatible with every
      C pointer.  For this reason we need to glob all pointers into one.
      Still pointers in different address spaces are not compatible.  */
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     hstate.add_int (TYPE_ADDR_SPACE (TREE_TYPE (type)));
 
   /* For array types hash the domain bounds and the string flag.  */
@@ -542,7 +542,7 @@ lto_register_canonical_types (tree node, bool first_p)
   if (first_p)
     TYPE_CANONICAL (node) = NULL_TREE;
 
-  if (POINTER_TYPE_P (node)
+  if (INDIRECT_TYPE_P (node)
       || TREE_CODE (node) == COMPLEX_TYPE
       || TREE_CODE (node) == ARRAY_TYPE)
     lto_register_canonical_types (TREE_TYPE (node), first_p);
@@ -1531,7 +1531,7 @@ compare_tree_sccs_1 (tree t1, tree t2, tree **map)
 	       || code == METHOD_TYPE)
 	compare_tree_edges (TYPE_ARG_TYPES (t1), TYPE_ARG_TYPES (t2));
 
-      if (!POINTER_TYPE_P (t1))
+      if (!INDIRECT_TYPE_P (t1))
 	compare_tree_edges (TYPE_MIN_VALUE_RAW (t1), TYPE_MIN_VALUE_RAW (t2));
       compare_tree_edges (TYPE_MAX_VALUE_RAW (t1), TYPE_MAX_VALUE_RAW (t2));
     }

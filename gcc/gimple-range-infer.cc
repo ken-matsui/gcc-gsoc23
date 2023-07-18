@@ -151,7 +151,7 @@ gimple_infer_range::gimple_infer_range (gimple *s)
 		  || bitmap_bit_p (nonnullargs, i))
 		{
 		  tree op = gimple_call_arg (s, i);
-		  if (POINTER_TYPE_P (TREE_TYPE (op)))
+		  if (INDIRECT_TYPE_P (TREE_TYPE (op)))
 		    add_nonzero (op);
 		}
 	    }

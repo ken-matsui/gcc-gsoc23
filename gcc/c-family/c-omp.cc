@@ -234,7 +234,7 @@ c_finish_omp_atomic (location_t loc, enum tree_code code,
      And lets not even talk about vector types...  */
   type = TREE_TYPE (lhs);
   if (!INTEGRAL_TYPE_P (type)
-      && !POINTER_TYPE_P (type)
+      && !INDIRECT_TYPE_P (type)
       && !SCALAR_FLOAT_TYPE_P (type))
     {
       error_at (loc, "invalid expression type for %<#pragma omp atomic%>");
@@ -912,7 +912,7 @@ check_omp_for_incr_expr (location_t loc, tree exp, tree decl)
 static tree
 c_omp_for_incr_canonicalize_ptr (location_t loc, tree decl, tree incr)
 {
-  if (POINTER_TYPE_P (TREE_TYPE (decl))
+  if (INDIRECT_TYPE_P (TREE_TYPE (decl))
       && TREE_OPERAND (incr, 1))
     {
       tree t = fold_convert_loc (loc,
@@ -3032,7 +3032,7 @@ c_omp_adjust_map_clauses (tree clauses, bool is_target)
 	if (OMP_CLAUSE_CODE (c) == OMP_CLAUSE_MAP
 	    && OMP_CLAUSE_MAP_KIND (c) == GOMP_MAP_FIRSTPRIVATE_POINTER
 	    && DECL_P (OMP_CLAUSE_DECL (c))
-	    && POINTER_TYPE_P (TREE_TYPE (OMP_CLAUSE_DECL (c))))
+	    && INDIRECT_TYPE_P (TREE_TYPE (OMP_CLAUSE_DECL (c))))
 	  {
 	    tree ptr = OMP_CLAUSE_DECL (c);
 	    OMP_CLAUSE_SET_MAP_KIND (c, GOMP_MAP_ATTACH_DETACH);
@@ -3057,7 +3057,7 @@ c_omp_adjust_map_clauses (tree clauses, bool is_target)
 	   and merge them with a hash_map to process below.  */
 
 	if (OMP_CLAUSE_MAP_KIND (c) == GOMP_MAP_FIRSTPRIVATE_POINTER
-	    && POINTER_TYPE_P (TREE_TYPE (OMP_CLAUSE_DECL (c))))
+	    && INDIRECT_TYPE_P (TREE_TYPE (OMP_CLAUSE_DECL (c))))
 	  {
 	    tree ptr = OMP_CLAUSE_DECL (c);
 	    map_clause &mc = maps.get_or_insert (ptr);

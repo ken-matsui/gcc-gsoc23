@@ -1069,7 +1069,7 @@ function_resolver::scalar_argument_p (unsigned int i)
   return (INTEGRAL_TYPE_P (type)
 	  /* Allow pointer types, leaving the frontend to warn where
 	     necessary.  */
-	  || POINTER_TYPE_P (type)
+	  || INDIRECT_TYPE_P (type)
 	  || SCALAR_FLOAT_TYPE_P (type));
 }
 

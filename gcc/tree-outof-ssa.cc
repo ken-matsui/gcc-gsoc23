@@ -690,7 +690,7 @@ get_temp_reg (tree name)
   if (reg_mode == BLKmode)
     return assign_temp (type, 0, 0);
   rtx x = gen_reg_rtx (reg_mode);
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     mark_reg_pointer (x, TYPE_ALIGN (TREE_TYPE (type)));
   return x;
 }

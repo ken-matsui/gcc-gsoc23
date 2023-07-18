@@ -297,7 +297,7 @@ get_stateful_arg (sm_context *sm_ctxt, const gcall *call, unsigned arg_idx)
 {
   tree ap = gimple_call_arg (call, arg_idx);
   if (ap
-      && POINTER_TYPE_P (TREE_TYPE (ap)))
+      && INDIRECT_TYPE_P (TREE_TYPE (ap)))
     {
       if (const program_state *new_state = sm_ctxt->get_new_program_state ())
 	{

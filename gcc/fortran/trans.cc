@@ -344,7 +344,7 @@ gfc_build_addr_expr (tree type, tree t)
   tree base_type = TREE_TYPE (t);
   tree natural_type;
 
-  if (type && POINTER_TYPE_P (type)
+  if (type && INDIRECT_TYPE_P (type)
       && TREE_CODE (base_type) == ARRAY_TYPE
       && TYPE_MAIN_VARIANT (TREE_TYPE (type))
 	 == TYPE_MAIN_VARIANT (TREE_TYPE (base_type)))
@@ -424,7 +424,7 @@ get_array_span (tree type, tree decl)
 	  else
 	    {
 	      /* Allow for dummy arguments and other good things.  */
-	      if (POINTER_TYPE_P (TREE_TYPE (decl)))
+	      if (INDIRECT_TYPE_P (TREE_TYPE (decl)))
 		decl = build_fold_indirect_ref_loc (input_location, decl);
 
 	      /* Check if '_data' is an array descriptor.  If it is not,
@@ -1117,7 +1117,7 @@ get_final_proc_ref (gfc_se *se, gfc_expr *expr, tree class_container)
       gfc_conv_expr (se, final_wrapper);
     }
 
-  if (POINTER_TYPE_P (TREE_TYPE (se->expr)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (se->expr)))
     se->expr = build_fold_indirect_ref_loc (input_location, se->expr);
 }
 
@@ -1212,7 +1212,7 @@ get_var_descr (gfc_se *se, gfc_expr *var, tree class_container)
       gcc_assert (tmp_se.post.head == NULL_TREE);
     }
 
-  if (!POINTER_TYPE_P (TREE_TYPE (tmp_se.expr)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (tmp_se.expr)))
     tmp_se.expr = gfc_build_addr_expr (NULL, tmp_se.expr);
 
   gfc_add_block_to_block (&se->pre, &tmp_se.pre);
@@ -1309,7 +1309,7 @@ gfc_add_comp_finalizer_call (stmtblock_t *block, tree decl, gfc_component *comp,
       gcc_assert (se.post.head == NULL_TREE);
     }
 
-  if (!POINTER_TYPE_P (TREE_TYPE (array)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (array)))
     array = gfc_build_addr_expr (NULL, array);
 
   if (!final_expr)
@@ -1322,7 +1322,7 @@ gfc_add_comp_finalizer_call (stmtblock_t *block, tree decl, gfc_component *comp,
 			      logical_type_node, cond, tmp);
     }
 
-  if (POINTER_TYPE_P (TREE_TYPE (final_fndecl)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (final_fndecl)))
     final_fndecl = build_fold_indirect_ref_loc (input_location, final_fndecl);
 
   tmp = build_call_expr_loc (input_location,
@@ -1912,7 +1912,7 @@ gfc_deallocate_with_status (tree pointer, tree status, tree errmsg,
       else
 	{
 	  gcc_assert (errlen != NULL_TREE);
-	  if (!POINTER_TYPE_P (TREE_TYPE (errmsg)))
+	  if (!INDIRECT_TYPE_P (TREE_TYPE (errmsg)))
 	    errmsg = gfc_build_addr_expr (NULL_TREE, errmsg);
 	}
 

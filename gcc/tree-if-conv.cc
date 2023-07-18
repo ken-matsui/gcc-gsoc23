@@ -1069,7 +1069,7 @@ if_convertible_gimple_assign_stmt_p (gimple *stmt,
       return false;
     }
   else if ((INTEGRAL_TYPE_P (TREE_TYPE (lhs))
-	    || POINTER_TYPE_P (TREE_TYPE (lhs)))
+	    || INDIRECT_TYPE_P (TREE_TYPE (lhs)))
 	   && TYPE_OVERFLOW_UNDEFINED (TREE_TYPE (lhs))
 	   && arith_code_with_undefined_signed_overflow
 				(gimple_assign_rhs_code (stmt)))
@@ -2719,7 +2719,7 @@ predicate_statements (loop_p loop)
 	    }
 	  else if (((lhs = gimple_assign_lhs (stmt)), true)
 		   && (INTEGRAL_TYPE_P (TREE_TYPE (lhs))
-		       || POINTER_TYPE_P (TREE_TYPE (lhs)))
+		       || INDIRECT_TYPE_P (TREE_TYPE (lhs)))
 		   && TYPE_OVERFLOW_UNDEFINED (TREE_TYPE (lhs))
 		   && arith_code_with_undefined_signed_overflow
 						(gimple_assign_rhs_code (stmt)))

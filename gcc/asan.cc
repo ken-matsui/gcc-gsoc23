@@ -2811,7 +2811,7 @@ instrument_derefs (gimple_stmt_iterator *iter, tree t,
 static void
 maybe_update_mem_ref_hash_table (tree base, tree len)
 {
-  if (!POINTER_TYPE_P (TREE_TYPE (base))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (base))
       || !INTEGRAL_TYPE_P (TREE_TYPE (len)))
     return;
 
@@ -2834,7 +2834,7 @@ instrument_mem_region_access (tree base, tree len,
 			      gimple_stmt_iterator *iter,
 			      location_t location, bool is_store)
 {
-  if (!POINTER_TYPE_P (TREE_TYPE (base))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (base))
       || !INTEGRAL_TYPE_P (TREE_TYPE (len))
       || integer_zerop (len))
     return;

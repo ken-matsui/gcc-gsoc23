@@ -539,7 +539,7 @@ fini_copy_prop (void)
 	  basic_block copy_of_bb
 	    = gimple_bb (SSA_NAME_DEF_STMT (copy_of[i].value));
 	  basic_block var_bb = gimple_bb (SSA_NAME_DEF_STMT (var));
-	  if (POINTER_TYPE_P (TREE_TYPE (var))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (var))
 	      && SSA_NAME_PTR_INFO (var)
 	      && !SSA_NAME_PTR_INFO (copy_of[i].value))
 	    {
@@ -553,7 +553,7 @@ fini_copy_prop (void)
 	      if (var_bb != copy_of_bb)
 		reset_flow_sensitive_info (copy_of[i].value);
 	    }
-	  else if (!POINTER_TYPE_P (TREE_TYPE (var))
+	  else if (!INDIRECT_TYPE_P (TREE_TYPE (var))
 		   && SSA_NAME_RANGE_INFO (var)
 		   && !SSA_NAME_RANGE_INFO (copy_of[i].value)
 		   && var_bb == copy_of_bb)

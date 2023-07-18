@@ -20271,7 +20271,7 @@ rs6000_handle_altivec_attribute (tree *node,
        ? *IDENTIFIER_POINTER (TREE_VALUE (args))
        : '?');
 
-  while (POINTER_TYPE_P (type)
+  while (INDIRECT_TYPE_P (type)
 	 || TREE_CODE (type) == FUNCTION_TYPE
 	 || TREE_CODE (type) == METHOD_TYPE
 	 || TREE_CODE (type) == ARRAY_TYPE)
@@ -23761,7 +23761,7 @@ rs6000_function_value (const_tree valtype,
 
   if ((INTEGRAL_TYPE_P (valtype)
        && GET_MODE_BITSIZE (mode) < (TARGET_32BIT ? 32 : 64))
-      || POINTER_TYPE_P (valtype))
+      || INDIRECT_TYPE_P (valtype))
     mode = TARGET_32BIT ? SImode : DImode;
 
   if (DECIMAL_FLOAT_MODE_P (mode) && TARGET_HARD_FLOAT)

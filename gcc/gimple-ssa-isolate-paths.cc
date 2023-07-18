@@ -268,7 +268,7 @@ stmt_uses_name_in_undefined_way (gimple *use_stmt, tree name, location_t loc)
   /* If we are working with a non pointer type, then see
      if this use is a DIV/MOD operation using NAME as the
      divisor.  */
-  if (!POINTER_TYPE_P (TREE_TYPE (name)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (name)))
     {
       if (!cfun->can_throw_non_call_exceptions)
 	return is_divmod_with_given_divisor (use_stmt, name);
@@ -449,7 +449,7 @@ is_addr_local (gimple *return_stmt, tree exp, locmap_t *plocmap,
       return true;
     }
 
-  if (!POINTER_TYPE_P (TREE_TYPE (exp)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (exp)))
     return false;
 
   if (TREE_CODE (exp) == SSA_NAME)
@@ -460,7 +460,7 @@ is_addr_local (gimple *return_stmt, tree exp, locmap_t *plocmap,
       if (is_gimple_assign (def_stmt))
 	{
 	  tree type = TREE_TYPE (gimple_assign_lhs (def_stmt));
-	  if (POINTER_TYPE_P (type))
+	  if (INDIRECT_TYPE_P (type))
 	    {
 	      tree_code code = gimple_assign_rhs_code (def_stmt);
 	      tree ptr1 = NULL_TREE, ptr2 = NULL_TREE;

@@ -374,11 +374,11 @@ ubsan_type_descriptor (tree type, enum ubsan_print_style pstyle)
   /* Get the name of the type, or the name of the pointer type.  */
   if (pstyle == UBSAN_PRINT_POINTER)
     {
-      gcc_assert (POINTER_TYPE_P (type));
+      gcc_assert (INDIRECT_TYPE_P (type));
       type2 = TREE_TYPE (type);
 
       /* Remove any '*' operators from TYPE.  */
-      while (POINTER_TYPE_P (type2))
+      while (INDIRECT_TYPE_P (type2))
         deref_depth++, type2 = TREE_TYPE (type2);
 
       if (TREE_CODE (type2) == METHOD_TYPE)
@@ -390,7 +390,7 @@ ubsan_type_descriptor (tree type, enum ubsan_print_style pstyle)
 
   if (pstyle == UBSAN_PRINT_ARRAY)
     {
-      while (POINTER_TYPE_P (type2))
+      while (INDIRECT_TYPE_P (type2))
         deref_depth++, type2 = TREE_TYPE (type2);
     }
 
@@ -1394,7 +1394,7 @@ instrument_mem_ref (tree mem, tree base, gimple_stmt_iterator *iter,
   if (align == 0 && !sanitize_flags_p (SANITIZE_NULL))
     return;
   tree t = TREE_OPERAND (base, 0);
-  if (!POINTER_TYPE_P (TREE_TYPE (t)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (t)))
     return;
   if (RECORD_OR_UNION_TYPE_P (TREE_TYPE (base)) && mem != base)
     ikind = UBSAN_MEMBER_ACCESS;
@@ -1494,7 +1494,7 @@ maybe_instrument_pointer_overflow (gimple_stmt_iterator *gsi, tree t)
   else
     return;
 
-  if (!POINTER_TYPE_P (TREE_TYPE (base)) && !DECL_P (base))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (base)) && !DECL_P (base))
     return;
   bytepos = bits_to_bytes_round_down (bitpos);
   if (offset == NULL_TREE && known_eq (bytepos, 0) && moff == NULL_TREE)
@@ -1970,7 +1970,7 @@ instrument_nonnull_arg (gimple_stmt_iterator *gsi)
   for (unsigned int i = 0; i < gimple_call_num_args (stmt); i++)
     {
       tree arg = gimple_call_arg (stmt, i);
-      if (POINTER_TYPE_P (TREE_TYPE (arg))
+      if (INDIRECT_TYPE_P (TREE_TYPE (arg))
 	  && infer_nonnull_range_by_attribute (stmt, arg))
 	{
 	  gimple *g;
@@ -2034,7 +2034,7 @@ instrument_nonnull_return (gimple_stmt_iterator *gsi)
   loc[0] = gimple_location (stmt);
   loc[1] = UNKNOWN_LOCATION;
   if (arg
-      && POINTER_TYPE_P (TREE_TYPE (arg))
+      && INDIRECT_TYPE_P (TREE_TYPE (arg))
       && is_gimple_val (arg)
       && infer_nonnull_range_by_attribute (stmt, arg))
     {
@@ -2153,7 +2153,7 @@ instrument_object_size (gimple_stmt_iterator *gsi, tree t, bool is_lhs)
       gimple *def_stmt = SSA_NAME_DEF_STMT (base);
       if (gimple_assign_ssa_name_copy_p (def_stmt)
 	  || (gimple_assign_cast_p (def_stmt)
-	      && POINTER_TYPE_P (TREE_TYPE (gimple_assign_rhs1 (def_stmt))))
+	      && INDIRECT_TYPE_P (TREE_TYPE (gimple_assign_rhs1 (def_stmt))))
 	  || (is_gimple_assign (def_stmt)
 	      && gimple_assign_rhs_code (def_stmt) == POINTER_PLUS_EXPR))
 	{
@@ -2168,7 +2168,7 @@ instrument_object_size (gimple_stmt_iterator *gsi, tree t, bool is_lhs)
 	break;
     }
 
-  if (!POINTER_TYPE_P (TREE_TYPE (base)) && !DECL_P (base))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (base)) && !DECL_P (base))
     return;
 
   tree sizet;

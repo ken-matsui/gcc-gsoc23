@@ -175,7 +175,7 @@ svalue::can_merge_p (const svalue *other,
     return NULL;
 
   /* Reject attempts to merge NULL pointers with not-NULL-pointers.  */
-  if (POINTER_TYPE_P (get_type ()))
+  if (INDIRECT_TYPE_P (get_type ()))
     {
       bool null0 = false;
       bool null1 = false;

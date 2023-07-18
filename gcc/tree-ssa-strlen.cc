@@ -1358,7 +1358,7 @@ maybe_invalidate (gimple *stmt, bool zero_write = false)
 
   for (unsigned i = 1; vec_safe_iterate (stridx_to_strinfo, i, &si); ++i)
     {
-      if (si == NULL || !POINTER_TYPE_P (TREE_TYPE (si->ptr)))
+      if (si == NULL || !INDIRECT_TYPE_P (TREE_TYPE (si->ptr)))
 	continue;
 
       nonempty = true;
@@ -1673,7 +1673,7 @@ find_equal_ptrs (tree ptr, int idx)
 	case SSA_NAME:
 	  break;
 	CASE_CONVERT:
-	  if (!POINTER_TYPE_P (TREE_TYPE (ptr)))
+	  if (!INDIRECT_TYPE_P (TREE_TYPE (ptr)))
 	    return;
 	  if (TREE_CODE (ptr) == SSA_NAME)
 	    break;
@@ -5654,11 +5654,11 @@ strlen_pass::check_and_optimize_stmt (bool *cleanup_eh)
       tree lhs = gimple_assign_lhs (stmt);
       tree lhs_type = TREE_TYPE (lhs);
 
-      if (TREE_CODE (lhs) == SSA_NAME && POINTER_TYPE_P (lhs_type))
+      if (TREE_CODE (lhs) == SSA_NAME && INDIRECT_TYPE_P (lhs_type))
 	{
 	  if (gimple_assign_single_p (stmt)
 	      || (gimple_assign_cast_p (stmt)
-		  && POINTER_TYPE_P (TREE_TYPE (gimple_assign_rhs1 (stmt)))))
+		  && INDIRECT_TYPE_P (TREE_TYPE (gimple_assign_rhs1 (stmt)))))
 	    {
 	      int idx = get_stridx (gimple_assign_rhs1 (stmt), stmt);
 	      ssa_ver_to_stridx[SSA_NAME_VERSION (lhs)] = idx;
@@ -5804,7 +5804,7 @@ strlen_pass::before_dom_children (basic_block bb)
     {
       gphi *phi = gsi.phi ();
       tree result = gimple_phi_result (phi);
-      if (!virtual_operand_p (result) && POINTER_TYPE_P (TREE_TYPE (result)))
+      if (!virtual_operand_p (result) && INDIRECT_TYPE_P (TREE_TYPE (result)))
 	{
 	  int idx = get_stridx (gimple_phi_arg_def (phi, 0), phi);
 	  if (idx != 0)

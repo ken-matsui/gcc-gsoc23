@@ -390,8 +390,8 @@ compare_values_warnv (tree val1, tree val2, bool *strict_overflow_p)
 
   /* Below we rely on the fact that VAL1 and VAL2 are both pointers or
      both integers.  */
-  gcc_assert (POINTER_TYPE_P (TREE_TYPE (val1))
-	      == POINTER_TYPE_P (TREE_TYPE (val2)));
+  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (val1))
+	      == INDIRECT_TYPE_P (TREE_TYPE (val2)));
 
   /* Convert the two values into the same type.  This is needed because
      sizetype causes sign extension even for unsigned types.  */
@@ -477,7 +477,7 @@ compare_values_warnv (tree val1, tree val2, bool *strict_overflow_p)
   if (!cst1 || !cst2)
     return -2;
 
-  if (!POINTER_TYPE_P (TREE_TYPE (val1)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (val1)))
     {
       /* We cannot compare overflowed values.  */
       if (TREE_OVERFLOW (val1) || TREE_OVERFLOW (val2))

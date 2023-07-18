@@ -106,13 +106,13 @@ binary_op (tree_code code, tree type, tree arg0, tree arg1)
   if (code == FLOAT_MOD_EXPR)
     return build_float_modulus (type, arg0, arg1);
 
-  if (POINTER_TYPE_P (t0) && INTEGRAL_TYPE_P (t1))
+  if (INDIRECT_TYPE_P (t0) && INTEGRAL_TYPE_P (t1))
     return build_nop (type, build_offset_op (code, arg0, arg1));
 
-  if (INTEGRAL_TYPE_P (t0) && POINTER_TYPE_P (t1))
+  if (INTEGRAL_TYPE_P (t0) && INDIRECT_TYPE_P (t1))
     return build_nop (type, build_offset_op (code, arg1, arg0));
 
-  if (POINTER_TYPE_P (t0) && POINTER_TYPE_P (t1))
+  if (INDIRECT_TYPE_P (t0) && INDIRECT_TYPE_P (t1))
     {
       gcc_assert (code == MINUS_EXPR);
       tree ptrtype = lang_hooks.types.type_for_mode (ptr_mode, 0);
@@ -1625,7 +1625,7 @@ public:
 		  thisexp = force_target_expr (thisexp);
 
 		/* Want reference to `this' object.  */
-		if (!POINTER_TYPE_P (TREE_TYPE (thisexp)))
+		if (!INDIRECT_TYPE_P (TREE_TYPE (thisexp)))
 		  thisexp = build_address (thisexp);
 
 		/* Make the callee a virtual call.  */
@@ -2051,7 +2051,7 @@ public:
     TREE_USED (result) = 1;
 
     if (declaration_reference_p (e->var))
-      gcc_assert (POINTER_TYPE_P (TREE_TYPE (result)));
+      gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (result)));
     else
       result = build_address (result);
 

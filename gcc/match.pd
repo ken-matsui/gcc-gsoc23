@@ -1867,7 +1867,7 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
 	 && (int_fits_type_p (@1, TREE_TYPE (@0))
 	     || tree_nop_conversion_p (TREE_TYPE (@0), type)))
 	|| types_match (@0, @1))
-       && !POINTER_TYPE_P (TREE_TYPE (@0))
+       && !INDIRECT_TYPE_P (TREE_TYPE (@0))
        && !VECTOR_TYPE_P (TREE_TYPE (@0))
        && TREE_CODE (TREE_TYPE (@0)) != OFFSET_TYPE
        /* ???  This transform conflicts with fold-const.cc doing
@@ -1907,7 +1907,7 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
        && TREE_CODE (@1) != INTEGER_CST
        && tree_nop_conversion_p (type, TREE_TYPE (@2))
        && types_match (type, @0)
-       && !POINTER_TYPE_P (TREE_TYPE (@0))
+       && !INDIRECT_TYPE_P (TREE_TYPE (@0))
        && TREE_CODE (TREE_TYPE (@0)) != OFFSET_TYPE)
    (bitop @0 (convert @1)))))
 
@@ -2493,7 +2493,7 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
  INTEGER_CST@0)
 (match with_possible_nonzero_bits
  SSA_NAME@0
- (if (INTEGRAL_TYPE_P (TREE_TYPE (@0)) || POINTER_TYPE_P (TREE_TYPE (@0)))))
+ (if (INTEGRAL_TYPE_P (TREE_TYPE (@0)) || INDIRECT_TYPE_P (TREE_TYPE (@0)))))
 /* Slightly extended version, do not make it recursive to keep it cheap.  */
 (match (with_possible_nonzero_bits2 @0)
  with_possible_nonzero_bits@0)
@@ -2660,7 +2660,7 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
 /* Canonicalize (T *)(ptr - ptr-cst) to &MEM[ptr + -ptr-cst].  */
 (simplify
  (convert (pointer_diff @0 INTEGER_CST@1))
- (if (POINTER_TYPE_P (type))
+ (if (INDIRECT_TYPE_P (type))
   { build_fold_addr_expr_with_type
       (build2 (MEM_REF, char_type_node, @0,
 	       wide_int_to_tree (ptr_type_node, wi::neg (wi::to_wide (@1)))),
@@ -2671,7 +2671,7 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
    alignment.  */
 (simplify
  (bit_and (convert? @0) INTEGER_CST@1)
- (if (POINTER_TYPE_P (TREE_TYPE (@0))
+ (if (INDIRECT_TYPE_P (TREE_TYPE (@0))
       && tree_nop_conversion_p (type, TREE_TYPE (@0)))
   (with
    {
@@ -3204,7 +3204,7 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
 	   final type requires a sign- or zero-extension,
 	   then we have to punt - it is not defined which
 	   one is correct.  */
-	|| (POINTER_TYPE_P (TREE_TYPE (@0))
+	|| (INDIRECT_TYPE_P (TREE_TYPE (@0))
 	    && TREE_CODE (@1) == INTEGER_CST
 	    && tree_int_cst_sign_bit (@1) == 0))
     (convert @1)))
@@ -3260,7 +3260,7 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
 	    final type requires a sign- or zero-extension,
 	    then we have to punt - it is not defined which
 	    one is correct.  */
-	 || (POINTER_TYPE_P (TREE_TYPE (@0))
+	 || (INDIRECT_TYPE_P (TREE_TYPE (@0))
 	     && TREE_CODE (@1) == INTEGER_CST
 	     && tree_int_cst_sign_bit (@1) == 0))
      (negate (convert @1)))))
@@ -3312,7 +3312,7 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
 	    final type requires a sign- or zero-extension,
 	    then we have to punt - it is not defined which
 	    one is correct.  */
-	 || (POINTER_TYPE_P (TREE_TYPE (@0))
+	 || (INDIRECT_TYPE_P (TREE_TYPE (@0))
 	     && TREE_CODE (@1) == INTEGER_CST
 	     && tree_int_cst_sign_bit (@1) == 0
 	     && TREE_CODE (@2) == INTEGER_CST
@@ -4120,8 +4120,8 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
    conversions use a NOP_EXPR instead.  */
 (simplify
   (view_convert @0)
-  (if ((INTEGRAL_TYPE_P (type) || POINTER_TYPE_P (type))
-       && (INTEGRAL_TYPE_P (TREE_TYPE (@0)) || POINTER_TYPE_P (TREE_TYPE (@0)))
+  (if ((INTEGRAL_TYPE_P (type) || INDIRECT_TYPE_P (type))
+       && (INTEGRAL_TYPE_P (TREE_TYPE (@0)) || INDIRECT_TYPE_P (TREE_TYPE (@0)))
        && TYPE_PRECISION (type) == TYPE_PRECISION (TREE_TYPE (@0)))
    (convert @0)))
 
@@ -4129,8 +4129,8 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
    zero-extend while keeping the same size (for bool-to-char).  */
 (simplify
   (view_convert (convert@0 @1))
-  (if ((INTEGRAL_TYPE_P (TREE_TYPE (@0)) || POINTER_TYPE_P (TREE_TYPE (@0)))
-       && (INTEGRAL_TYPE_P (TREE_TYPE (@1)) || POINTER_TYPE_P (TREE_TYPE (@1)))
+  (if ((INTEGRAL_TYPE_P (TREE_TYPE (@0)) || INDIRECT_TYPE_P (TREE_TYPE (@0)))
+       && (INTEGRAL_TYPE_P (TREE_TYPE (@1)) || INDIRECT_TYPE_P (TREE_TYPE (@1)))
        && TYPE_SIZE (TREE_TYPE (@0)) == TYPE_SIZE (TREE_TYPE (@1))
        && (TYPE_PRECISION (TREE_TYPE (@0)) == TYPE_PRECISION (TREE_TYPE (@1))
 	   || (TYPE_PRECISION (TREE_TYPE (@0)) > TYPE_PRECISION (TREE_TYPE (@1))
@@ -4172,19 +4172,19 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
       tree inside_type = TREE_TYPE (@0);
       tree inter_type = TREE_TYPE (@1);
       int inside_int = INTEGRAL_TYPE_P (inside_type);
-      int inside_ptr = POINTER_TYPE_P (inside_type);
+      int inside_ptr = INDIRECT_TYPE_P (inside_type);
       int inside_float = FLOAT_TYPE_P (inside_type);
       int inside_vec = VECTOR_TYPE_P (inside_type);
       unsigned int inside_prec = element_precision (inside_type);
       int inside_unsignedp = TYPE_UNSIGNED (inside_type);
       int inter_int = INTEGRAL_TYPE_P (inter_type);
-      int inter_ptr = POINTER_TYPE_P (inter_type);
+      int inter_ptr = INDIRECT_TYPE_P (inter_type);
       int inter_float = FLOAT_TYPE_P (inter_type);
       int inter_vec = VECTOR_TYPE_P (inter_type);
       unsigned int inter_prec = element_precision (inter_type);
       int inter_unsignedp = TYPE_UNSIGNED (inter_type);
       int final_int = INTEGRAL_TYPE_P (type);
-      int final_ptr = POINTER_TYPE_P (type);
+      int final_ptr = INDIRECT_TYPE_P (type);
       int final_float = FLOAT_TYPE_P (type);
       int final_vec = VECTOR_TYPE_P (type);
       unsigned int final_prec = element_precision (type);
@@ -5985,9 +5985,9 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
        /* Disable this optimization if we're casting a function pointer
 	  type on targets that require function pointer canonicalization.  */
        && !(targetm.have_canonicalize_funcptr_for_compare ()
-	    && ((POINTER_TYPE_P (TREE_TYPE (@00))
+	    && ((INDIRECT_TYPE_P (TREE_TYPE (@00))
 		 && FUNC_OR_METHOD_TYPE_P (TREE_TYPE (TREE_TYPE (@00))))
-		|| (POINTER_TYPE_P (TREE_TYPE (@10))
+		|| (INDIRECT_TYPE_P (TREE_TYPE (@10))
 		    && FUNC_OR_METHOD_TYPE_P (TREE_TYPE (TREE_TYPE (@10))))))
        && single_use (@0))
    (if (TYPE_PRECISION (TREE_TYPE (@00)) == TYPE_PRECISION (TREE_TYPE (@0))
@@ -5996,7 +5996,7 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
 	&& (TYPE_UNSIGNED (TREE_TYPE (@00)) == TYPE_UNSIGNED (TREE_TYPE (@0))
 	    || cmp == NE_EXPR
 	    || cmp == EQ_EXPR)
-	&& !POINTER_TYPE_P (TREE_TYPE (@00))
+	&& !INDIRECT_TYPE_P (TREE_TYPE (@00))
 	/* (int)bool:32 != (int)uint is not the same as
 	   bool:32 != (bool:32)uint since boolean types only have two valid
 	   values independent of their precision.  */
@@ -6241,7 +6241,7 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
  (cond
   (ne (bit_and @0 integer_pow2p@1) integer_zerop)
   INTEGER_CST@2 integer_zerop)
- (if (!POINTER_TYPE_P (type) && integer_pow2p (@2))
+ (if (!INDIRECT_TYPE_P (type) && integer_pow2p (@2))
   (with {
      int shift = (wi::exact_log2 (wi::to_wide (@2))
 		  - wi::exact_log2 (wi::to_wide (@1)));
@@ -6324,7 +6324,7 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
 (for neeq (ne eq)
  (simplify
   (neeq @0 @1)
-  (if (POINTER_TYPE_P (TREE_TYPE (@0))
+  (if (INDIRECT_TYPE_P (TREE_TYPE (@0))
        && ptrs_compare_unequal (@0, @1))
    { constant_boolean_node (neeq != EQ_EXPR, type); })))
 
@@ -6337,7 +6337,7 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
 (for cmp (ne eq)
  (simplify
   (cmp (convert @0) INTEGER_CST@1)
-  (if (((POINTER_TYPE_P (TREE_TYPE (@0))
+  (if (((INDIRECT_TYPE_P (TREE_TYPE (@0))
 	 && !FUNC_OR_METHOD_TYPE_P (TREE_TYPE (TREE_TYPE (@0)))
 	 && INTEGRAL_TYPE_P (TREE_TYPE (@1))
 	 /* Don't perform this optimization in GENERIC if @0 has reference
@@ -6346,7 +6346,7 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
 	      && TYPE_REF_P (TREE_TYPE (@0))
 	      && (flag_sanitize & (SANITIZE_NULL | SANITIZE_ALIGNMENT))))
 	|| (INTEGRAL_TYPE_P (TREE_TYPE (@0))
-	    && POINTER_TYPE_P (TREE_TYPE (@1))
+	    && INDIRECT_TYPE_P (TREE_TYPE (@1))
 	    && !FUNC_OR_METHOD_TYPE_P (TREE_TYPE (TREE_TYPE (@1)))))
        && TYPE_PRECISION (TREE_TYPE (@0)) == TYPE_PRECISION (TREE_TYPE (@1)))
    (cmp @0 (convert @1)))))
@@ -6358,7 +6358,7 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
  (simplify
   (cmp (convert?@2 @0) uniform_integer_cst_p@1)
   (if ((INTEGRAL_TYPE_P (TREE_TYPE (@1))
-	|| POINTER_TYPE_P (TREE_TYPE (@1))
+	|| INDIRECT_TYPE_P (TREE_TYPE (@1))
 	|| VECTOR_INTEGER_TYPE_P (TREE_TYPE (@1)))
        && tree_nop_conversion_p (TREE_TYPE (@2), TREE_TYPE (@0)))
    (with

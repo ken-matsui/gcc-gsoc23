@@ -210,7 +210,7 @@ pp_c_type_cast (c_pretty_printer *pp, tree t)
 void
 pp_c_space_for_pointer_operator (c_pretty_printer *pp, tree t)
 {
-  if (POINTER_TYPE_P (t))
+  if (INDIRECT_TYPE_P (t))
     {
       tree pointee = strip_pointer_operator (TREE_TYPE (t));
       if (TREE_CODE (pointee) != ARRAY_TYPE

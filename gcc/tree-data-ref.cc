@@ -846,7 +846,7 @@ split_constant_offset_1 (tree type, tree op0, enum tree_code code, tree op1,
 	       // element size from corresponding op embedded ARRAY_REF,
 	       // if unsuccessful, just punt.
 	     }  */
-	while (POINTER_TYPE_P (type))
+	while (INDIRECT_TYPE_P (type))
 	  type = TREE_TYPE (type);
 	if (int_size_in_bytes (type) < 0)
 	  return false;
@@ -946,20 +946,20 @@ split_constant_offset_1 (tree type, tree op0, enum tree_code code, tree op1,
 
 	       (sizetype) (TYPE) OP0 == (sizetype) *VAR + (sizetype) *OFF.  */
 	tree itype = TREE_TYPE (op0);
-	if ((POINTER_TYPE_P (itype)
+	if ((INDIRECT_TYPE_P (itype)
 	     || (INTEGRAL_TYPE_P (itype) && !TYPE_OVERFLOW_TRAPS (itype)))
-	    && (POINTER_TYPE_P (type)
+	    && (INDIRECT_TYPE_P (type)
 		|| (INTEGRAL_TYPE_P (type) && !TYPE_OVERFLOW_TRAPS (type)))
-	    && (POINTER_TYPE_P (type) == POINTER_TYPE_P (itype)
+	    && (INDIRECT_TYPE_P (type) == INDIRECT_TYPE_P (itype)
 		|| (TYPE_PRECISION (type) == TYPE_PRECISION (sizetype)
 		    && TYPE_PRECISION (itype) == TYPE_PRECISION (sizetype))))
 	  {
-	    if (POINTER_TYPE_P (type))
+	    if (INDIRECT_TYPE_P (type))
 	      {
 		split_constant_offset (op0, var, off, nullptr, cache, limit);
 		*var = fold_convert (type, *var);
 	      }
-	    else if (POINTER_TYPE_P (itype))
+	    else if (INDIRECT_TYPE_P (itype))
 	      {
 		split_constant_offset (op0, var, off, nullptr, cache, limit);
 		*var = fold_convert (sizetype, *var);
@@ -1094,7 +1094,7 @@ canonicalize_base_object_address (tree addr)
 
   /* The base address may be obtained by casting from integer, in that case
      keep the cast.  */
-  if (!POINTER_TYPE_P (TREE_TYPE (addr)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (addr)))
     return orig;
 
   if (TREE_CODE (addr) != ADDR_EXPR)
@@ -6087,7 +6087,7 @@ dr_alignment (innermost_loop_behavior *drb)
 static tree
 get_base_for_alignment_1 (tree base, unsigned int *alignment_out)
 {
-  if (TREE_CODE (base) != SSA_NAME || !POINTER_TYPE_P (TREE_TYPE (base)))
+  if (TREE_CODE (base) != SSA_NAME || !INDIRECT_TYPE_P (TREE_TYPE (base)))
     return NULL_TREE;
 
   gimple *def = SSA_NAME_DEF_STMT (base);
@@ -6104,7 +6104,7 @@ get_base_for_alignment_1 (tree base, unsigned int *alignment_out)
     }
 
   /* Punt if the expression is too complicated to handle.  */
-  if (tree_contains_chrecs (base, NULL) || !POINTER_TYPE_P (TREE_TYPE (base)))
+  if (tree_contains_chrecs (base, NULL) || !INDIRECT_TYPE_P (TREE_TYPE (base)))
     return NULL_TREE;
 
   /* The only useful cases are those for which a dereference folds to something

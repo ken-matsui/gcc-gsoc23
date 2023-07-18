@@ -1725,12 +1725,12 @@ dump_mem_ref (pretty_printer *pp, tree node, int spc, dump_flags_t flags)
 	  /* Enclose pointers to arrays in parentheses.  */
 	  tree op0 = TREE_OPERAND (node, 0);
 	  tree op0type = TREE_TYPE (op0);
-	  if (POINTER_TYPE_P (op0type)
+	  if (INDIRECT_TYPE_P (op0type)
 	      && TREE_CODE (TREE_TYPE (op0type)) == ARRAY_TYPE)
 	    pp_left_paren (pp);
 	  pp_star (pp);
 	  dump_generic_node (pp, op0, spc, flags, false);
-	  if (POINTER_TYPE_P (op0type)
+	  if (INDIRECT_TYPE_P (op0type)
 	      && TREE_CODE (TREE_TYPE (op0type)) == ARRAY_TYPE)
 	    pp_right_paren (pp);
 	}
@@ -2185,7 +2185,7 @@ dump_generic_node (pretty_printer *pp, tree node, int spc, dump_flags_t flags,
 
     case INTEGER_CST:
       if (flags & TDF_GIMPLE
-	  && (POINTER_TYPE_P (TREE_TYPE (node))
+	  && (INDIRECT_TYPE_P (TREE_TYPE (node))
 	      || (TYPE_PRECISION (TREE_TYPE (node))
 		  < TYPE_PRECISION (integer_type_node))
 	      || exact_log2 (TYPE_PRECISION (TREE_TYPE (node))) == -1
@@ -2238,7 +2238,7 @@ dump_generic_node (pretty_printer *pp, tree node, int spc, dump_flags_t flags,
 	  pp_string (pp, pp_buffer (pp)->digit_buffer);
 	}
       if ((flags & TDF_GIMPLE)
-	  && ! (POINTER_TYPE_P (TREE_TYPE (node))
+	  && ! (INDIRECT_TYPE_P (TREE_TYPE (node))
 		|| (TYPE_PRECISION (TREE_TYPE (node))
 		    < TYPE_PRECISION (integer_type_node))
 		|| exact_log2 (TYPE_PRECISION (TREE_TYPE (node))) == -1))

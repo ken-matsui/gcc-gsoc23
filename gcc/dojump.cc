@@ -1294,9 +1294,9 @@ do_compare_and_jump (tree treeop0, tree treeop1, enum rtx_code signed_code,
      handles the case where the other operand is a void pointer.  See
      PR middle-end/17564.  */
   if (targetm.have_canonicalize_funcptr_for_compare ()
-      && ((POINTER_TYPE_P (TREE_TYPE (treeop0))
+      && ((INDIRECT_TYPE_P (TREE_TYPE (treeop0))
 	   && FUNC_OR_METHOD_TYPE_P (TREE_TYPE (TREE_TYPE (treeop0))))
-	  || (POINTER_TYPE_P (TREE_TYPE (treeop1))
+	  || (INDIRECT_TYPE_P (TREE_TYPE (treeop1))
 	      && FUNC_OR_METHOD_TYPE_P (TREE_TYPE (TREE_TYPE (treeop1))))))
     {
       rtx new_op0 = gen_reg_rtx (mode);

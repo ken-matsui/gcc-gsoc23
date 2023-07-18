@@ -233,7 +233,7 @@ handle_malloc_attribute (tree *node, tree ARG_UNUSED (name),
 			 bool * ARG_UNUSED (no_add_attrs))
 {
   if (TREE_CODE (*node) == FUNCTION_DECL
-      && POINTER_TYPE_P (TREE_TYPE (TREE_TYPE (*node))))
+      && INDIRECT_TYPE_P (TREE_TYPE (TREE_TYPE (*node))))
     DECL_IS_MALLOC (*node) = 1;
   else
     gcc_unreachable ();

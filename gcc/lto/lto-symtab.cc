@@ -291,7 +291,7 @@ warn_type_compatibility_p (tree prevailing_type, tree type,
 	      t1 = TREE_TYPE (t1);
 	      t2 = TREE_TYPE (t2);
 	    }
-	  if ((!POINTER_TYPE_P (t1) || !POINTER_TYPE_P (t2))
+	  if ((!INDIRECT_TYPE_P (t1) || !INDIRECT_TYPE_P (t2))
 	      || (set1 != TYPE_ALIAS_SET (ptr_type_node)
 		  && set2 != TYPE_ALIAS_SET (ptr_type_node)))
 	    lev |= 5;

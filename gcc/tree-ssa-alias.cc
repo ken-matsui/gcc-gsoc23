@@ -254,7 +254,7 @@ ptr_deref_may_alias_decl_p (tree ptr, tree decl)
   if ((TREE_CODE (ptr) != SSA_NAME
        && TREE_CODE (ptr) != ADDR_EXPR
        && TREE_CODE (ptr) != POINTER_PLUS_EXPR)
-      || !POINTER_TYPE_P (TREE_TYPE (ptr))
+      || !INDIRECT_TYPE_P (TREE_TYPE (ptr))
       || (!VAR_P (decl)
 	  && TREE_CODE (decl) != PARM_DECL
 	  && TREE_CODE (decl) != RESULT_DECL))
@@ -371,8 +371,8 @@ ptr_derefs_may_alias_p (tree ptr1, tree ptr2)
   /* From here we require SSA name pointers.  Anything else aliases.  */
   if (TREE_CODE (ptr1) != SSA_NAME
       || TREE_CODE (ptr2) != SSA_NAME
-      || !POINTER_TYPE_P (TREE_TYPE (ptr1))
-      || !POINTER_TYPE_P (TREE_TYPE (ptr2)))
+      || !INDIRECT_TYPE_P (TREE_TYPE (ptr1))
+      || !INDIRECT_TYPE_P (TREE_TYPE (ptr2)))
     return true;
 
   /* We may end up with two empty points-to solutions for two same pointers.
@@ -585,7 +585,7 @@ dump_alias_info (FILE *file)
     {
       struct ptr_info_def *pi;
 
-      if (!POINTER_TYPE_P (TREE_TYPE (ptr))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (ptr))
 	  || SSA_NAME_IN_FREE_LIST (ptr))
 	continue;
 
@@ -873,7 +873,7 @@ ao_ref_init_from_ptr_and_range (ao_ref *ref, tree ptr,
     }
   else
     {
-      gcc_assert (POINTER_TYPE_P (TREE_TYPE (ptr)));
+      gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (ptr)));
       ref->base = build2 (MEM_REF, char_type_node,
 			  ptr, null_pointer_node);
       ref->offset = 0;
@@ -998,8 +998,8 @@ same_type_for_tbaa (tree type1, tree type2)
 
   /* Pointers to void are considered compatible with all other pointers,
      so for two pointers see what the alias set resolution thinks.  */
-  if (POINTER_TYPE_P (type1)
-      && POINTER_TYPE_P (type2)
+  if (INDIRECT_TYPE_P (type1)
+      && INDIRECT_TYPE_P (type2)
       && alias_sets_conflict_p (set1, set2))
     return -1;
 
@@ -2660,7 +2660,7 @@ modref_may_conflict (const gcall *stmt,
 		continue;
 
 	      /* PTA oracle will be unhapy of arg is not an pointer.  */
-	      if (!POINTER_TYPE_P (TREE_TYPE (arg)))
+	      if (!INDIRECT_TYPE_P (TREE_TYPE (arg)))
 		return true;
 
 	      /* If we don't have base pointer, give up.  */
@@ -2703,7 +2703,7 @@ check_fnspec (gcall *call, ao_ref *ref, bool clobber)
 	  : !fnspec.global_memory_read_p ())
 	{
 	  for (unsigned int i = 0; i < gimple_call_num_args (call); i++)
-	    if (POINTER_TYPE_P (TREE_TYPE (gimple_call_arg (call, i)))
+	    if (INDIRECT_TYPE_P (TREE_TYPE (gimple_call_arg (call, i)))
 		&& (!fnspec.arg_specified_p (i)
 		    || (clobber ? fnspec.arg_maybe_written_p (i)
 			: fnspec.arg_maybe_read_p (i))))

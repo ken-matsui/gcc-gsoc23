@@ -279,7 +279,7 @@ ipa_polymorphic_call_context::restrict_to_inner_class (tree otr_type,
 
 	      /* Do not consider vptr itself.  Not even for placement new.  */
 	      if (!pos && DECL_ARTIFICIAL (fld)
-		  && POINTER_TYPE_P (TREE_TYPE (fld))
+		  && INDIRECT_TYPE_P (TREE_TYPE (fld))
 		  && TYPE_BINFO (type)
 		  && polymorphic_type_binfo_p (TYPE_BINFO (type)))
 		continue;
@@ -1112,7 +1112,7 @@ ipa_polymorphic_call_context::ipa_polymorphic_call_context (tree fndecl,
     base_type = TREE_TYPE (gimple_assign_rhs1
 			    (SSA_NAME_DEF_STMT (base_pointer)));
  
-  if (base_type && POINTER_TYPE_P (base_type))
+  if (base_type && INDIRECT_TYPE_P (base_type))
     combine_speculation_with (TYPE_MAIN_VARIANT (TREE_TYPE (base_type)),
 			      offset,
 			      true, NULL /* Do not change type here */);
@@ -1171,7 +1171,7 @@ noncall_stmt_may_be_vtbl_ptr_store (gimple *stmt)
       if (!AGGREGATE_TYPE_P (TREE_TYPE (lhs)))
 	{
 	  if (flag_strict_aliasing
-	      && !POINTER_TYPE_P (TREE_TYPE (lhs)))
+	      && !INDIRECT_TYPE_P (TREE_TYPE (lhs)))
 	    return false;
 
 	  if (TREE_CODE (lhs) == COMPONENT_REF

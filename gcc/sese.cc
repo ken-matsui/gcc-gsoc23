@@ -417,7 +417,7 @@ scev_analyzable_p (tree def, sese_l &region)
      following test returns false for non integer types to avoid such
      problems.  */
   if (!INTEGRAL_TYPE_P (type)
-      && !POINTER_TYPE_P (type))
+      && !INDIRECT_TYPE_P (type))
     return false;
 
   loop = loop_containing_stmt (SSA_NAME_DEF_STMT (def));

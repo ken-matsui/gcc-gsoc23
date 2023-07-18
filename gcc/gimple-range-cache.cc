@@ -272,7 +272,7 @@ sbr_sparse_bitmap::sbr_sparse_bitmap (tree t, vrange_allocator *allocator,
   // Pre-cache varying.
   m_range[0] = m_range_allocator->clone_varying (t);
   // Pre-cache zero and non-zero values for pointers.
-  if (POINTER_TYPE_P (t))
+  if (INDIRECT_TYPE_P (t))
     {
       int_range<2> nonzero;
       nonzero.set_nonzero (t);
@@ -1055,7 +1055,7 @@ ranger_cache::set_global_range (tree name, const vrange &r, bool changed)
   // not include this latest value. PR 100774.
 
   if (r.singleton_p ()
-      || (POINTER_TYPE_P (TREE_TYPE (name)) && r.nonzero_p ()))
+      || (INDIRECT_TYPE_P (TREE_TYPE (name)) && r.nonzero_p ()))
     m_gori.set_range_invariant (name);
   m_temporal->set_timestamp (name);
 }

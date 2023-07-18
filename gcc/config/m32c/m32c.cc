@@ -1346,7 +1346,7 @@ m32c_function_arg (cumulative_args_t ca_v, const function_arg_info &arg)
       return NULL_RTX;
     }
 
-  if (arg.type && INTEGRAL_TYPE_P (arg.type) && POINTER_TYPE_P (arg.type))
+  if (arg.type && INTEGRAL_TYPE_P (arg.type) && INDIRECT_TYPE_P (arg.type))
     return NULL_RTX;
 
   if (arg.aggregate_type_p ())

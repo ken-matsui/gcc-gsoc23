@@ -1204,7 +1204,7 @@ gnat_to_gnu_entity (Entity_Id gnat_entity, tree gnu_expr, bool definition)
 	   initialize it to NULL, unless the object is declared imported as
 	   per RM B.1(24).  */
 	if (definition
-	    && (POINTER_TYPE_P (gnu_type) || TYPE_IS_FAT_POINTER_P (gnu_type))
+	    && (INDIRECT_TYPE_P (gnu_type) || TYPE_IS_FAT_POINTER_P (gnu_type))
 	    && !gnu_expr
 	    && !Is_Imported (gnat_entity))
 	  gnu_expr = null_pointer_node;
@@ -6179,7 +6179,7 @@ gnat_to_gnu_subprog_type (Entity_Id gnat_subprog, bool definition,
 	     In parameter, then it may only read memory through it and can be
 	     considered pure in the GCC sense.  */
 	  if (pure_flag
-	      && ((POINTER_TYPE_P (gnu_param_type)
+	      && ((INDIRECT_TYPE_P (gnu_param_type)
 		   && TREE_CODE (TREE_TYPE (gnu_param_type)) != FUNCTION_TYPE)
 		  || TYPE_IS_FAT_POINTER_P (gnu_param_type)))
 	    pure_flag = DECL_POINTS_TO_READONLY_P (gnu_param);
@@ -6597,7 +6597,7 @@ array_type_has_nonaliased_component (tree gnu_type, Entity_Id gnat_type)
 
   /* Consider that an array of pointers has an aliased component, which is
      sort of logical and helps with Taft Amendment types in LTO mode.  */
-  if (POINTER_TYPE_P (TREE_TYPE (gnu_type)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (gnu_type)))
     return false;
 
   /* Otherwise, rely exclusively on properties of the element type.  */

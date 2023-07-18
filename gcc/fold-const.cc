@@ -1052,9 +1052,9 @@ associate_trees (location_t loc, tree t1, tree t2, enum tree_code code, tree typ
 static bool
 int_binop_types_match_p (enum tree_code code, const_tree type1, const_tree type2)
 {
-  if (!INTEGRAL_TYPE_P (type1) && !POINTER_TYPE_P (type1))
+  if (!INTEGRAL_TYPE_P (type1) && !INDIRECT_TYPE_P (type1))
     return false;
-  if (!INTEGRAL_TYPE_P (type2) && !POINTER_TYPE_P (type2))
+  if (!INTEGRAL_TYPE_P (type2) && !INDIRECT_TYPE_P (type2))
     return false;
 
   switch (code)
@@ -2113,7 +2113,7 @@ fold_convert_const_int_from_int (tree type, const_tree arg1)
      appropriately sign-extended or truncated.  Use widest_int
      so that any extension is done according ARG1's type.  */
   return force_fit_type (type, wi::to_widest (arg1),
-			 !POINTER_TYPE_P (TREE_TYPE (arg1)),
+			 !INDIRECT_TYPE_P (TREE_TYPE (arg1)),
 			 TREE_OVERFLOW (arg1));
 }
 
@@ -2394,14 +2394,14 @@ fold_convert_const (enum tree_code code, tree type, tree arg1)
   /* We can't widen types, since the runtime value could overflow the
      original type before being extended to the new type.  */
   if (POLY_INT_CST_P (arg1)
-      && (POINTER_TYPE_P (type) || INTEGRAL_TYPE_P (type))
+      && (INDIRECT_TYPE_P (type) || INTEGRAL_TYPE_P (type))
       && TYPE_PRECISION (type) <= TYPE_PRECISION (arg_type))
     return build_poly_int_cst (type,
 			       poly_wide_int::from (poly_int_cst_value (arg1),
 						    TYPE_PRECISION (type),
 						    TYPE_SIGN (arg_type)));
 
-  if (POINTER_TYPE_P (type) || INTEGRAL_TYPE_P (type)
+  if (INDIRECT_TYPE_P (type) || INTEGRAL_TYPE_P (type)
       || TREE_CODE (type) == OFFSET_TYPE)
     {
       if (TREE_CODE (arg1) == INTEGER_CST)
@@ -2508,7 +2508,7 @@ fold_convertible_p (const_tree type, const_tree arg)
     case POINTER_TYPE: case REFERENCE_TYPE:
     case OFFSET_TYPE:
       return (INTEGRAL_TYPE_P (orig)
-	      || (POINTER_TYPE_P (orig)
+	      || (INDIRECT_TYPE_P (orig)
 		  && TYPE_PRECISION (type) <= TYPE_PRECISION (orig))
 	      || TREE_CODE (orig) == OFFSET_TYPE);
 
@@ -2550,7 +2550,7 @@ fold_convert_loc (location_t loc, tree type, tree arg)
     case POINTER_TYPE:
     case REFERENCE_TYPE:
       /* Handle conversions between pointers to different address spaces.  */
-      if (POINTER_TYPE_P (orig)
+      if (INDIRECT_TYPE_P (orig)
 	  && (TYPE_ADDR_SPACE (TREE_TYPE (type))
 	      != TYPE_ADDR_SPACE (TREE_TYPE (orig))))
 	return fold_build1_loc (loc, ADDR_SPACE_CONVERT_EXPR, type, arg);
@@ -2564,7 +2564,7 @@ fold_convert_loc (location_t loc, tree type, tree arg)
 	  if (tem != NULL_TREE)
 	    return tem;
 	}
-      if (INTEGRAL_TYPE_P (orig) || POINTER_TYPE_P (orig)
+      if (INTEGRAL_TYPE_P (orig) || INDIRECT_TYPE_P (orig)
 	  || TREE_CODE (orig) == OFFSET_TYPE)
 	return fold_build1_loc (loc, NOP_EXPR, type, arg);
       if (TREE_CODE (orig) == COMPLEX_TYPE)
@@ -2683,7 +2683,7 @@ fold_convert_loc (location_t loc, tree type, tree arg)
       if (integer_zerop (arg))
 	return build_zero_vector (type);
       gcc_assert (tree_int_cst_equal (TYPE_SIZE (type), TYPE_SIZE (orig)));
-      gcc_assert (INTEGRAL_TYPE_P (orig) || POINTER_TYPE_P (orig)
+      gcc_assert (INTEGRAL_TYPE_P (orig) || INDIRECT_TYPE_P (orig)
 		  || VECTOR_TYPE_P (orig));
       return fold_build1_loc (loc, VIEW_CONVERT_EXPR, type, arg);
 
@@ -3110,8 +3110,8 @@ operand_compare::operand_equal_p (const_tree arg0, const_tree arg1,
     return false;
 
   /* We cannot consider pointers to different address space equal.  */
-  if (POINTER_TYPE_P (TREE_TYPE (arg0))
-      && POINTER_TYPE_P (TREE_TYPE (arg1))
+  if (INDIRECT_TYPE_P (TREE_TYPE (arg0))
+      && INDIRECT_TYPE_P (TREE_TYPE (arg1))
       && (TYPE_ADDR_SPACE (TREE_TYPE (TREE_TYPE (arg0)))
 	  != TYPE_ADDR_SPACE (TREE_TYPE (TREE_TYPE (arg1)))))
     return false;
@@ -3134,8 +3134,8 @@ operand_compare::operand_equal_p (const_tree arg0, const_tree arg1,
 	 strictly don't have a signedness, require either two pointers or
 	 two non-pointers as well.  */
       if (TYPE_UNSIGNED (TREE_TYPE (arg0)) != TYPE_UNSIGNED (TREE_TYPE (arg1))
-	  || POINTER_TYPE_P (TREE_TYPE (arg0))
-			     != POINTER_TYPE_P (TREE_TYPE (arg1)))
+	  || INDIRECT_TYPE_P (TREE_TYPE (arg0))
+			     != INDIRECT_TYPE_P (TREE_TYPE (arg1)))
 	return false;
 
       /* If both types don't have the same precision, then it is not safe
@@ -4592,7 +4592,7 @@ make_bit_field_ref (location_t loc, tree inner, tree orig_inner, tree type,
     {
       tree size = TYPE_SIZE (TREE_TYPE (inner));
       if ((INTEGRAL_TYPE_P (TREE_TYPE (inner))
-	   || POINTER_TYPE_P (TREE_TYPE (inner)))
+	   || INDIRECT_TYPE_P (TREE_TYPE (inner)))
 	  && tree_fits_shwi_p (size)
 	  && tree_to_shwi (size) == bitsize)
 	return fold_convert_loc (loc, type, inner);
@@ -5537,7 +5537,7 @@ range_check_type (tree etype)
       else
 	return NULL_TREE;
     }
-  else if (POINTER_TYPE_P (etype) || TREE_CODE (etype) == OFFSET_TYPE)
+  else if (INDIRECT_TYPE_P (etype) || TREE_CODE (etype) == OFFSET_TYPE)
     etype = unsigned_type_for (etype);
   return etype;
 }
@@ -5555,7 +5555,7 @@ build_range_check (location_t loc, tree type, tree exp, int in_p,
   /* Disable this optimization for function pointer expressions
      on targets that require function pointer canonicalization.  */
   if (targetm.have_canonicalize_funcptr_for_compare ()
-      && POINTER_TYPE_P (etype)
+      && INDIRECT_TYPE_P (etype)
       && FUNC_OR_METHOD_TYPE_P (TREE_TYPE (etype)))
     return NULL_TREE;
 
@@ -7522,7 +7522,7 @@ fold_to_nonsharp_ineq_using_bound (location_t loc, tree ineq, tree bound)
 
   typea = TREE_TYPE (a);
   if (!INTEGRAL_TYPE_P (typea)
-      && !POINTER_TYPE_P (typea))
+      && !INDIRECT_TYPE_P (typea))
     return NULL_TREE;
 
   if (TREE_CODE (ineq) == LT_EXPR)
@@ -7541,7 +7541,7 @@ fold_to_nonsharp_ineq_using_bound (location_t loc, tree ineq, tree bound)
   if (TREE_TYPE (a1) != typea)
     return NULL_TREE;
 
-  if (POINTER_TYPE_P (typea))
+  if (INDIRECT_TYPE_P (typea))
     {
       /* Convert the pointer types into integer before taking the difference.  */
       tree ta = fold_convert_loc (loc, ssizetype, a);
@@ -9396,7 +9396,7 @@ fold_unary_loc (location_t loc, enum tree_code code, tree type, tree op0)
 	 living at offset zero.  This occurs frequently in
 	 C++ upcasting and then accessing the base.  */
       if (TREE_CODE (op0) == ADDR_EXPR
-	  && POINTER_TYPE_P (type)
+	  && INDIRECT_TYPE_P (type)
 	  && handled_component_p (TREE_OPERAND (op0, 0)))
         {
 	  poly_int64 bitsize, bitpos;
@@ -9487,7 +9487,7 @@ fold_unary_loc (location_t loc, enum tree_code code, tree type, tree op0)
       /* Convert (T1)(X p+ Y) into ((T1)X p+ Y), for pointer type, when the new
 	 cast (T1)X will fold away.  We assume that this happens when X itself
 	 is a cast.  */
-      if (POINTER_TYPE_P (type)
+      if (INDIRECT_TYPE_P (type)
 	  && TREE_CODE (arg0) == POINTER_PLUS_EXPR
 	  && CONVERT_EXPR_P (TREE_OPERAND (arg0, 0)))
 	{
@@ -9834,7 +9834,7 @@ maybe_canonicalize_comparison_1 (location_t loc, enum tree_code code, tree type,
 	 && TYPE_OVERFLOW_UNDEFINED (TREE_TYPE (arg0)))
 	/* In principle pointers also have undefined overflow behavior,
 	   but that causes problems elsewhere.  */
-	&& !POINTER_TYPE_P (TREE_TYPE (arg0))
+	&& !INDIRECT_TYPE_P (TREE_TYPE (arg0))
 	&& (code0 == MINUS_EXPR
 	    || code0 == PLUS_EXPR)
 	&& TREE_CODE (TREE_OPERAND (arg0, 1)) == INTEGER_CST))
@@ -9934,7 +9934,7 @@ maybe_canonicalize_comparison (location_t loc, enum tree_code code, tree type,
 static bool
 pointer_may_wrap_p (tree base, tree offset, poly_int64 bitpos)
 {
-  if (!POINTER_TYPE_P (TREE_TYPE (base)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (base)))
     return true;
 
   if (maybe_lt (bitpos, 0))
@@ -10032,7 +10032,7 @@ fold_comparison (location_t loc, enum tree_code code, tree type,
      comparison of the base objects and the offsets into the object.
      This requires at least one operand being an ADDR_EXPR or a
      POINTER_PLUS_EXPR to do more than the operand_equal_p test below.  */
-  if (POINTER_TYPE_P (TREE_TYPE (arg0))
+  if (INDIRECT_TYPE_P (TREE_TYPE (arg0))
       && (TREE_CODE (arg0) == ADDR_EXPR
 	  || TREE_CODE (arg1) == ADDR_EXPR
 	  || TREE_CODE (arg0) == POINTER_PLUS_EXPR
@@ -10685,7 +10685,7 @@ tree_expr_nonzero_warnv_p (tree t, bool *strict_overflow_p)
   enum tree_code code;
 
   /* Doing something useful for floating point would need more work.  */
-  if (!INTEGRAL_TYPE_P (type) && !POINTER_TYPE_P (type))
+  if (!INTEGRAL_TYPE_P (type) && !INDIRECT_TYPE_P (type))
     return false;
 
   code = TREE_CODE (t);
@@ -11307,7 +11307,7 @@ fold_binary_loc (location_t loc, enum tree_code code, tree type,
 
 	  /* With undefined overflow prefer doing association in a type
 	     which wraps on overflow, if that is one of the operand types.  */
-	  if ((POINTER_TYPE_P (type) || INTEGRAL_TYPE_P (type))
+	  if ((INDIRECT_TYPE_P (type) || INTEGRAL_TYPE_P (type))
 	      && !TYPE_OVERFLOW_WRAPS (type))
 	    {
 	      if (INTEGRAL_TYPE_P (TREE_TYPE (arg0))
@@ -11321,7 +11321,7 @@ fold_binary_loc (location_t loc, enum tree_code code, tree type,
 
 	  /* With undefined overflow we can only associate constants with one
 	     variable, and constants whose association doesn't overflow.  */
-	  if ((POINTER_TYPE_P (atype) || INTEGRAL_TYPE_P (atype))
+	  if ((INDIRECT_TYPE_P (atype) || INTEGRAL_TYPE_P (atype))
 	      && !TYPE_OVERFLOW_WRAPS (atype))
 	    {
 	      if ((var0 && var1) || (minus_var0 && minus_var1))
@@ -15970,7 +15970,7 @@ fold_indirect_ref_1 (location_t loc, tree type, tree op0)
 
   STRIP_NOPS (sub);
   subtype = TREE_TYPE (sub);
-  if (!POINTER_TYPE_P (subtype)
+  if (!INDIRECT_TYPE_P (subtype)
       || TYPE_REF_CAN_ALIAS_ALL (TREE_TYPE (op0)))
     return NULL_TREE;
 
@@ -16659,7 +16659,7 @@ address_compare (tree_code code, tree type, tree op0, tree op1,
 	  || known_eq (off0, off1)
 	  || TYPE_OVERFLOW_UNDEFINED (TREE_TYPE (op0))
 	  /* Or if we compare using pointers to decls or strings.  */
-	  || (POINTER_TYPE_P (type)
+	  || (INDIRECT_TYPE_P (type)
 	      && (DECL_P (base0) || TREE_CODE (base0) == STRING_CST)))
 	return 1;
       return 2;

@@ -359,7 +359,7 @@ is_setjmp_call_p (const gcall *call)
   if (is_special_named_call_p (call, "setjmp", 1)
       || is_special_named_call_p (call, "sigsetjmp", 2))
     /* region_model::on_setjmp requires a pointer.  */
-    if (POINTER_TYPE_P (TREE_TYPE (gimple_call_arg (call, 0))))
+    if (INDIRECT_TYPE_P (TREE_TYPE (gimple_call_arg (call, 0))))
       return true;
 
   return false;
@@ -374,7 +374,7 @@ is_longjmp_call_p (const gcall *call)
       || is_special_named_call_p (call, "siglongjmp", 2))
     /* exploded_node::on_longjmp requires a pointer for the initial
        argument.  */
-    if (POINTER_TYPE_P (TREE_TYPE (gimple_call_arg (call, 0))))
+    if (INDIRECT_TYPE_P (TREE_TYPE (gimple_call_arg (call, 0))))
       return true;
 
   return false;

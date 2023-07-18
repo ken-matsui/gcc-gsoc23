@@ -2803,13 +2803,13 @@ objc_eh_runtime_type (tree type)
       goto make_err_class;
     }
 
-  if (POINTER_TYPE_P (type) && objc_is_object_id (TREE_TYPE (type)))
+  if (INDIRECT_TYPE_P (type) && objc_is_object_id (TREE_TYPE (type)))
     {
       ident = get_identifier ("id");
       goto make_err_class;
     }
 
-  if (!POINTER_TYPE_P (type) || !TYPED_OBJECT (TREE_TYPE (type)))
+  if (!INDIRECT_TYPE_P (type) || !TYPED_OBJECT (TREE_TYPE (type)))
     {
 #ifdef OBJCPLUS
       /* This routine is also called for c++'s catch clause; in which case,

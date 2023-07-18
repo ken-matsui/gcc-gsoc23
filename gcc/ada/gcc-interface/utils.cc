@@ -2794,7 +2794,7 @@ create_var_decl (tree name, tree asm_name, tree type, tree init,
 
   /* Detect constants created by the front-end to hold 'reference to function
      calls for stabilization purposes.  This is needed for renaming.  */
-  if (const_flag && init && POINTER_TYPE_P (type))
+  if (const_flag && init && INDIRECT_TYPE_P (type))
     {
       tree inner = init;
       if (TREE_CODE (inner) == COMPOUND_EXPR)
@@ -5383,10 +5383,10 @@ unchecked_convert (tree type, tree expr, bool notrunc_p)
   /* If both types are integral or regular pointer, then just do a normal
      conversion.  Likewise for a conversion to an unconstrained array.  */
   if (((INTEGRAL_TYPE_P (type)
-	|| (POINTER_TYPE_P (type) && !TYPE_IS_THIN_POINTER_P (type))
+	|| (INDIRECT_TYPE_P (type) && !TYPE_IS_THIN_POINTER_P (type))
 	|| (code == RECORD_TYPE && TYPE_JUSTIFIED_MODULAR_P (type)))
        && (INTEGRAL_TYPE_P (etype)
-	   || (POINTER_TYPE_P (etype) && !TYPE_IS_THIN_POINTER_P (etype))
+	   || (INDIRECT_TYPE_P (etype) && !TYPE_IS_THIN_POINTER_P (etype))
 	   || (ecode == RECORD_TYPE && TYPE_JUSTIFIED_MODULAR_P (etype))))
       || code == UNCONSTRAINED_ARRAY_TYPE)
     {
@@ -5636,7 +5636,7 @@ unchecked_convert (tree type, tree expr, bool notrunc_p)
   /* If we are converting a string constant to a pointer to character, make
      sure that the string is not folded into an integer constant.  */
   else if (TREE_CODE (expr) == STRING_CST
-	   && POINTER_TYPE_P (type)
+	   && INDIRECT_TYPE_P (type)
 	   && TYPE_STRING_FLAG (TREE_TYPE (type)))
     expr = build1 (VIEW_CONVERT_EXPR, type, expr);
 
@@ -6746,7 +6746,7 @@ handle_malloc_attribute (tree *node, tree name, tree ARG_UNUSED (args),
 			 int ARG_UNUSED (flags), bool *no_add_attrs)
 {
   if (TREE_CODE (*node) == FUNCTION_DECL
-      && POINTER_TYPE_P (TREE_TYPE (TREE_TYPE (*node))))
+      && INDIRECT_TYPE_P (TREE_TYPE (TREE_TYPE (*node))))
     DECL_IS_MALLOC (*node) = 1;
   else
     {
@@ -7013,7 +7013,7 @@ handle_vector_size_attribute (tree *node, tree name, tree args,
 
      In this case, the mode is SI, but the type being modified is
      HI, so we need to look further.  */
-  while (POINTER_TYPE_P (type)
+  while (INDIRECT_TYPE_P (type)
 	 || TREE_CODE (type) == FUNCTION_TYPE
 	 || TREE_CODE (type) == ARRAY_TYPE)
     type = TREE_TYPE (type);

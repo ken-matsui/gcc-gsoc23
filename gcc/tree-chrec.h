@@ -146,13 +146,13 @@ build_polynomial_chrec (unsigned loop_num,
 
   /* Types of left and right sides of a chrec should be compatible, but
      pointer CHRECs are special in that the evolution is of ptroff type.  */
-  if (POINTER_TYPE_P (TREE_TYPE (left)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (left)))
     gcc_checking_assert (ptrofftype_p (TREE_TYPE (right)));
   else
     {
       /* Pointer types should occur only on the left hand side, i.e. in
 	 the base of the chrec, and not in the step.  */
-      gcc_checking_assert (!POINTER_TYPE_P (TREE_TYPE (right))
+      gcc_checking_assert (!INDIRECT_TYPE_P (TREE_TYPE (right))
 			   && types_compatible_p (TREE_TYPE (left),
 						  TREE_TYPE (right)));
     }

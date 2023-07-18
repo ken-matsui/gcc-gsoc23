@@ -2687,7 +2687,7 @@ propagate_bits_across_jump_function (cgraph_edge *cs, int idx,
      transform for these cases.  Similarly, we can have bad type mismatches
      with LTO, avoid doing anything with those too.  */
   if (!parm_type
-      || (!INTEGRAL_TYPE_P (parm_type) && !POINTER_TYPE_P (parm_type)))
+      || (!INTEGRAL_TYPE_P (parm_type) && !INDIRECT_TYPE_P (parm_type)))
     {
       if (dump_file && (dump_flags & TDF_DETAILS))
 	fprintf (dump_file, "Setting dest_lattice to bottom, because type of "
@@ -2772,7 +2772,7 @@ propagate_vr_across_jump_function (cgraph_edge *cs, ipa_jump_func *jfunc,
 
   if (!param_type
       || (!INTEGRAL_TYPE_P (param_type)
-	  && !POINTER_TYPE_P (param_type)))
+	  && !INDIRECT_TYPE_P (param_type)))
     return dest_lat->set_to_bottom ();
 
   if (jfunc->type == IPA_JF_PASS_THROUGH)

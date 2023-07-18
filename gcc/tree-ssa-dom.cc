@@ -1385,7 +1385,7 @@ maybe_set_nonzero_bits (edge e, tree var)
 	return;
     }
   cst = gimple_assign_rhs2 (stmt);
-  if (POINTER_TYPE_P (TREE_TYPE (var)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (var)))
     {
       struct ptr_info_def *pi = SSA_NAME_PTR_INFO (var);
       if (pi && pi->misalign)

@@ -152,7 +152,7 @@ gfc_omp_array_data (tree decl, bool type_only)
 {
   tree type = TREE_TYPE (decl);
 
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     type = TREE_TYPE (type);
 
   if (!GFC_DESCRIPTOR_TYPE_P (type))
@@ -161,7 +161,7 @@ gfc_omp_array_data (tree decl, bool type_only)
   if (type_only)
     return GFC_TYPE_ARRAY_DATAPTR_TYPE (type);
 
-  if (POINTER_TYPE_P (TREE_TYPE (decl)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (decl)))
     decl = build_fold_indirect_ref (decl);
 
   decl = gfc_conv_descriptor_data_get (decl);
@@ -175,7 +175,7 @@ tree
 gfc_omp_array_size (tree decl, gimple_seq *pre_p)
 {
   stmtblock_t block;
-  if (POINTER_TYPE_P (TREE_TYPE (decl)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (decl)))
     decl = build_fold_indirect_ref (decl);
   tree type = TREE_TYPE (decl);
   gcc_assert (GFC_DESCRIPTOR_TYPE_P (type));
@@ -372,7 +372,7 @@ gfc_has_alloc_comps (tree type, tree decl)
 {
   tree field, ftype;
 
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     {
       if (GFC_DECL_GET_SCALAR_ALLOCATABLE (decl))
 	type = TREE_TYPE (type);
@@ -410,7 +410,7 @@ gfc_has_alloc_comps (tree type, tree decl)
 static bool
 gfc_is_polymorphic_nonptr (tree type)
 {
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     type = TREE_TYPE (type);
   return GFC_CLASS_TYPE_P (type);
 }
@@ -421,7 +421,7 @@ gfc_is_polymorphic_nonptr (tree type)
 static bool
 gfc_is_unlimited_polymorphic_nonptr (tree type)
 {
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     type = TREE_TYPE (type);
   if (!GFC_CLASS_TYPE_P (type))
     return false;
@@ -739,7 +739,7 @@ gfc_omp_clause_default_ctor (tree clause, tree decl, tree outer)
   if ((! GFC_DESCRIPTOR_TYPE_P (type)
        || GFC_TYPE_ARRAY_AKIND (type) != GFC_ARRAY_ALLOCATABLE)
       && (!GFC_DECL_GET_SCALAR_ALLOCATABLE (OMP_CLAUSE_DECL (clause))
-	  || !POINTER_TYPE_P (type)))
+	  || !INDIRECT_TYPE_P (type)))
     {
       if (gfc_has_alloc_comps (type, OMP_CLAUSE_DECL (clause)))
 	{
@@ -863,7 +863,7 @@ gfc_omp_clause_copy_ctor (tree clause, tree dest, tree src)
 
   if (gfc_is_polymorphic_nonptr (decl_type))
     {
-      if (POINTER_TYPE_P (decl_type))
+      if (INDIRECT_TYPE_P (decl_type))
 	decl_type = TREE_TYPE (decl_type);
       decl_type = TREE_TYPE (TYPE_FIELDS (decl_type));
       if (GFC_DESCRIPTOR_TYPE_P (decl_type) || GFC_ARRAY_TYPE_P (decl_type))
@@ -933,7 +933,7 @@ gfc_omp_clause_copy_ctor (tree clause, tree dest, tree src)
   if ((! GFC_DESCRIPTOR_TYPE_P (type)
        || GFC_TYPE_ARRAY_AKIND (type) != GFC_ARRAY_ALLOCATABLE)
       && (!GFC_DECL_GET_SCALAR_ALLOCATABLE (OMP_CLAUSE_DECL (clause))
-	  || !POINTER_TYPE_P (type)))
+	  || !INDIRECT_TYPE_P (type)))
     {
       if (gfc_has_alloc_comps (type, OMP_CLAUSE_DECL (clause)))
 	{
@@ -1037,7 +1037,7 @@ gfc_omp_clause_assign_op (tree clause, tree dest, tree src)
   if ((! GFC_DESCRIPTOR_TYPE_P (type)
        || GFC_TYPE_ARRAY_AKIND (type) != GFC_ARRAY_ALLOCATABLE)
       && (!GFC_DECL_GET_SCALAR_ALLOCATABLE (OMP_CLAUSE_DECL (clause))
-	  || !POINTER_TYPE_P (type)))
+	  || !INDIRECT_TYPE_P (type)))
     {
       if (gfc_has_alloc_comps (type, OMP_CLAUSE_DECL (clause)))
 	{
@@ -1234,7 +1234,7 @@ gfc_omp_linear_clause_add_loop (stmtblock_t *block, tree dest, tree src,
     }
   else
     {
-      gcc_assert (POINTER_TYPE_P (TREE_TYPE (dest)));
+      gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (dest)));
       tree idx = fold_build2 (MULT_EXPR, sizetype,
 			      fold_convert (sizetype, index),
 			      TYPE_SIZE_UNIT (TREE_TYPE (TREE_TYPE (dest))));
@@ -1276,7 +1276,7 @@ gfc_omp_clause_linear_ctor (tree clause, tree dest, tree src, tree add)
   if ((! GFC_DESCRIPTOR_TYPE_P (type)
        || GFC_TYPE_ARRAY_AKIND (type) != GFC_ARRAY_ALLOCATABLE)
       && (!GFC_DECL_GET_SCALAR_ALLOCATABLE (OMP_CLAUSE_DECL (clause))
-	  || !POINTER_TYPE_P (type)))
+	  || !INDIRECT_TYPE_P (type)))
     {
       bool compute_nelts = false;
       gcc_assert (TREE_CODE (type) == ARRAY_TYPE);
@@ -1380,7 +1380,7 @@ gfc_omp_clause_dtor (tree clause, tree decl)
 	= TREE_TYPE (GFC_DECL_SAVED_DESCRIPTOR (OMP_CLAUSE_DECL (clause)));
   if (gfc_is_polymorphic_nonptr (decl_type))
     {
-      if (POINTER_TYPE_P (decl_type))
+      if (INDIRECT_TYPE_P (decl_type))
 	decl_type = TREE_TYPE (decl_type);
       decl_type = TREE_TYPE (TYPE_FIELDS (decl_type));
       if (GFC_DESCRIPTOR_TYPE_P (decl_type) || GFC_ARRAY_TYPE_P (decl_type))
@@ -1426,7 +1426,7 @@ gfc_omp_clause_dtor (tree clause, tree decl)
   if ((! GFC_DESCRIPTOR_TYPE_P (type)
        || GFC_TYPE_ARRAY_AKIND (type) != GFC_ARRAY_ALLOCATABLE)
       && (!GFC_DECL_GET_SCALAR_ALLOCATABLE (OMP_CLAUSE_DECL (clause))
-	  || !POINTER_TYPE_P (type)))
+	  || !INDIRECT_TYPE_P (type)))
     {
       if (gfc_has_alloc_comps (type, OMP_CLAUSE_DECL (clause)))
 	return gfc_walk_alloc_comps (decl, NULL_TREE,
@@ -1545,7 +1545,7 @@ gfc_omp_finish_clause (tree c, gimple_seq *pre_p, bool openacc)
 
   tree c2 = NULL_TREE, c3 = NULL_TREE, c4 = NULL_TREE;
   tree present = gfc_omp_check_optional_argument (decl, true);
-  if (POINTER_TYPE_P (TREE_TYPE (decl)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (decl)))
     {
       if (!gfc_omp_privatize_by_reference (decl)
 	  && !GFC_DECL_GET_SCALAR_POINTER (decl)
@@ -1616,7 +1616,7 @@ gfc_omp_finish_clause (tree c, gimple_seq *pre_p, bool openacc)
       if (present)
 	ptr = gfc_build_cond_assign_expr (&block, present, ptr,
 					  null_pointer_node);
-      gcc_assert (POINTER_TYPE_P (TREE_TYPE (ptr)));
+      gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (ptr)));
       ptr = build_fold_indirect_ref (ptr);
       OMP_CLAUSE_DECL (c) = ptr;
       c2 = build_omp_clause (input_location, OMP_CLAUSE_MAP);
@@ -2452,11 +2452,11 @@ gfc_trans_omp_array_section (stmtblock_t *block, gfc_exec_op op,
 					    OMP_CLAUSE_SIZE (node), elemsz);
     }
   gcc_assert (se.post.head == NULL_TREE);
-  gcc_assert (POINTER_TYPE_P (TREE_TYPE (ptr)));
+  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (ptr)));
   OMP_CLAUSE_DECL (node) = build_fold_indirect_ref (ptr);
   ptr = fold_convert (ptrdiff_type_node, ptr);
 
-  if (POINTER_TYPE_P (TREE_TYPE (decl))
+  if (INDIRECT_TYPE_P (TREE_TYPE (decl))
       && GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (TREE_TYPE (decl)))
       && ptr_kind == GOMP_MAP_POINTER
       && op != EXEC_OMP_TARGET_EXIT_DATA
@@ -2552,7 +2552,7 @@ gfc_trans_omp_array_section (stmtblock_t *block, gfc_exec_op op,
 	}
       else
 	{
-	  gcc_assert (POINTER_TYPE_P (TREE_TYPE (decl)));
+	  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (decl)));
 	  ptr2 = decl;
 	}
       node3 = build_omp_clause (input_location,
@@ -2848,7 +2848,7 @@ gfc_trans_omp_clauses (stmtblock_t *block, gfc_omp_clauses *clauses,
 				  }
 				else
 				  type = gfc_sym_type (n->sym);
-				if (POINTER_TYPE_P (type))
+				if (INDIRECT_TYPE_P (type))
 				  type = TREE_TYPE (type);
 				/* Otherwise to be determined what exactly
 				   should be done.  */
@@ -2980,7 +2980,7 @@ gfc_trans_omp_clauses (stmtblock_t *block, gfc_omp_clauses *clauses,
 		  if (GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (decl)))
 		    {
 		      decl = gfc_conv_descriptor_data_get (decl);
-		      gcc_assert (POINTER_TYPE_P (TREE_TYPE (decl)));
+		      gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (decl)));
 		      decl = build_fold_indirect_ref (decl);
 		    }
 		  else if (n->sym->attr.allocatable || n->sym->attr.pointer)
@@ -3005,7 +3005,7 @@ gfc_trans_omp_clauses (stmtblock_t *block, gfc_omp_clauses *clauses,
 		    }
 		  gfc_add_block_to_block (&iter_block, &se.pre);
 		  gfc_add_block_to_block (&iter_block, &se.post);
-		  gcc_assert (POINTER_TYPE_P (TREE_TYPE (ptr)));
+		  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (ptr)));
 		  OMP_CLAUSE_DECL (node) = build_fold_indirect_ref (ptr);
 		}
 	      if (list == OMP_LIST_DEPEND)
@@ -3220,7 +3220,7 @@ gfc_trans_omp_clauses (stmtblock_t *block, gfc_omp_clauses *clauses,
 		      OMP_CLAUSE_SIZE (node2) = size_int (0);
 		      goto finalize_map_clause;
 		    }
-		  else if (POINTER_TYPE_P (type)
+		  else if (INDIRECT_TYPE_P (type)
 			   && (gfc_omp_privatize_by_reference (decl)
 			       || GFC_DECL_GET_SCALAR_POINTER (decl)
 			       || GFC_DECL_GET_SCALAR_ALLOCATABLE (decl)
@@ -3310,7 +3310,7 @@ gfc_trans_omp_clauses (stmtblock_t *block, gfc_omp_clauses *clauses,
 		      if (present)
 			ptr = gfc_build_cond_assign_expr (block, present, ptr,
 							  null_pointer_node);
-		      gcc_assert (POINTER_TYPE_P (TREE_TYPE (ptr)));
+		      gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (ptr)));
 		      ptr = build_fold_indirect_ref (ptr);
 		      OMP_CLAUSE_DECL (node) = ptr;
 		      node2 = build_omp_clause (input_location, OMP_CLAUSE_MAP);
@@ -3469,7 +3469,7 @@ gfc_trans_omp_clauses (stmtblock_t *block, gfc_omp_clauses *clauses,
 			   && INDIRECT_REF_P (TREE_OPERAND (decl, 0)))
 		    {
 		      /* A single indirectref is handled by the middle end.  */
-		      gcc_assert (!POINTER_TYPE_P (TREE_TYPE (decl)));
+		      gcc_assert (!INDIRECT_TYPE_P (TREE_TYPE (decl)));
 		      decl = TREE_OPERAND (decl, 0);
 		      decl = gfc_build_cond_assign_expr (block, present, decl,
 							 null_pointer_node);
@@ -3521,7 +3521,7 @@ gfc_trans_omp_clauses (stmtblock_t *block, gfc_omp_clauses *clauses,
 		  gomp_map_kind k = GOMP_MAP_POINTER;
 		  if (!openacc
 		      && !GFC_DESCRIPTOR_TYPE_P (type)
-		      && !(POINTER_TYPE_P (type)
+		      && !(INDIRECT_TYPE_P (type)
 			   && GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (type))))
 		    k = GOMP_MAP_FIRSTPRIVATE_POINTER;
 		  gfc_trans_omp_array_section (block, op, n, decl, element, k,
@@ -3544,7 +3544,7 @@ gfc_trans_omp_clauses (stmtblock_t *block, gfc_omp_clauses *clauses,
 		  gfc_add_block_to_block (block, &se.pre);
 		  /* For BT_CHARACTER a pointer is returned.  */
 		  OMP_CLAUSE_DECL (node)
-		    = POINTER_TYPE_P (TREE_TYPE (se.expr))
+		    = INDIRECT_TYPE_P (TREE_TYPE (se.expr))
 		      ? build_fold_indirect_ref (se.expr) : se.expr;
 		  gfc_add_block_to_block (block, &se.post);
 		  if (pointer || allocatable)
@@ -3569,7 +3569,7 @@ gfc_trans_omp_clauses (stmtblock_t *block, gfc_omp_clauses *clauses,
 				   : GOMP_MAP_ALWAYS_POINTER);
 		      OMP_CLAUSE_SET_MAP_KIND (node2, kind);
 		      OMP_CLAUSE_DECL (node2)
-			= POINTER_TYPE_P (TREE_TYPE (se.expr))
+			= INDIRECT_TYPE_P (TREE_TYPE (se.expr))
 			  ? se.expr
 			  : gfc_build_addr_expr (NULL, se.expr);
 		      OMP_CLAUSE_SIZE (node2) = size_int (0);
@@ -3656,7 +3656,7 @@ gfc_trans_omp_clauses (stmtblock_t *block, gfc_omp_clauses *clauses,
 			  if (lastref->u.c.component->ts.type == BT_CLASS)
 			    {
 			      data = gfc_class_data_get (inner);
-			      gcc_assert (POINTER_TYPE_P (TREE_TYPE (data)));
+			      gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (data)));
 			      data = build_fold_indirect_ref (data);
 			      size = gfc_class_vtab_size_get (inner);
 			    }
@@ -3691,7 +3691,7 @@ gfc_trans_omp_clauses (stmtblock_t *block, gfc_omp_clauses *clauses,
 			 additional nodes.  */
 		      if ((n->u.map_op == OMP_MAP_ATTACH
 			   || n->u.map_op == OMP_MAP_DETACH)
-			  && (POINTER_TYPE_P (TREE_TYPE (inner))
+			  && (INDIRECT_TYPE_P (TREE_TYPE (inner))
 			      || GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (inner))))
 			{
 			  if (GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (inner)))
@@ -3865,7 +3865,7 @@ gfc_trans_omp_clauses (stmtblock_t *block, gfc_omp_clauses *clauses,
 		    {
 		      tree type = TREE_TYPE (decl);
 		      tree ptr = gfc_conv_descriptor_data_get (decl);
-		      gcc_assert (POINTER_TYPE_P (TREE_TYPE (ptr)));
+		      gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (ptr)));
 		      ptr = build_fold_indirect_ref (ptr);
 		      OMP_CLAUSE_DECL (node) = ptr;
 		      OMP_CLAUSE_SIZE (node)
@@ -3915,7 +3915,7 @@ gfc_trans_omp_clauses (stmtblock_t *block, gfc_omp_clauses *clauses,
 				       OMP_CLAUSE_SIZE (node), elemsz);
 		    }
 		  gfc_add_block_to_block (block, &se.post);
-		  gcc_assert (POINTER_TYPE_P (TREE_TYPE (ptr)));
+		  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (ptr)));
 		  OMP_CLAUSE_DECL (node) = build_fold_indirect_ref (ptr);
 		}
 	      if (n->u.present_modifier)
@@ -5989,7 +5989,7 @@ gfc_trans_omp_depobj (gfc_code *code)
   gcc_assert (se.pre.head == NULL && se.post.head == NULL);
   tree depobj = se.expr;
   location_t loc = EXPR_LOCATION (depobj);
-  if (!POINTER_TYPE_P (TREE_TYPE (depobj)))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (depobj)))
     depobj = gfc_build_addr_expr (NULL, depobj);
   depobj = fold_convert (build_pointer_type_for_mode (ptr_type_node,
 						      TYPE_MODE (ptr_type_node),
@@ -6015,25 +6015,25 @@ gfc_trans_omp_depobj (gfc_code *code)
 	    }
 	  gfc_add_block_to_block (&block, &se.pre);
 	  gfc_add_block_to_block (&block, &se.post);
-	  gcc_assert (POINTER_TYPE_P (TREE_TYPE (var)));
+	  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (var)));
 	}
       else
 	{
 	  var = gfc_get_symbol_decl (n->sym);
-	  if (POINTER_TYPE_P (TREE_TYPE (var))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (var))
 	      && GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (TREE_TYPE (var))))
 	    var = build_fold_indirect_ref (var);
 	  if (GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (var)))
 	    {
 	      var = gfc_conv_descriptor_data_get (var);
-	      gcc_assert (POINTER_TYPE_P (TREE_TYPE (var)));
+	      gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (var)));
 	    }
 	  else if ((n->sym->attr.allocatable || n->sym->attr.pointer)
 		   && n->sym->attr.dummy)
 	    var = build_fold_indirect_ref (var);
-	  else if (!POINTER_TYPE_P (TREE_TYPE (var))
+	  else if (!INDIRECT_TYPE_P (TREE_TYPE (var))
 		   || (n->sym->ts.f90_type == BT_VOID
-		       && !POINTER_TYPE_P (TREE_TYPE (TREE_TYPE (var)))
+		       && !INDIRECT_TYPE_P (TREE_TYPE (TREE_TYPE (var)))
 		       && !GFC_ARRAY_TYPE_P (TREE_TYPE (TREE_TYPE (var)))))
 	    {
 	      TREE_ADDRESSABLE (var) = 1;
@@ -6091,7 +6091,7 @@ gfc_trans_omp_error (gfc_code *code)
     {
       gfc_conv_expr (&se, code->ext.omp_clauses->message);
       message = se.expr;
-      if (!POINTER_TYPE_P (TREE_TYPE (message)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (message)))
 	/* To ensure an ARRAY_TYPE is not passed as such.  */
 	message = gfc_build_addr_expr (NULL, message);
       len = se.string_length;

@@ -193,7 +193,7 @@ func_checker::compatible_polymorphic_types_p (tree t1, tree t2,
   gcc_assert (TREE_CODE (t1) != FUNCTION_TYPE && TREE_CODE (t1) != METHOD_TYPE);
 
   /* Pointer types generally give no information.  */
-  if (POINTER_TYPE_P (t1))
+  if (INDIRECT_TYPE_P (t1))
     {
       if (!compare_ptr)
 	return true;

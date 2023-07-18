@@ -242,7 +242,7 @@ encode_type_qualifiers (tree declspecs)
 static bool
 pointee_is_readonly (tree pointee)
 {
-  while (POINTER_TYPE_P (pointee))
+  while (INDIRECT_TYPE_P (pointee))
     pointee = TREE_TYPE (pointee);
 
   return TYPE_READONLY (pointee);

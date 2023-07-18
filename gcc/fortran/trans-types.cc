@@ -1142,7 +1142,7 @@ gfc_get_character_type (int kind, gfc_charlen * cl)
   tree len;
 
   len = (cl == NULL) ? NULL_TREE : cl->backend_decl;
-  if (len && POINTER_TYPE_P (TREE_TYPE (len)))
+  if (len && INDIRECT_TYPE_P (TREE_TYPE (len)))
     len = build_fold_indirect_ref (len);
 
   return gfc_get_character_type_len (kind, len);
@@ -2859,7 +2859,7 @@ gfc_get_derived_type (gfc_symbol * derived, int codimen)
       /* Ensure that the CLASS language specific flag is set.  */
       if (c->ts.type == BT_CLASS)
 	{
-	  if (POINTER_TYPE_P (field_type))
+	  if (INDIRECT_TYPE_P (field_type))
 	    GFC_CLASS_TYPE_P (TREE_TYPE (field_type)) = 1;
 	  else
 	    GFC_CLASS_TYPE_P (field_type) = 1;
@@ -3445,7 +3445,7 @@ gfc_get_array_descr_info (const_tree type, struct array_descr_info *info)
 
   if (! GFC_DESCRIPTOR_TYPE_P (type))
     {
-      if (! POINTER_TYPE_P (type))
+      if (! INDIRECT_TYPE_P (type))
 	return false;
       type = TREE_TYPE (type);
       if (! GFC_DESCRIPTOR_TYPE_P (type))
@@ -3458,7 +3458,7 @@ gfc_get_array_descr_info (const_tree type, struct array_descr_info *info)
     return false;
 
   etype = GFC_TYPE_ARRAY_DATAPTR_TYPE (type);
-  gcc_assert (POINTER_TYPE_P (etype));
+  gcc_assert (INDIRECT_TYPE_P (etype));
   etype = TREE_TYPE (etype);
 
   /* If the type is not a scalar coarray.  */

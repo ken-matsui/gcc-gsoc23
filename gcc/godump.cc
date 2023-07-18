@@ -693,7 +693,7 @@ go_format_type (class godump_container *container, tree type,
   if (use_type_name
       && TYPE_NAME (type) != NULL_TREE
       && (AGGREGATE_TYPE_P (type)
-	  || POINTER_TYPE_P (type)
+	  || INDIRECT_TYPE_P (type)
 	  || TREE_CODE (type) == FUNCTION_TYPE))
     {
       tree name;
@@ -947,7 +947,7 @@ go_format_type (class godump_container *container, tree type,
 		   pointer.  */
 		if (TYPE_NAME (TREE_TYPE (field)) != NULL_TREE
 		    && (RECORD_OR_UNION_TYPE_P (TREE_TYPE (field))
-			|| (POINTER_TYPE_P (TREE_TYPE (field))
+			|| (INDIRECT_TYPE_P (TREE_TYPE (field))
 			    && (TREE_CODE (TREE_TYPE (TREE_TYPE (field)))
 				== FUNCTION_TYPE))))
 		  {

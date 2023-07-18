@@ -2416,7 +2416,7 @@ get_origin_and_offset_r (tree x, HOST_WIDE_INT *fldoff, HOST_WIDE_INT *fldsize,
 	  x = SSA_NAME_VAR (x);
 
 	tree xtype = TREE_TYPE (x);
-	if (POINTER_TYPE_P (xtype))
+	if (INDIRECT_TYPE_P (xtype))
 	  xtype = TREE_TYPE (xtype);
 
 	if (off)
@@ -4373,7 +4373,7 @@ handle_printf_call (gimple_stmt_iterator *gsi, pointer_query &ptr_qry)
       if (idx_format == UINT_MAX
 	  || idx_format >= gimple_call_num_args (info.callstmt)
 	  || idx_args > gimple_call_num_args (info.callstmt)
-	  || !POINTER_TYPE_P (TREE_TYPE (gimple_call_arg (info.callstmt,
+	  || !INDIRECT_TYPE_P (TREE_TYPE (gimple_call_arg (info.callstmt,
 							  idx_format))))
 	return false;
       info.fncode = BUILT_IN_NONE;

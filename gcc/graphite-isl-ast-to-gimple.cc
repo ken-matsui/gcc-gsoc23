@@ -258,8 +258,8 @@ gcc_expression_from_isl_ast_expr_id (tree type,
   tree t = *tp;
   if (useless_type_conversion_p (type, TREE_TYPE (t)))
     return t;
-  if (POINTER_TYPE_P (TREE_TYPE (t))
-      && !POINTER_TYPE_P (type) && !ptrofftype_p (type))
+  if (INDIRECT_TYPE_P (TREE_TYPE (t))
+      && !INDIRECT_TYPE_P (type) && !ptrofftype_p (type))
     t = fold_convert (sizetype, t);
   return fold_convert (type, t);
 }
@@ -724,13 +724,13 @@ translate_isl_ast_node_for (loop_p context_loop, __isl_keep isl_ast_node *node,
     ;
   else
     {
-      tree one = build_one_cst (POINTER_TYPE_P (type) ? sizetype : type);
+      tree one = build_one_cst (INDIRECT_TYPE_P (type) ? sizetype : type);
       /* Adding +1 and using LT_EXPR helps with loop latches that have a
 	 loop iteration count of "PARAMETER - 1".  For PARAMETER == 0 this
 	 becomes 2^k-1 due to integer overflow, and the condition lb <= ub
 	 is true, even if we do not want this.  However lb < ub + 1 is false,
 	 as expected.  */
-      tree ub_one = fold_build2 (POINTER_TYPE_P (type)
+      tree ub_one = fold_build2 (INDIRECT_TYPE_P (type)
 				 ? POINTER_PLUS_EXPR : PLUS_EXPR,
 				 type, unshare_expr (ub), one);
       create_empty_if_region_on_edge (next_e,

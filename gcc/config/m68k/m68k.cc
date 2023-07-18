@@ -5867,7 +5867,7 @@ m68k_function_value (const_tree valtype, const_tree func ATTRIBUTE_UNUSED)
   }
 
   /* If the function returns a pointer, push that into %a0.  */
-  if (func && POINTER_TYPE_P (TREE_TYPE (TREE_TYPE (func))))
+  if (func && INDIRECT_TYPE_P (TREE_TYPE (TREE_TYPE (func))))
     /* For compatibility with the large body of existing code which
        does not always properly declare external functions returning
        pointer types, the m68k/SVR4 convention is to copy the value
@@ -5884,7 +5884,7 @@ m68k_function_value (const_tree valtype, const_tree func ATTRIBUTE_UNUSED)
 		  gen_rtx_EXPR_LIST (VOIDmode,
 				     gen_rtx_REG (mode, D0_REG),
 				     const0_rtx)));
-  else if (POINTER_TYPE_P (valtype))
+  else if (INDIRECT_TYPE_P (valtype))
     return gen_rtx_REG (mode, A0_REG);
   else
     return gen_rtx_REG (mode, D0_REG);

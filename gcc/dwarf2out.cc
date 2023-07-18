@@ -18966,7 +18966,7 @@ loc_list_from_tree_1 (tree loc, int want_address,
 		&& want_address != 1
 		&& ! DECL_IGNORED_P (loc)
 		&& (INTEGRAL_TYPE_P (TREE_TYPE (loc))
-		    || POINTER_TYPE_P (TREE_TYPE (loc)))
+		    || INDIRECT_TYPE_P (TREE_TYPE (loc)))
 		&& (GET_MODE_SIZE (SCALAR_INT_TYPE_MODE (TREE_TYPE (loc)))
 		    <= DWARF2_ADDR_SIZE))
 	      {

@@ -3797,7 +3797,7 @@ next_runtime_02_eh_type (tree type)
       /*|| errorcount || sorrycount*/)
     goto err_mark_in;
 
-  if (POINTER_TYPE_P (type) && objc_is_object_id (TREE_TYPE (type)))
+  if (INDIRECT_TYPE_P (type) && objc_is_object_id (TREE_TYPE (type)))
     {
       if (!next_v2_EHTYPE_id_decl)
 	{
@@ -3812,7 +3812,7 @@ next_runtime_02_eh_type (tree type)
       return build_fold_addr_expr (next_v2_EHTYPE_id_decl);
     }
 
-  if (!POINTER_TYPE_P (type) || !TYPED_OBJECT (TREE_TYPE (type)))
+  if (!INDIRECT_TYPE_P (type) || !TYPED_OBJECT (TREE_TYPE (type)))
     {
 #ifdef OBJCPLUS
       /* This routine is also called for c++'s catch clause; in which
@@ -3906,7 +3906,7 @@ static tree begin_catch (struct objc_try_context **cur_try_context, tree type,
 
       /* We might want to build a catch object for this (if it's not
 	 id).  */
-      if (POINTER_TYPE_P (type)
+      if (INDIRECT_TYPE_P (type)
 	  && !objc_is_object_id (TREE_TYPE (type))
 	  && TYPED_OBJECT (TREE_TYPE (type)))
 	objc_v2_add_to_ehtype_list (OBJC_TYPE_NAME (TREE_TYPE (type)));

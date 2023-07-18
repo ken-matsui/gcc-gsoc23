@@ -1679,7 +1679,7 @@ dump_ada_function_declaration (pretty_printer *buffer, tree func,
 	 parameter that is not the first one of a method which either has a
 	 slot in the virtual table or is a constructor.  */
       if (TREE_TYPE (arg)
-	  && POINTER_TYPE_P (TREE_TYPE (arg))
+	  && INDIRECT_TYPE_P (TREE_TYPE (arg))
 	  && is_tagged_type (TREE_TYPE (TREE_TYPE (arg)))
 	  && !(num == 1 && is_method && (DECL_VINDEX (func) || is_constructor)))
 	pp_string (buffer, "'Class");

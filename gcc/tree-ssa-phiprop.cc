@@ -289,7 +289,7 @@ propagate_with_phi (basic_block bb, gphi *phi, struct phiprop_d *phivn,
   bool changed;
   tree type = NULL_TREE;
 
-  if (!POINTER_TYPE_P (TREE_TYPE (ptr))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (ptr))
       || (!is_gimple_reg_type (TREE_TYPE (TREE_TYPE (ptr)))
 	  && TYPE_MODE (TREE_TYPE (TREE_TYPE (ptr))) == BLKmode))
     return false;

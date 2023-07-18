@@ -678,14 +678,14 @@ is_empty_base_ref (tree expr)
   if (TREE_CODE (expr) != NOP_EXPR)
     return false;
   tree type = TREE_TYPE (expr);
-  if (!POINTER_TYPE_P (type))
+  if (!INDIRECT_TYPE_P (type))
     return false;
   type = TREE_TYPE (type);
   if (!is_empty_class (type))
     return false;
   STRIP_NOPS (expr);
   tree fromtype = TREE_TYPE (expr);
-  if (!POINTER_TYPE_P (fromtype))
+  if (!INDIRECT_TYPE_P (fromtype))
     return false;
   fromtype = TREE_TYPE (fromtype);
   return (CLASS_TYPE_P (fromtype)

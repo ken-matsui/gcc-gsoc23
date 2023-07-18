@@ -1975,7 +1975,7 @@ set_mem_attributes_minus_bitpos (rtx ref, tree t, int objectp,
   attrs.alias = get_alias_set (t);
 
   MEM_VOLATILE_P (ref) |= TYPE_VOLATILE (type);
-  MEM_POINTER (ref) = POINTER_TYPE_P (type);
+  MEM_POINTER (ref) = INDIRECT_TYPE_P (type);
 
   /* Default values from pre-existing memory attributes if present.  */
   refattrs = MEM_ATTRS (ref);

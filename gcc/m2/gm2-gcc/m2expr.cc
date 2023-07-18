@@ -2550,13 +2550,13 @@ m2expr_build_binary_op_check (location_t location, enum tree_code code,
 
   if (code == PLUS_EXPR)
     {
-      if (POINTER_TYPE_P (type1))
+      if (INDIRECT_TYPE_P (type1))
         {
           op2 = fold_convert_loc (location, sizetype, unshare_expr (op2));
           return fold_build2_loc (location, POINTER_PLUS_EXPR, TREE_TYPE (op1),
                                   op1, op2);
         }
-      else if (POINTER_TYPE_P (type2))
+      else if (INDIRECT_TYPE_P (type2))
         {
           op1 = fold_convert_loc (location, sizetype, unshare_expr (op1));
           return fold_build2_loc (location, POINTER_PLUS_EXPR, TREE_TYPE (op2),
@@ -2565,14 +2565,14 @@ m2expr_build_binary_op_check (location_t location, enum tree_code code,
     }
   if (code == MINUS_EXPR)
     {
-      if (POINTER_TYPE_P (type1))
+      if (INDIRECT_TYPE_P (type1))
         {
           op2 = fold_convert_loc (location, sizetype, unshare_expr (op2));
           op2 = fold_build1_loc (location, NEGATE_EXPR, sizetype, op2);
           return fold_build2_loc (location, POINTER_PLUS_EXPR, TREE_TYPE (op1),
                                   op1, op2);
         }
-      else if (POINTER_TYPE_P (type2))
+      else if (INDIRECT_TYPE_P (type2))
         {
           op2 = fold_convert_loc (location, sizetype, unshare_expr (op2));
           op2 = fold_build1_loc (location, NEGATE_EXPR, sizetype, op2);
@@ -2625,8 +2625,8 @@ m2expr_BuildAddAddress (location_t location, tree op1, tree op2)
   type2 = m2tree_skip_type_decl (TREE_TYPE (op2));
 
   m2assert_AssertLocation (location);
-  ASSERT_CONDITION (POINTER_TYPE_P (type1));
-  ASSERT_CONDITION (!POINTER_TYPE_P (type2));
+  ASSERT_CONDITION (INDIRECT_TYPE_P (type1));
+  ASSERT_CONDITION (!INDIRECT_TYPE_P (type2));
 
   op2 = fold_convert_loc (location, sizetype, unshare_expr (op2));
   return fold_build2_loc (location, POINTER_PLUS_EXPR, TREE_TYPE (op1),

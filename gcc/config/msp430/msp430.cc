@@ -850,7 +850,7 @@ msp430_gimplify_va_arg_expr (tree valist, tree type, gimple_seq *pre_p,
     {
       /* FIXME: This is where this function diverts from targhooks.cc:
 	 std_gimplify_va_arg_expr().  It works, but I do not know why...  */
-      if (! POINTER_TYPE_P (type))
+      if (! INDIRECT_TYPE_P (type))
 	{
 	  t = build2 (MODIFY_EXPR, TREE_TYPE (valist), valist_tmp,
 		      fold_build_pointer_plus_hwi (valist_tmp, boundary - 1));

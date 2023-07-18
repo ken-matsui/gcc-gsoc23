@@ -35,7 +35,7 @@ along with GCC; see the file COPYING3.  If not see
 static void
 do_warn_nonnull_compare (function *fun, tree arg)
 {
-  if (!POINTER_TYPE_P (TREE_TYPE (arg))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (arg))
       && TREE_CODE (TREE_TYPE (arg)) != OFFSET_TYPE)
     return;
 
@@ -95,7 +95,7 @@ do_warn_nonnull_compare (function *fun, tree arg)
 	    break;
 	  }
       if (op
-	  && (POINTER_TYPE_P (TREE_TYPE (arg))
+	  && (INDIRECT_TYPE_P (TREE_TYPE (arg))
 	      ? integer_zerop (op) : integer_minus_onep (op))
 	  && !warning_suppressed_p (stmt, OPT_Wnonnull_compare))
 	warning_at (loc, OPT_Wnonnull_compare,

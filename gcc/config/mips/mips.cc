@@ -6352,7 +6352,7 @@ mips_function_arg_padding (machine_mode mode, const_tree type)
      stack argument is passed in the last byte of the stack slot.  */
   if (type != 0
       ? (INTEGRAL_TYPE_P (type)
-	 || POINTER_TYPE_P (type)
+	 || INDIRECT_TYPE_P (type)
 	 || FIXED_POINT_TYPE_P (type))
       : (SCALAR_INT_MODE_P (mode)
 	 || ALL_SCALAR_FIXED_POINT_MODE_P (mode)))

@@ -59,7 +59,7 @@ chrec_fold_plus_poly_poly (enum tree_code code,
   gcc_assert (poly1);
   gcc_assert (TREE_CODE (poly0) == POLYNOMIAL_CHREC);
   gcc_assert (TREE_CODE (poly1) == POLYNOMIAL_CHREC);
-  if (POINTER_TYPE_P (chrec_type (poly0)))
+  if (INDIRECT_TYPE_P (chrec_type (poly0)))
     gcc_checking_assert (ptrofftype_p (chrec_type (poly1))
 			 && useless_type_conversion_p (type, chrec_type (poly0)));
   else
@@ -368,7 +368,7 @@ chrec_fold_plus (tree type,
   if (integer_zerop (op1))
     return chrec_convert (type, op0, NULL);
 
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     code = POINTER_PLUS_EXPR;
   else
     code = PLUS_EXPR;
@@ -623,7 +623,7 @@ chrec_apply (unsigned var,
 	  else if (operand_equal_p (CHREC_LEFT (chrec), chrecr)
 		   && TREE_CODE (x) == PLUS_EXPR
 		   && integer_all_onesp (TREE_OPERAND (x, 1))
-		   && !POINTER_TYPE_P (type)
+		   && !INDIRECT_TYPE_P (type)
 		   && TYPE_PRECISION (TREE_TYPE (x))
 		      >= TYPE_PRECISION (type))
 	    {
@@ -862,7 +862,7 @@ reset_evolution_in_loop (unsigned loop_num,
 {
   class loop *loop = get_loop (cfun, loop_num);
 
-  if (POINTER_TYPE_P (chrec_type (chrec)))
+  if (INDIRECT_TYPE_P (chrec_type (chrec)))
     gcc_assert (ptrofftype_p (chrec_type (new_evol)));
   else
     gcc_assert (chrec_type (chrec) == chrec_type (new_evol));
@@ -1319,7 +1319,7 @@ convert_affine_scev (class loop *loop, tree type,
   bool enforce_overflow_semantics;
   bool must_check_src_overflow, must_check_rslt_overflow;
   tree new_base, new_step;
-  tree step_type = POINTER_TYPE_P (type) ? sizetype : type;
+  tree step_type = INDIRECT_TYPE_P (type) ? sizetype : type;
 
   /* In general,
      (TYPE) (BASE + STEP * i) = (TYPE) BASE + (TYPE -- sign extend) STEP * i,
@@ -1416,7 +1416,7 @@ convert_affine_scev (class loop *loop, tree type,
 tree
 chrec_convert_rhs (tree type, tree chrec, gimple *at_stmt)
 {
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     type = sizetype;
 
   return chrec_convert (type, chrec, at_stmt);
@@ -1586,7 +1586,7 @@ chrec_convert_aggressive (tree type, tree chrec, bool *fold_conversions)
       if (convert_affine_scev (loop, type, &base, &step, NULL, true))
 	return build_polynomial_chrec (loop->num, base, step);
     }
-  rtype = POINTER_TYPE_P (type) ? sizetype : type;
+  rtype = INDIRECT_TYPE_P (type) ? sizetype : type;
 
   left = CHREC_LEFT (chrec);
   right = CHREC_RIGHT (chrec);

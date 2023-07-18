@@ -2718,7 +2718,7 @@ Gcc_backend::convert_tree(tree type_tree, tree expr_tree, Location location)
     return error_mark_node;
 
   gcc_assert(TREE_CODE(type_tree) == TREE_CODE(TREE_TYPE(expr_tree)));
-  if (POINTER_TYPE_P(type_tree)
+  if (INDIRECT_TYPE_P(type_tree)
       || INTEGRAL_TYPE_P(type_tree)
       || SCALAR_FLOAT_TYPE_P(type_tree)
       || COMPLEX_FLOAT_TYPE_P(type_tree))

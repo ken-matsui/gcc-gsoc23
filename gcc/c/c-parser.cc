@@ -8385,7 +8385,7 @@ c_parser_binary_expression (c_parser *parser, struct c_expr *after,
 	      type0 = TREE_TYPE (type0);				      \
 	    if (!TYPE_P (type1))					      \
 	      type1 = TREE_TYPE (type1);				      \
-	    if (POINTER_TYPE_P (type0)					      \
+	    if (INDIRECT_TYPE_P (type0)					      \
 		&& comptypes (TREE_TYPE (type0), type1)			      \
 		&& !(TREE_CODE (first_arg) == PARM_DECL			      \
 		     && C_ARRAY_PARAMETER (first_arg)			      \
@@ -14171,7 +14171,7 @@ c_parser_oacc_data_clause_deviceptr (c_parser *parser, tree list)
 	error_at (loc, "%qD is not a variable", v);
       else if (TREE_TYPE (v) == error_mark_node)
 	;
-      else if (!POINTER_TYPE_P (TREE_TYPE (v)))
+      else if (!INDIRECT_TYPE_P (TREE_TYPE (v)))
 	error_at (loc, "%qD is not a pointer variable", v);
 
       tree u = build_omp_clause (loc, OMP_CLAUSE_MAP);

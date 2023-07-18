@@ -1412,7 +1412,7 @@ shorten_binary_op (tree result_type, tree op0, tree op1, bool bitwise)
 	   && (type
 	       = c_common_signed_or_unsigned_type (unsigned1,
 						   TREE_TYPE (arg1)))
-	   && !POINTER_TYPE_P (type)
+	   && !INDIRECT_TYPE_P (type)
 	   && int_fits_type_p (arg0, type))
     return type;
 
@@ -1423,7 +1423,7 @@ shorten_binary_op (tree result_type, tree op0, tree op1, bool bitwise)
 	   && (type
 	       = c_common_signed_or_unsigned_type (unsigned0,
 						   TREE_TYPE (arg0)))
-	   && !POINTER_TYPE_P (type)
+	   && !INDIRECT_TYPE_P (type)
 	   && int_fits_type_p (arg1, type))
     return type;
 
@@ -3655,7 +3655,7 @@ c_common_truthvalue_conversion (location_t location, tree expr)
 	tree totype = TREE_TYPE (expr);
 	tree fromtype = TREE_TYPE (TREE_OPERAND (expr, 0));
 
-	if (POINTER_TYPE_P (totype)
+	if (INDIRECT_TYPE_P (totype)
 	    && !c_inhibit_evaluation_warnings
 	    && TYPE_REF_P (fromtype))
 	  {
@@ -3784,7 +3784,7 @@ c_apply_type_quals_to_decl (int type_quals, tree decl)
 	   FIXME currently we just ignore it.  */
 	type = TREE_TYPE (type);
       if (!type
-	  || !POINTER_TYPE_P (type)
+	  || !INDIRECT_TYPE_P (type)
 	  || !C_TYPE_OBJECT_OR_INCOMPLETE_P (TREE_TYPE (type)))
 	error ("invalid use of %<restrict%>");
     }
@@ -4865,7 +4865,7 @@ build_va_arg (location_t loc, tree expr, tree type)
   else
     {
       /* Case 2b: va_list is pointer to array elem type.  */
-      gcc_assert (POINTER_TYPE_P (va_type));
+      gcc_assert (INDIRECT_TYPE_P (va_type));
 
       /* Comparison as in std_canonical_va_list_type.  */
       gcc_assert (TYPE_MAIN_VARIANT (TREE_TYPE (va_type))
@@ -5023,7 +5023,7 @@ self_promoting_args_p (const_tree parms)
 tree
 strip_pointer_operator (tree t)
 {
-  while (POINTER_TYPE_P (t))
+  while (INDIRECT_TYPE_P (t))
     t = TREE_TYPE (t);
   return t;
 }
@@ -5032,7 +5032,7 @@ strip_pointer_operator (tree t)
 tree
 strip_pointer_or_array_types (tree t)
 {
-  while (TREE_CODE (t) == ARRAY_TYPE || POINTER_TYPE_P (t))
+  while (TREE_CODE (t) == ARRAY_TYPE || INDIRECT_TYPE_P (t))
     t = TREE_TYPE (t);
   return t;
 }
@@ -5085,9 +5085,9 @@ c_add_case_label (location_t loc, splay_tree cases, tree cond,
     goto error_out;
 
   if ((low_value && TREE_TYPE (low_value)
-       && POINTER_TYPE_P (TREE_TYPE (low_value)))
+       && INDIRECT_TYPE_P (TREE_TYPE (low_value)))
       || (high_value && TREE_TYPE (high_value)
-	  && POINTER_TYPE_P (TREE_TYPE (high_value))))
+	  && INDIRECT_TYPE_P (TREE_TYPE (high_value))))
     {
       error_at (loc, "pointers are not permitted as case values");
       goto error_out;
@@ -5703,7 +5703,7 @@ check_function_sentinel (const_tree fntype, int nargs, tree *argarray)
 
       /* Validate the sentinel.  */
       sentinel = fold_for_warn (argarray[nargs - 1 - pos]);
-      if ((!POINTER_TYPE_P (TREE_TYPE (sentinel))
+      if ((!INDIRECT_TYPE_P (TREE_TYPE (sentinel))
 	   || !integer_zerop (sentinel))
 	  /* Although __null (in C++) is only an integer we allow it
 	     nevertheless, as we are guaranteed that it's exactly
@@ -5764,7 +5764,7 @@ check_function_restrict (const_tree fndecl, const_tree fntype,
 	  type = TREE_VALUE (parms);
 	  parms = TREE_CHAIN (parms);
 	}
-      if (POINTER_TYPE_P (type)
+      if (INDIRECT_TYPE_P (type)
 	  && TYPE_RESTRICT (type)
 	  && !TYPE_READONLY (TREE_TYPE (type)))
 	warned |= warn_for_restrict (i, argarray.address (), nargs);
@@ -6466,7 +6466,7 @@ check_builtin_function_arguments (location_t loc, vec<location_t> arg_loc,
     case BUILT_IN_CLEAR_PADDING:
       if (builtin_function_validate_nargs (loc, fndecl, nargs, 1))
 	{
-	  if (!POINTER_TYPE_P (TREE_TYPE (args[0])))
+	  if (!INDIRECT_TYPE_P (TREE_TYPE (args[0])))
 	    {
 	      error_at (ARG_LOCATION (0), "argument %u in call to function "
 			"%qE does not have pointer type", 1, fndecl);
@@ -6852,7 +6852,7 @@ fold_offsetof (tree expr, tree type, enum tree_code ctx)
       gcc_unreachable ();
     }
 
-  if (!POINTER_TYPE_P (type))
+  if (!INDIRECT_TYPE_P (type))
     return size_binop (PLUS_EXPR, base, convert (type, off));
   return fold_build_pointer_plus (base, off);
 }
@@ -7088,7 +7088,7 @@ speculation_safe_value_resolve_call (tree function, vec<tree, va_gc> *params)
       type = TREE_TYPE ((*params)[0]);
     }
 
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     return BUILT_IN_SPECULATION_SAFE_VALUE_PTR;
 
   if (!INTEGRAL_TYPE_P (type))
@@ -7213,7 +7213,7 @@ sync_resolve_size (tree function, vec<tree, va_gc> *params, bool fetch)
     goto incompatible;
 
   type = TREE_TYPE (type);
-  if (!INTEGRAL_TYPE_P (type) && !POINTER_TYPE_P (type))
+  if (!INTEGRAL_TYPE_P (type) && !INDIRECT_TYPE_P (type))
     goto incompatible;
 
   if (!COMPLETE_TYPE_P (type))
@@ -7432,7 +7432,7 @@ get_atomic_generic_size (location_t loc, tree function,
 	  (*params)[x] = default_conversion ((*params)[x]);
 	  type = TREE_TYPE ((*params)[x]);
 	}
-      if (!POINTER_TYPE_P (type))
+      if (!INDIRECT_TYPE_P (type))
 	{
 	  error_at (loc, "argument %d of %qE must be a pointer type", x + 1,
 		    function);
@@ -8710,7 +8710,7 @@ cxx_fundamental_alignment_p (unsigned align)
 bool
 pointer_to_zero_sized_aggr_p (tree t)
 {
-  if (!POINTER_TYPE_P (t))
+  if (!INDIRECT_TYPE_P (t))
     return false;
   t = TREE_TYPE (t);
   return (TYPE_SIZE (t) && integer_zerop (TYPE_SIZE (t)));

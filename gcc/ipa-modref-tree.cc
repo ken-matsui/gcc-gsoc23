@@ -695,7 +695,7 @@ modref_access_node::get_ao_ref (const gcall *stmt, ao_ref *ref) const
 
   if (!parm_offset_known
       || !(arg = get_call_arg (stmt))
-      || !POINTER_TYPE_P (TREE_TYPE (arg)))
+      || !INDIRECT_TYPE_P (TREE_TYPE (arg)))
     return false;
   poly_offset_int off = (poly_offset_int)offset
 	+ ((poly_offset_int)parm_offset << LOG2_BITS_PER_UNIT);

@@ -2338,7 +2338,7 @@ dump_ssaname_info (pretty_printer *buffer, tree node, int spc)
   if (TREE_CODE (node) != SSA_NAME)
     return;
 
-  if (POINTER_TYPE_P (TREE_TYPE (node))
+  if (INDIRECT_TYPE_P (TREE_TYPE (node))
       && SSA_NAME_PTR_INFO (node))
     {
       unsigned int align, misalign;
@@ -2353,7 +2353,7 @@ dump_ssaname_info (pretty_printer *buffer, tree node, int spc)
 	}
     }
 
-  if (!POINTER_TYPE_P (TREE_TYPE (node))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (node))
       && SSA_NAME_RANGE_INFO (node))
     {
       Value_Range r (TREE_TYPE (node));

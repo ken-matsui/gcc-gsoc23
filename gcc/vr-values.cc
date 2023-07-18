@@ -340,7 +340,7 @@ simplify_using_ranges::legacy_fold_cond_overflow (gimple *stmt)
 
   /* We only deal with integral and pointer types.  */
   if (!INTEGRAL_TYPE_P (TREE_TYPE (op0))
-      && !POINTER_TYPE_P (TREE_TYPE (op0)))
+      && !INDIRECT_TYPE_P (TREE_TYPE (op0)))
     return NULL_TREE;
 
   /* If OP0 CODE OP1 is an overflow comparison, if it can be expressed
@@ -986,7 +986,7 @@ range_fits_type_p (const irange *vr,
   /* We can only handle integral and pointer types.  */
   src_type = vr->type ();
   if (!INTEGRAL_TYPE_P (src_type)
-      && !POINTER_TYPE_P (src_type))
+      && !INDIRECT_TYPE_P (src_type))
     return false;
 
   /* An extension is fine unless VR is SIGNED and dest_sgn is UNSIGNED,
@@ -1259,7 +1259,7 @@ simplify_using_ranges::simplify_casted_cond (gcond *stmt)
 	}
 
       if (TREE_CODE (innerop) == SSA_NAME
-	  && !POINTER_TYPE_P (TREE_TYPE (innerop))
+	  && !INDIRECT_TYPE_P (TREE_TYPE (innerop))
 	  && !SSA_NAME_OCCURS_IN_ABNORMAL_PHI (innerop)
 	  && desired_pro_or_demotion_p (TREE_TYPE (innerop), TREE_TYPE (op0)))
 	{

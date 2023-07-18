@@ -74,7 +74,7 @@ get_offset_range (tree x, gimple *stmt, offset_int r[2], range_query *rvals)
     x = TREE_OPERAND (x, 0);
 
   tree type = TREE_TYPE (x);
-  if (!INTEGRAL_TYPE_P (type) && !POINTER_TYPE_P (type))
+  if (!INTEGRAL_TYPE_P (type) && !INDIRECT_TYPE_P (type))
     return false;
 
    if (TREE_CODE (x) != INTEGER_CST
@@ -556,7 +556,7 @@ gimple_parm_array_size (tree ptr, wide_int rng[2],
      from the current function declaratation (e.g., attribute access or
      related).  */
   tree var = SSA_NAME_VAR (ptr);
-  if (TREE_CODE (var) != PARM_DECL || !POINTER_TYPE_P (TREE_TYPE (var)))
+  if (TREE_CODE (var) != PARM_DECL || !INDIRECT_TYPE_P (TREE_TYPE (var)))
     return NULL_TREE;
 
   const unsigned prec = TYPE_PRECISION (sizetype);
@@ -1750,7 +1750,7 @@ handle_decl (tree decl, bool addr, access_ref *pref)
      the identity of the object has been determined.  */
   pref->offrng[0] = pref->offrng[1] = 0;
 
-  if (!addr && POINTER_TYPE_P (decl_type))
+  if (!addr && INDIRECT_TYPE_P (decl_type))
     {
       /* Set the maximum size if the reference is to the pointer
 	 itself (as opposed to what it points to), and clear
@@ -1942,7 +1942,7 @@ handle_component_ref (tree cref, gimple *stmt, bool addr, int ostype,
 
   pref->ref = field;
 
-  if (!addr && POINTER_TYPE_P (TREE_TYPE (field)))
+  if (!addr && INDIRECT_TYPE_P (TREE_TYPE (field)))
     {
       /* Set maximum size if the reference is to the pointer member
 	 itself (as opposed to what it points to).  */
@@ -2181,7 +2181,7 @@ handle_ssa_name (tree ptr, bool addr, int ostype,
       return true;
     }
 
-  if (ostype > 1 && POINTER_TYPE_P (TREE_TYPE (rhs)))
+  if (ostype > 1 && INDIRECT_TYPE_P (TREE_TYPE (rhs)))
     {
       /* When determining the qualifiers follow the pointer but
 	 avoid caching the result.  As the pointer is added to
@@ -2283,7 +2283,7 @@ compute_objsize_r (tree ptr, gimple *stmt, bool addr, int ostype,
       if (integer_zerop (ptr)
 	  || wi::to_widest (ptr) >= param_min_pagesize)
 	pref->set_max_size_range ();
-      else if (POINTER_TYPE_P (TREE_TYPE (ptr)))
+      else if (INDIRECT_TYPE_P (TREE_TYPE (ptr)))
 	{
 	  tree deref_type = TREE_TYPE (TREE_TYPE (ptr));
 	  addr_space_t as = TYPE_ADDR_SPACE (deref_type);

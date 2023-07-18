@@ -3561,7 +3561,7 @@ static tree
 cxx_maybe_fold_addr_pointer_plus (tree t)
 {
   while (CONVERT_EXPR_P (t)
-	 && POINTER_TYPE_P (TREE_TYPE (TREE_OPERAND (t, 0))))
+	 && INDIRECT_TYPE_P (TREE_TYPE (TREE_OPERAND (t, 0))))
     t = TREE_OPERAND (t, 0);
   if (TREE_CODE (t) != POINTER_PLUS_EXPR)
     return NULL_TREE;
@@ -3570,7 +3570,7 @@ cxx_maybe_fold_addr_pointer_plus (tree t)
   if (TREE_CODE (op1) != INTEGER_CST)
     return NULL_TREE;
   while (CONVERT_EXPR_P (op0)
-	 && POINTER_TYPE_P (TREE_TYPE (TREE_OPERAND (op0, 0))))
+	 && INDIRECT_TYPE_P (TREE_TYPE (TREE_OPERAND (op0, 0))))
     op0 = TREE_OPERAND (op0, 0);
   if (TREE_CODE (op0) != ADDR_EXPR)
     return NULL_TREE;
@@ -3640,7 +3640,7 @@ cxx_eval_binary_expression (const constexpr_ctx *ctx, tree t,
     }
   if (r == NULL_TREE
       && TREE_CODE_CLASS (code) == tcc_comparison
-      && POINTER_TYPE_P (TREE_TYPE (lhs)))
+      && INDIRECT_TYPE_P (TREE_TYPE (lhs)))
     {
       if (tree lhso = cxx_maybe_fold_addr_pointer_plus (lhs))
 	lhs = fold_convert (TREE_TYPE (lhs), lhso);

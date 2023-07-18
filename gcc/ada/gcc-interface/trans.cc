@@ -4501,7 +4501,7 @@ is_array_of_scalar_type (tree type)
 
   type = TREE_TYPE (type);
 
-  return !AGGREGATE_TYPE_P (type) && !POINTER_TYPE_P (type);
+  return !AGGREGATE_TYPE_P (type) && !INDIRECT_TYPE_P (type);
 }
 
 /* Helper function for walk_tree, used by return_slot_opt_for_pure_call_p.  */
@@ -4546,7 +4546,7 @@ return_slot_opt_for_pure_call_p (tree target, tree call)
       if (is_array_of_scalar_type (arg_type))
 	walk_tree_without_duplicates (&arg, find_decls_r, decls);
 
-      else if (AGGREGATE_TYPE_P (arg_type) || POINTER_TYPE_P (arg_type))
+      else if (AGGREGATE_TYPE_P (arg_type) || INDIRECT_TYPE_P (arg_type))
 	return false;
     }
 
@@ -6970,7 +6970,7 @@ gnat_to_gnu (Node_Id gnat_node)
 
       /* If the result is a pointer type, see if we are improperly
 	 converting to a stricter alignment.  */
-      if (STRICT_ALIGNMENT && POINTER_TYPE_P (gnu_result_type)
+      if (STRICT_ALIGNMENT && INDIRECT_TYPE_P (gnu_result_type)
 	  && Is_Access_Type (Etype (gnat_node)))
 	{
 	  unsigned int align = known_alignment (gnu_expr);
@@ -6988,7 +6988,7 @@ gnat_to_gnu (Node_Id gnat_node)
 	 build the pointer.  */
       if (TARGET_VTABLE_USES_DESCRIPTORS
 	  && TREE_TYPE (gnu_expr) == fdesc_type_node
-	  && POINTER_TYPE_P (gnu_result_type))
+	  && INDIRECT_TYPE_P (gnu_result_type))
 	gnu_expr = build_unary_op (ADDR_EXPR, NULL_TREE, gnu_expr);
 
       gnu_result = unchecked_convert (gnu_result_type, gnu_expr,
@@ -10458,17 +10458,17 @@ validate_unchecked_conversion (Node_Id gnat_node)
   /* If the target is a pointer type, see if we are either converting from a
      non-pointer or from a pointer to a type with a different alias set and
      warn if so, unless the pointer has been marked to alias everything.  */
-  if (POINTER_TYPE_P (gnu_target_type)
+  if (INDIRECT_TYPE_P (gnu_target_type)
       && !TYPE_REF_CAN_ALIAS_ALL (gnu_target_type))
     {
-      tree gnu_source_desig_type = POINTER_TYPE_P (gnu_source_type)
+      tree gnu_source_desig_type = INDIRECT_TYPE_P (gnu_source_type)
 				   ? TREE_TYPE (gnu_source_type)
 				   : NULL_TREE;
       tree gnu_target_desig_type = TREE_TYPE (gnu_target_type);
       alias_set_type target_alias_set = get_alias_set (gnu_target_desig_type);
 
       if (target_alias_set != 0
-	  && (!POINTER_TYPE_P (gnu_source_type)
+	  && (!INDIRECT_TYPE_P (gnu_source_type)
 	      || !alias_sets_conflict_p (get_alias_set (gnu_source_desig_type),
 					 target_alias_set)))
 	{

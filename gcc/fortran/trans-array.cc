@@ -946,11 +946,11 @@ gfc_get_array_span (tree desc, gfc_expr *expr)
 
   if (is_pointer_array (desc)
       || (get_CFI_desc (NULL, expr, &desc, NULL)
-	  && (POINTER_TYPE_P (TREE_TYPE (desc))
+	  && (INDIRECT_TYPE_P (TREE_TYPE (desc))
 	      ? GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (TREE_TYPE (desc)))
 	      : GFC_DESCRIPTOR_TYPE_P (TREE_TYPE (desc)))))
     {
-      if (POINTER_TYPE_P (TREE_TYPE (desc)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (desc)))
 	desc = build_fold_indirect_ref_loc (input_location, desc);
 
       /* This will have the span field set.  */
@@ -960,7 +960,7 @@ gfc_get_array_span (tree desc, gfc_expr *expr)
     {
       if (DECL_LANG_SPECIFIC (desc) && GFC_DECL_SAVED_DESCRIPTOR (desc))
 	desc = GFC_DECL_SAVED_DESCRIPTOR (desc);
-      if (POINTER_TYPE_P (TREE_TYPE (desc)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (desc)))
 	desc = build_fold_indirect_ref_loc (input_location, desc);
       tmp = gfc_conv_descriptor_span_get (desc);
     }
@@ -1441,7 +1441,7 @@ gfc_trans_create_temp_array (stmtblock_t * pre, stmtblock_t * post, gfc_ss * ss,
      dynamic type.  Generate an eltype and then the class expression.  */
   if (eltype == NULL_TREE && initial)
     {
-      gcc_assert (POINTER_TYPE_P (TREE_TYPE (initial)));
+      gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (initial)));
       class_expr = build_fold_indirect_ref_loc (input_location, initial);
       /* Obtain the structure (class) expression.  */
       class_expr = gfc_get_class_from_expr (class_expr);
@@ -1880,7 +1880,7 @@ gfc_trans_array_ctor_element (stmtblock_t * pblock, tree desc,
 					  gfc_character_kinds[i].bit_size / 8));
 
       gfc_conv_string_parameter (se);
-      if (POINTER_TYPE_P (TREE_TYPE (tmp)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (tmp)))
 	{
 	  /* The temporary is an array of pointers.  */
 	  se->expr = fold_convert (TREE_TYPE (tmp), se->expr);
@@ -2151,7 +2151,7 @@ gfc_trans_array_constructor_value (stmtblock_t * pblock,
 		    se.expr = fold_convert (type, se.expr);
 		  /* For constant character array constructors we build
 		     an array of pointers.  */
-		  else if (POINTER_TYPE_P (type))
+		  else if (INDIRECT_TYPE_P (type))
 		    se.expr = gfc_build_addr_expr
 				(gfc_get_pchar_type (p->expr->ts.kind),
 				 se.expr);
@@ -2577,7 +2577,7 @@ gfc_build_constant_array_constructor (gfc_expr * expr, tree type)
       gfc_conv_constant (&se, c->expr);
       if (c->expr->ts.type != BT_CHARACTER)
 	se.expr = fold_convert (type, se.expr);
-      else if (POINTER_TYPE_P (type))
+      else if (INDIRECT_TYPE_P (type))
 	se.expr = gfc_build_addr_expr (gfc_get_pchar_type (c->expr->ts.kind),
 				       se.expr);
       CONSTRUCTOR_APPEND_ELT (v, build_int_cst (gfc_array_index_type, nelem),
@@ -3695,7 +3695,7 @@ build_class_array_ref (gfc_se *se, tree base, tree index)
       else
 	decl = gfc_get_class_from_gfc_expr (class_expr);
 
-      if (POINTER_TYPE_P (TREE_TYPE (decl)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (decl)))
 	decl = build_fold_indirect_ref_loc (input_location, decl);
 
       if (!GFC_CLASS_TYPE_P (TREE_TYPE (decl)))
@@ -3726,7 +3726,7 @@ non_negative_strides_array_p (tree expr)
     return false;
 
   tree type = TREE_TYPE (expr);
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     type = TREE_TYPE (type);
 
   if (TYPE_LANG_SPECIFIC (type))
@@ -6251,7 +6251,7 @@ gfc_array_allocate (gfc_se * se, gfc_expr * expr, tree status, tree errmsg,
     }
 
   /* Allocate memory to store the data.  */
-  if (POINTER_TYPE_P (TREE_TYPE (se->expr)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (se->expr)))
     se->expr = build_fold_indirect_ref_loc (input_location, se->expr);
 
   if (coarray && flag_coarray == GFC_FCOARRAY_LIB)
@@ -7847,7 +7847,7 @@ gfc_conv_expr_descriptor (gfc_se *se, gfc_expr *expr)
       if (expr->ts.type == BT_CHARACTER)
 	{
 	  gfc_conv_expr (&rse, expr);
-	  if (POINTER_TYPE_P (TREE_TYPE (rse.expr)))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (rse.expr)))
 	    rse.expr = build_fold_indirect_ref_loc (input_location,
 						rse.expr);
 	}
@@ -8039,7 +8039,7 @@ gfc_conv_expr_descriptor (gfc_se *se, gfc_expr *expr)
 	  tree tmp2 = desc;
 	  if (DECL_LANG_SPECIFIC (tmp2) && GFC_DECL_SAVED_DESCRIPTOR (tmp2))
 	    tmp2 = GFC_DECL_SAVED_DESCRIPTOR (tmp2);
-	  if (POINTER_TYPE_P (TREE_TYPE (tmp2)))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (tmp2)))
 	    tmp2 = build_fold_indirect_ref_loc (input_location, tmp2);
 	  dtype = gfc_conv_descriptor_dtype (tmp2);
 	}
@@ -8431,7 +8431,7 @@ gfc_conv_array_parameter (gfc_se * se, gfc_expr * expr, bool g77,
         {
 	  /* Some variables are declared directly, others are declared as
 	     pointers and allocated on the heap.  */
-          if (sym->attr.dummy || POINTER_TYPE_P (TREE_TYPE (tmp)))
+          if (sym->attr.dummy || INDIRECT_TYPE_P (TREE_TYPE (tmp)))
             se->expr = tmp;
           else
 	    se->expr = gfc_build_addr_expr (NULL_TREE, tmp);
@@ -9104,7 +9104,7 @@ structure_alloc_comps (gfc_symbol * der_type, tree decl, tree dest,
 
   decl_type = TREE_TYPE (decl);
 
-  if ((POINTER_TYPE_P (decl_type))
+  if ((INDIRECT_TYPE_P (decl_type))
 	|| (TYPE_REF_P (decl_type) && rank == 0))
     {
       decl = build_fold_indirect_ref_loc (input_location, decl);
@@ -10075,7 +10075,7 @@ structure_alloc_comps (gfc_symbol * der_type, tree decl, tree dest,
 	      if (c->ts.type == BT_CLASS)
 		{
 		  tmp = gfc_get_vptr_from_expr (comp);
-		  if (POINTER_TYPE_P (TREE_TYPE (tmp)))
+		  if (INDIRECT_TYPE_P (TREE_TYPE (tmp)))
 		    tmp = build_fold_indirect_ref_loc (input_location, tmp);
 		  tmp = gfc_vptr_size_get (tmp);
 		}
@@ -11086,7 +11086,7 @@ gfc_alloc_allocatable_for_assignment (gfc_loopinfo *loop,
       if (token == NULL_TREE)
 	{
 	  tmp = gfc_get_tree_for_caf_expr (expr1);
-	  if (POINTER_TYPE_P (TREE_TYPE (tmp)))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (tmp)))
 	    tmp = build_fold_indirect_ref (tmp);
 	  gfc_get_caf_token_offset (&caf_se, &token, NULL, tmp, NULL_TREE,
 				    expr1);

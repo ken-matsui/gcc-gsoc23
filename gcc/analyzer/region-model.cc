@@ -2463,7 +2463,7 @@ region_model::deref_rvalue (const svalue *ptr_sval, tree ptr_tree,
 			    region_model_context *ctxt) const
 {
   gcc_assert (ptr_sval);
-  gcc_assert (POINTER_TYPE_P (ptr_sval->get_type ()));
+  gcc_assert (INDIRECT_TYPE_P (ptr_sval->get_type ()));
 
   /* If we're dereferencing PTR_SVAL, assume that it is non-NULL; add this
      as a constraint.  This suppresses false positives from
@@ -3143,7 +3143,7 @@ region_model::check_region_size (const region *lhs_reg, const svalue *rhs_sval,
     return;
 
   tree pointer_type = lhs_reg->get_type ();
-  if (pointer_type == NULL_TREE || !POINTER_TYPE_P (pointer_type))
+  if (pointer_type == NULL_TREE || !INDIRECT_TYPE_P (pointer_type))
     return;
 
   tree pointee_type = TREE_TYPE (pointer_type);
@@ -4548,7 +4548,7 @@ region_model::on_top_level_param (tree param,
 				  bool nonnull,
 				  region_model_context *ctxt)
 {
-  if (POINTER_TYPE_P (TREE_TYPE (param)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (param)))
     {
       const region *param_reg = get_lvalue (param, ctxt);
       const svalue *init_ptr_sval

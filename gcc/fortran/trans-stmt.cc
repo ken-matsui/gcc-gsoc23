@@ -1802,7 +1802,7 @@ trans_associate_var (gfc_symbol *sym, gfc_wrapped_block *block)
 	      if (DECL_LANG_SPECIFIC (class_decl)
 		  && GFC_DECL_SAVED_DESCRIPTOR (class_decl))
 		class_decl = GFC_DECL_SAVED_DESCRIPTOR (class_decl);
-	      if (POINTER_TYPE_P (TREE_TYPE (class_decl)))
+	      if (INDIRECT_TYPE_P (TREE_TYPE (class_decl)))
 		class_decl = build_fold_indirect_ref_loc (input_location,
 							  class_decl);
 	      gcc_assert (GFC_CLASS_TYPE_P (TREE_TYPE (class_decl)));
@@ -1812,7 +1812,7 @@ trans_associate_var (gfc_symbol *sym, gfc_wrapped_block *block)
 	    {
 	      class_decl = sym2->backend_decl;
 	      gfc_conv_expr_descriptor (&se, e);
-	      if (POINTER_TYPE_P (TREE_TYPE (se.expr)))
+	      if (INDIRECT_TYPE_P (TREE_TYPE (se.expr)))
 		se.expr = build_fold_indirect_ref_loc (input_location,
 						       se.expr);
 	    }
@@ -1831,7 +1831,7 @@ trans_associate_var (gfc_symbol *sym, gfc_wrapped_block *block)
 
       /* The SELECT TYPE mechanisms turn class temporaries into pointers, which
 	 point to the selector. */
-      class_ptr = class_decl != NULL_TREE && POINTER_TYPE_P (TREE_TYPE (desc));
+      class_ptr = class_decl != NULL_TREE && INDIRECT_TYPE_P (TREE_TYPE (desc));
       if (class_ptr)
 	{
 	  tmp = gfc_create_var (TREE_TYPE (TREE_TYPE (desc)), "class");
@@ -1867,7 +1867,7 @@ trans_associate_var (gfc_symbol *sym, gfc_wrapped_block *block)
 	  sym2 = sym2->assoc->target->symtree->n.sym;
 	  se.expr = sym2->backend_decl;
 
-	  if (POINTER_TYPE_P (TREE_TYPE (se.expr)))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (se.expr)))
 	    se.expr = build_fold_indirect_ref_loc (input_location,
 						   se.expr);
 	}
@@ -2129,7 +2129,7 @@ trans_associate_var (gfc_symbol *sym, gfc_wrapped_block *block)
 	}
 
       if (sym->ts.type == BT_CHARACTER && e->ts.type == BT_CHARACTER
-	  && POINTER_TYPE_P (TREE_TYPE (se.expr)))
+	  && INDIRECT_TYPE_P (TREE_TYPE (se.expr)))
 	{
 	  /* These are pointer types already.  */
 	  tmp = fold_convert (TREE_TYPE (sym->backend_decl), se.expr);
@@ -6490,7 +6490,7 @@ gfc_trans_allocate (gfc_code * code)
       if (code->expr3->ts.type == BT_CLASS)
 	{
 	  gfc_expr *rhs;
-	  tmp = expr3 != NULL_TREE && POINTER_TYPE_P (TREE_TYPE (expr3)) ?
+	  tmp = expr3 != NULL_TREE && INDIRECT_TYPE_P (TREE_TYPE (expr3)) ?
 		build_fold_indirect_ref (expr3): expr3;
 	  /* Polymorphic SOURCE: VPTR must be determined at run time.
 	     expr3 may be a temporary array declaration, therefore check for
@@ -6684,7 +6684,7 @@ gfc_trans_allocate (gfc_code * code)
 		}
 	      gfc_add_full_array_ref (e3rhs, arr);
 	    }
-	  else if (POINTER_TYPE_P (TREE_TYPE (expr3)))
+	  else if (INDIRECT_TYPE_P (TREE_TYPE (expr3)))
 	    newsym->n.sym->attr.pointer = 1;
 	  /* The string length is known, too.  Set it for char arrays.  */
 	  if (e3rhs->ts.type == BT_CHARACTER)

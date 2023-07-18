@@ -2952,7 +2952,7 @@ canonicalize_addr_expr (tree *expr_p)
   tree datype, ddatype, pddatype;
 
   /* We simplify only conversions from an ADDR_EXPR to a pointer type.  */
-  if (!POINTER_TYPE_P (TREE_TYPE (expr))
+  if (!INDIRECT_TYPE_P (TREE_TYPE (expr))
       || TREE_CODE (addr_expr) != ADDR_EXPR)
     return;
 
@@ -3423,7 +3423,7 @@ gimplify_self_mod_expr (tree *expr_p, gimple_seq *pre_p, gimple_seq *post_p,
     }
 
   /* For POINTERs increment, use POINTER_PLUS_EXPR.  */
-  if (POINTER_TYPE_P (TREE_TYPE (lhs)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (lhs)))
     {
       rhs = convert_to_ptrofftype_loc (loc, rhs);
       if (arith_code == MINUS_EXPR)
@@ -4786,7 +4786,7 @@ gimplify_init_ctor_preeval_1 (tree *tp, int *walk_subtrees, void *xdata)
       tree type, fntype = TREE_TYPE (TREE_TYPE (CALL_EXPR_FN (t)));
 
       for (type = TYPE_ARG_TYPES (fntype); type; type = TREE_CHAIN (type))
-	if (POINTER_TYPE_P (TREE_VALUE (type))
+	if (INDIRECT_TYPE_P (TREE_VALUE (type))
 	    && (!data->lhs_base_decl || TREE_ADDRESSABLE (data->lhs_base_decl))
 	    && alias_sets_conflict_p (data->lhs_alias_set,
 				      get_alias_set
@@ -6117,7 +6117,7 @@ gimplify_modify_expr (tree *expr_p, gimple_seq *pre_p, gimple_seq *post_p,
   /* Insert pointer conversions required by the middle-end that are not
      required by the frontend.  This fixes middle-end type checking for
      for example gcc.dg/redecl-6.c.  */
-  if (POINTER_TYPE_P (TREE_TYPE (*to_p)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (*to_p)))
     {
       STRIP_USELESS_TYPE_CONVERSION (*from_p);
       if (!useless_type_conversion_p (TREE_TYPE (*to_p), TREE_TYPE (*from_p)))
@@ -8439,7 +8439,7 @@ gimplify_omp_depend (tree *list_p, gimple_seq *pre_p)
 		       : (begin > end ? (end - begin + (step + 1)) / step : 0)
 		       and compute product of those for the entire depend
 		       clause.  */
-		    if (POINTER_TYPE_P (type))
+		    if (INDIRECT_TYPE_P (type))
 		      endmbegin = fold_build2_loc (loc, POINTER_DIFF_EXPR,
 						   stype, end, begin);
 		    else
@@ -8692,7 +8692,7 @@ gimplify_omp_depend (tree *list_p, gimple_seq *pre_p)
 		    TREE_SIDE_EFFECTS (bind) = 1;
 		    SET_EXPR_LOCATION (bind, loc);
 		    append_to_statement_list_force (bind, p);
-		    if (POINTER_TYPE_P (type))
+		    if (INDIRECT_TYPE_P (type))
 		      tem = build2_loc (loc, POINTER_PLUS_EXPR, type,
 					var, fold_convert_loc (loc, sizetype,
 							       step));
@@ -10397,7 +10397,7 @@ omp_accumulate_sibling_list (enum omp_region_type region_type,
 
       tree sdecl = omp_strip_components_and_deref (base);
 
-      if (POINTER_TYPE_P (TREE_TYPE (sdecl)) && (region_type & ORT_TARGET))
+      if (INDIRECT_TYPE_P (TREE_TYPE (sdecl)) && (region_type & ORT_TARGET))
 	{
 	  tree c2 = build_omp_clause (OMP_CLAUSE_LOCATION (grp_end),
 				      OMP_CLAUSE_MAP);
@@ -11374,7 +11374,7 @@ gimplify_scan_omp_clauses (tree *list_p, gimple_seq *pre_p,
 		  if (base
 		      && DECL_P (base)
 		      && GOMP_MAP_ALWAYS_P (OMP_CLAUSE_MAP_KIND (c))
-		      && POINTER_TYPE_P (TREE_TYPE (base)))
+		      && INDIRECT_TYPE_P (TREE_TYPE (base)))
 		    {
 		      splay_tree_node n
 			= splay_tree_lookup (ctx->variables,
@@ -14044,7 +14044,7 @@ gimplify_omp_for (tree *expr_p, gimple_seq *pre_p)
       decl = TREE_OPERAND (t, 0);
       gcc_assert (DECL_P (decl));
       gcc_assert (INTEGRAL_TYPE_P (TREE_TYPE (decl))
-		  || POINTER_TYPE_P (TREE_TYPE (decl)));
+		  || INDIRECT_TYPE_P (TREE_TYPE (decl)));
       if (is_doacross)
 	{
 	  if (TREE_CODE (for_stmt) == OMP_FOR && OMP_FOR_ORIG_DECLS (for_stmt))
@@ -14321,7 +14321,7 @@ gimplify_omp_for (tree *expr_p, gimple_seq *pre_p)
 	    tree decl = TREE_OPERAND (t, 0);
 	    /* c_omp_for_incr_canonicalize_ptr() should have been
 	       called to massage things appropriately.  */
-	    gcc_assert (!POINTER_TYPE_P (TREE_TYPE (decl)));
+	    gcc_assert (!INDIRECT_TYPE_P (TREE_TYPE (decl)));
 
 	    if (orig_for_stmt != for_stmt)
 	      break;
@@ -14338,7 +14338,7 @@ gimplify_omp_for (tree *expr_p, gimple_seq *pre_p)
 	case POSTDECREMENT_EXPR:
 	  /* c_omp_for_incr_canonicalize_ptr() should have been
 	     called to massage things appropriately.  */
-	  gcc_assert (!POINTER_TYPE_P (TREE_TYPE (decl)));
+	  gcc_assert (!INDIRECT_TYPE_P (TREE_TYPE (decl)));
 	  if (orig_for_stmt != for_stmt)
 	    break;
 	  t = build_int_cst (TREE_TYPE (decl), -1);
@@ -14382,7 +14382,7 @@ gimplify_omp_for (tree *expr_p, gimple_seq *pre_p)
 	    {
 	      tree step = TREE_OPERAND (t, 1);
 	      tree stept = TREE_TYPE (decl);
-	      if (POINTER_TYPE_P (stept))
+	      if (INDIRECT_TYPE_P (stept))
 		stept = sizetype;
 	      step = fold_convert (stept, step);
 	      if (TREE_CODE (t) == MINUS_EXPR)
@@ -18043,7 +18043,7 @@ gimplify_va_arg_expr (tree *expr_p, gimple_seq *pre_p,
     return GS_ERROR;
   have_va_type = targetm.canonical_va_list_type (have_va_type);
   if (have_va_type == NULL_TREE
-      && POINTER_TYPE_P (TREE_TYPE (valist)))
+      && INDIRECT_TYPE_P (TREE_TYPE (valist)))
     /* Handle 'Case 1: Not an array type' from c-common.cc/build_va_arg.  */
     have_va_type
       = targetm.canonical_va_list_type (TREE_TYPE (TREE_TYPE (valist)));

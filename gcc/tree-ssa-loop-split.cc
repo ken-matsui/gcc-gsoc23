@@ -399,7 +399,7 @@ compute_new_first_bound (gimple_seq *stmts, class tree_niter_desc *niter,
 					   stmts, true, NULL_TREE);
   tree controlstep = niter->control.step;
   tree enddiff;
-  if (POINTER_TYPE_P (TREE_TYPE (controlbase)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (controlbase)))
     {
       controlstep = gimple_build (stmts, NEGATE_EXPR,
 				  TREE_TYPE (controlstep), controlstep);
@@ -417,7 +417,7 @@ compute_new_first_bound (gimple_seq *stmts, class tree_niter_desc *niter,
   tree end = force_gimple_operand (niter->bound, &stmts2,
 					true, NULL_TREE);
   gimple_seq_add_seq_without_update (stmts, stmts2);
-  if (POINTER_TYPE_P (TREE_TYPE (enddiff)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (enddiff)))
     {
       tree tem = gimple_convert (stmts, sizetype, enddiff);
       tem = gimple_build (stmts, NEGATE_EXPR, sizetype, tem);
@@ -432,7 +432,7 @@ compute_new_first_bound (gimple_seq *stmts, class tree_niter_desc *niter,
   /* Compute guard_init + (end-beg).  */
   tree newbound;
   enddiff = gimple_convert (stmts, TREE_TYPE (guard_init), enddiff);
-  if (POINTER_TYPE_P (TREE_TYPE (guard_init)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (guard_init)))
     {
       enddiff = gimple_convert (stmts, sizetype, enddiff);
       newbound = gimple_build (stmts, POINTER_PLUS_EXPR,
@@ -467,10 +467,10 @@ compute_new_first_bound (gimple_seq *stmts, class tree_niter_desc *niter,
   if (addbound)
     {
       tree type2 = TREE_TYPE (newbound);
-      if (POINTER_TYPE_P (type2))
+      if (INDIRECT_TYPE_P (type2))
 	type2 = sizetype;
       newbound = gimple_build (stmts,
-			       POINTER_TYPE_P (TREE_TYPE (newbound))
+			       INDIRECT_TYPE_P (TREE_TYPE (newbound))
 			       ? POINTER_PLUS_EXPR : PLUS_EXPR,
 			       TREE_TYPE (newbound),
 			       newbound,

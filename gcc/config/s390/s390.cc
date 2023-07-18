@@ -604,7 +604,7 @@ s390_check_type_for_vector_abi (const_tree type, bool arg_p, bool in_struct_p)
 
       s390_vector_abi = TARGET_VX_ABI ? 2 : 1;
     }
-  else if (POINTER_TYPE_P (type) || TREE_CODE (type) == ARRAY_TYPE)
+  else if (INDIRECT_TYPE_P (type) || TREE_CODE (type) == ARRAY_TYPE)
     {
       /* ARRAY_TYPE: Since with neither of the ABIs we have more than
 	 natural alignment there will never be ABI dependent padding
@@ -1019,7 +1019,7 @@ s390_expand_builtin (tree exp, rtx target, rtx subtarget ATTRIBUTE_UNUSED,
 	 "memory_operand"..) in the insn patterns instead of (mem
 	 (match_operand "address_operand)).  This is helpful for
 	 patterns not just accepting MEMs.  */
-      if (POINTER_TYPE_P (TREE_TYPE (arg))
+      if (INDIRECT_TYPE_P (TREE_TYPE (arg))
 	  && insn_op->predicate != address_operand)
 	op[arity] = gen_rtx_MEM (insn_op->mode, op[arity]);
 
@@ -1211,7 +1211,7 @@ s390_handle_vectorbool_attribute (tree *node, tree name ATTRIBUTE_UNUSED,
   tree type = *node, result = NULL_TREE;
   machine_mode mode;
 
-  while (POINTER_TYPE_P (type)
+  while (INDIRECT_TYPE_P (type)
 	 || TREE_CODE (type) == FUNCTION_TYPE
 	 || TREE_CODE (type) == METHOD_TYPE
 	 || TREE_CODE (type) == ARRAY_TYPE)
@@ -12764,7 +12764,7 @@ s390_function_arg_integer (machine_mode mode, const_tree type)
 
   /* We accept small integral (and similar) types.  */
   if (INTEGRAL_TYPE_P (type)
-      || POINTER_TYPE_P (type)
+      || INDIRECT_TYPE_P (type)
       || TREE_CODE (type) == NULLPTR_TYPE
       || TREE_CODE (type) == OFFSET_TYPE
       || (TARGET_SOFT_FLOAT && SCALAR_FLOAT_TYPE_P (type)))
@@ -12934,7 +12934,7 @@ s390_return_in_memory (const_tree type, const_tree fundecl ATTRIBUTE_UNUSED)
 {
   /* We accept small integral (and similar) types.  */
   if (INTEGRAL_TYPE_P (type)
-      || POINTER_TYPE_P (type)
+      || INDIRECT_TYPE_P (type)
       || TREE_CODE (type) == OFFSET_TYPE
       || SCALAR_FLOAT_TYPE_P (type))
     return int_size_in_bytes (type) > 8;
@@ -12969,7 +12969,7 @@ s390_promote_function_mode (const_tree type, machine_mode mode,
   if (INTEGRAL_MODE_P (mode)
       && GET_MODE_SIZE (mode) < UNITS_PER_LONG)
     {
-      if (type != NULL_TREE && POINTER_TYPE_P (type))
+      if (type != NULL_TREE && INDIRECT_TYPE_P (type))
 	*punsignedp = POINTERS_EXTEND_UNSIGNED;
       return Pmode;
     }

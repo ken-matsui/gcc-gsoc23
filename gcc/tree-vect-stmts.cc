@@ -4112,7 +4112,7 @@ vectorizable_simd_clone_call (vec_info *vinfo, stmt_vec_info stmt_info,
 	      bias = fold_convert (TREE_TYPE (step), bias);
 	      bias = fold_build2 (MULT_EXPR, TREE_TYPE (step), bias, step);
 	      thisarginfo.op
-		= fold_build2 (POINTER_TYPE_P (opt)
+		= fold_build2 (INDIRECT_TYPE_P (opt)
 			       ? POINTER_PLUS_EXPR : PLUS_EXPR, opt,
 			       thisarginfo.op, bias);
 	    }
@@ -4131,11 +4131,11 @@ vectorizable_simd_clone_call (vec_info *vinfo, stmt_vec_info stmt_info,
 	}
       else if ((thisarginfo.dt == vect_constant_def
 		|| thisarginfo.dt == vect_external_def)
-	       && POINTER_TYPE_P (TREE_TYPE (op)))
+	       && INDIRECT_TYPE_P (TREE_TYPE (op)))
 	thisarginfo.align = get_pointer_alignment (op) / BITS_PER_UNIT;
       /* Addresses of array elements indexed by GOMP_SIMD_LANE are
 	 linear too.  */
-      if (POINTER_TYPE_P (TREE_TYPE (op))
+      if (INDIRECT_TYPE_P (TREE_TYPE (op))
 	  && !thisarginfo.linear_step
 	  && !vec_stmt
 	  && thisarginfo.dt != vect_constant_def
@@ -4328,7 +4328,7 @@ vectorizable_simd_clone_call (vec_info *vinfo, stmt_vec_info stmt_info,
 									+ 1,
 								      true);
 	    STMT_VINFO_SIMD_CLONE_INFO (stmt_info).safe_push (arginfo[i].op);
-	    tree lst = POINTER_TYPE_P (TREE_TYPE (arginfo[i].op))
+	    tree lst = INDIRECT_TYPE_P (TREE_TYPE (arginfo[i].op))
 		       ? size_type_node : TREE_TYPE (arginfo[i].op);
 	    tree ls = build_int_cst (lst, arginfo[i].linear_step);
 	    STMT_VINFO_SIMD_CLONE_INFO (stmt_info).safe_push (ls);
@@ -4566,9 +4566,9 @@ vectorizable_simd_clone_call (vec_info *vinfo, stmt_vec_info stmt_info,
 		  add_phi_arg (new_phi, arginfo[i].op,
 			       loop_preheader_edge (loop), UNKNOWN_LOCATION);
 		  enum tree_code code
-		    = POINTER_TYPE_P (TREE_TYPE (op))
+		    = INDIRECT_TYPE_P (TREE_TYPE (op))
 		      ? POINTER_PLUS_EXPR : PLUS_EXPR;
-		  tree type = POINTER_TYPE_P (TREE_TYPE (op))
+		  tree type = INDIRECT_TYPE_P (TREE_TYPE (op))
 			      ? sizetype : TREE_TYPE (op);
 		  poly_widest_int cst
 		    = wi::mul (bestn->simdclone->args[i].linear_step,
@@ -4587,9 +4587,9 @@ vectorizable_simd_clone_call (vec_info *vinfo, stmt_vec_info stmt_info,
 	      else
 		{
 		  enum tree_code code
-		    = POINTER_TYPE_P (TREE_TYPE (op))
+		    = INDIRECT_TYPE_P (TREE_TYPE (op))
 		      ? POINTER_PLUS_EXPR : PLUS_EXPR;
-		  tree type = POINTER_TYPE_P (TREE_TYPE (op))
+		  tree type = INDIRECT_TYPE_P (TREE_TYPE (op))
 			      ? sizetype : TREE_TYPE (op);
 		  poly_widest_int cst
 		    = wi::mul (bestn->simdclone->args[i].linear_step,
@@ -12398,7 +12398,7 @@ get_related_vectype_for_scalar_type (machine_mode prevailing_mode,
   tree vectype;
 
   if ((!INTEGRAL_TYPE_P (scalar_type)
-       && !POINTER_TYPE_P (scalar_type)
+       && !INDIRECT_TYPE_P (scalar_type)
        && !SCALAR_FLOAT_TYPE_P (scalar_type))
       || (!is_int_mode (TYPE_MODE (scalar_type), &inner_mode)
 	  && !is_float_mode (TYPE_MODE (scalar_type), &inner_mode)))

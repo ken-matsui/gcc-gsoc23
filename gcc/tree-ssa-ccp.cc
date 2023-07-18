@@ -608,7 +608,7 @@ get_value_from_alignment (tree expr)
 
   get_pointer_alignment_1 (expr, &align, &bitpos);
   val.mask = wi::bit_and_not
-    (POINTER_TYPE_P (type) || TYPE_UNSIGNED (type)
+    (INDIRECT_TYPE_P (type) || TYPE_UNSIGNED (type)
      ? wi::mask <widest_int> (TYPE_PRECISION (type), false)
      : -1,
      align / BITS_PER_UNIT - 1);
@@ -993,7 +993,7 @@ ccp_finalize (bool nonzero_p)
       ccp_prop_value_t *val;
       unsigned int tem, align;
 
-      if (!POINTER_TYPE_P (TREE_TYPE (name))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (name))
 	  && (!INTEGRAL_TYPE_P (TREE_TYPE (name))
 	      /* Don't record nonzero bits before IPA to avoid
 		 using too much memory.  */
@@ -1006,7 +1006,7 @@ ccp_finalize (bool nonzero_p)
 	  || val->mask == 0)
 	continue;
 
-      if (POINTER_TYPE_P (TREE_TYPE (name)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (name)))
 	{
 	  /* Trailing mask bits specify the alignment, trailing value
 	     bits the misalignment.  */
@@ -2304,9 +2304,9 @@ evaluate_stmt (gimple *stmt)
 	  tree rhs1 = gimple_assign_rhs1 (stmt);
 	  tree lhs = gimple_assign_lhs (stmt);
 	  if ((INTEGRAL_TYPE_P (TREE_TYPE (lhs))
-	       || POINTER_TYPE_P (TREE_TYPE (lhs)))
+	       || INDIRECT_TYPE_P (TREE_TYPE (lhs)))
 	      && (INTEGRAL_TYPE_P (TREE_TYPE (rhs1))
-		  || POINTER_TYPE_P (TREE_TYPE (rhs1))))
+		  || INDIRECT_TYPE_P (TREE_TYPE (rhs1))))
 	    switch (get_gimple_rhs_class (subcode))
 	      {
 	      case GIMPLE_SINGLE_RHS:
@@ -2331,7 +2331,7 @@ evaluate_stmt (gimple *stmt)
 	  tree rhs1 = gimple_cond_lhs (stmt);
 	  tree rhs2 = gimple_cond_rhs (stmt);
 	  if (INTEGRAL_TYPE_P (TREE_TYPE (rhs1))
-	      || POINTER_TYPE_P (TREE_TYPE (rhs1)))
+	      || INDIRECT_TYPE_P (TREE_TYPE (rhs1)))
 	    val = bit_value_binop (code, TREE_TYPE (rhs1), rhs1, rhs2);
 	}
       else if (gimple_call_builtin_p (stmt, BUILT_IN_NORMAL))
@@ -3053,7 +3053,7 @@ optimize_stack_restore (gimple_stmt_iterator i)
   if (gimple_code (call) != GIMPLE_CALL
       || gimple_call_num_args (call) != 1
       || TREE_CODE (gimple_call_arg (call, 0)) != SSA_NAME
-      || !POINTER_TYPE_P (TREE_TYPE (gimple_call_arg (call, 0))))
+      || !INDIRECT_TYPE_P (TREE_TYPE (gimple_call_arg (call, 0))))
     return NULL_TREE;
 
   for (gsi_next (&i); !gsi_end_p (i); gsi_next (&i))
@@ -3133,7 +3133,7 @@ optimize_stdarg_builtin (gimple *call)
   callee = gimple_call_fndecl (call);
 
   cfun_va_list = targetm.fn_abi_va_list (callee);
-  va_list_simple_ptr = POINTER_TYPE_P (cfun_va_list)
+  va_list_simple_ptr = INDIRECT_TYPE_P (cfun_va_list)
 		       && (TREE_TYPE (cfun_va_list) == void_type_node
 			   || TREE_TYPE (cfun_va_list) == char_type_node);
 
@@ -3149,7 +3149,7 @@ optimize_stdarg_builtin (gimple *call)
 	return NULL_TREE;
 
       lhs = gimple_call_arg (call, 0);
-      if (!POINTER_TYPE_P (TREE_TYPE (lhs))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (lhs))
 	  || TYPE_MAIN_VARIANT (TREE_TYPE (TREE_TYPE (lhs)))
 	     != TYPE_MAIN_VARIANT (cfun_va_list))
 	return NULL_TREE;
@@ -3168,7 +3168,7 @@ optimize_stdarg_builtin (gimple *call)
 	return NULL_TREE;
 
       lhs = gimple_call_arg (call, 0);
-      if (!POINTER_TYPE_P (TREE_TYPE (lhs))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (lhs))
 	  || TYPE_MAIN_VARIANT (TREE_TYPE (TREE_TYPE (lhs)))
 	     != TYPE_MAIN_VARIANT (cfun_va_list))
 	return NULL_TREE;
@@ -4001,7 +4001,7 @@ optimize_atomic_op_fetch_cmp_0 (gimple_stmt_iterator *gsip,
       use_lhs = gimple_assign_lhs (use_stmt);
       if (!tree_nop_conversion_p (TREE_TYPE (use_lhs), TREE_TYPE (lhs))
 	  || (!INTEGRAL_TYPE_P (TREE_TYPE (use_lhs))
-	      && !POINTER_TYPE_P (TREE_TYPE (use_lhs)))
+	      && !INDIRECT_TYPE_P (TREE_TYPE (use_lhs)))
 	  || SSA_NAME_OCCURS_IN_ABNORMAL_PHI (use_lhs)
 	  || !single_imm_use (use_lhs, &use_p, &use_stmt))
 	return false;

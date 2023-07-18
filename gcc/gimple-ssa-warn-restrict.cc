@@ -435,7 +435,7 @@ builtin_memref::set_base_and_offset (tree expr)
 	  if (CONVERT_EXPR_CODE_P (code))
 	    {
 	      tree rhs = gimple_assign_rhs1 (stmt);
-	      if (POINTER_TYPE_P (TREE_TYPE (rhs)))
+	      if (INDIRECT_TYPE_P (TREE_TYPE (rhs)))
 		expr = gimple_assign_rhs1 (stmt);
 	      else
 		{
@@ -1047,7 +1047,7 @@ builtin_access::generic_overlap ()
 	 structure.  Give up to avoid excessive false positives.  */
       tree basetype = TREE_TYPE (dstref->base);
 
-      if (POINTER_TYPE_P (basetype))
+      if (INDIRECT_TYPE_P (basetype))
 	basetype = TREE_TYPE (basetype);
       else
 	while (TREE_CODE (basetype) == ARRAY_TYPE)
@@ -1849,7 +1849,7 @@ maybe_diag_access_bounds (gimple *call, tree func, int strict,
     {
       tree refop = TREE_OPERAND (ref.ref, 0);
       tree type = TREE_TYPE (refop);
-      if (POINTER_TYPE_P (type))
+      if (INDIRECT_TYPE_P (type))
 	type = TREE_TYPE (type);
       type = TYPE_MAIN_VARIANT (type);
 

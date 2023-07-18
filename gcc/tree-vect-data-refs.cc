@@ -4163,7 +4163,7 @@ vect_check_gather_scatter (stmt_vec_info stmt_info, loop_vec_info loop_vinfo,
 	  off = op0;
 	  continue;
 	CASE_CONVERT:
-	  if (!POINTER_TYPE_P (TREE_TYPE (op0))
+	  if (!INDIRECT_TYPE_P (TREE_TYPE (op0))
 	      && !INTEGRAL_TYPE_P (TREE_TYPE (op0)))
 	    break;
 
@@ -4171,7 +4171,7 @@ vect_check_gather_scatter (stmt_vec_info stmt_info, loop_vec_info loop_vinfo,
 	     the current offset type.  */
 	  if (use_ifn_p
 	      && TREE_CODE (off) == SSA_NAME
-	      && !POINTER_TYPE_P (TREE_TYPE (off))
+	      && !INDIRECT_TYPE_P (TREE_TYPE (off))
 	      && vect_gather_scatter_fn_p (loop_vinfo, DR_IS_READ (dr),
 					   masked_p, vectype, memory_type,
 					   TREE_TYPE (off), scale, &ifn,

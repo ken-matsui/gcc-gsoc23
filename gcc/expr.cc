@@ -5967,7 +5967,7 @@ expand_assignment (tree to, tree from, bool nontemporal)
 	}
       else
 	{
-	  if (POINTER_TYPE_P (TREE_TYPE (to)))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (to)))
 	    value = convert_memory_address_addr_space
 	      (as_a <scalar_int_mode> (GET_MODE (to_rtx)), value,
 	       TYPE_ADDR_SPACE (TREE_TYPE (TREE_TYPE (to))));
@@ -8810,7 +8810,7 @@ expand_expr_addr_expr (tree exp, rtx target, machine_mode tmode,
   if (tmode == VOIDmode)
     tmode = TYPE_MODE (TREE_TYPE (exp));
 
-  if (POINTER_TYPE_P (TREE_TYPE (exp)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (exp)))
     {
       as = TYPE_ADDR_SPACE (TREE_TYPE (TREE_TYPE (exp)));
       address_mode = targetm.addr_space.address_mode (as);
@@ -9389,8 +9389,8 @@ expand_expr_real_2 (sepops ops, rtx target, machine_mode tmode,
       {
 	tree treeop0_type = TREE_TYPE (treeop0);
 
-	gcc_assert (POINTER_TYPE_P (type));
-	gcc_assert (POINTER_TYPE_P (treeop0_type));
+	gcc_assert (INDIRECT_TYPE_P (type));
+	gcc_assert (INDIRECT_TYPE_P (treeop0_type));
 
 	addr_space_t as_to = TYPE_ADDR_SPACE (TREE_TYPE (type));
 	addr_space_t as_from = TYPE_ADDR_SPACE (TREE_TYPE (treeop0_type));
@@ -9535,9 +9535,9 @@ expand_expr_real_2 (sepops ops, rtx target, machine_mode tmode,
 
       /* Use TER to expand pointer addition of a negated value
 	 as pointer subtraction.  */
-      if ((POINTER_TYPE_P (TREE_TYPE (treeop0))
+      if ((INDIRECT_TYPE_P (TREE_TYPE (treeop0))
 	   || (TREE_CODE (TREE_TYPE (treeop0)) == VECTOR_TYPE
-	       && POINTER_TYPE_P (TREE_TYPE (TREE_TYPE (treeop0)))))
+	       && INDIRECT_TYPE_P (TREE_TYPE (TREE_TYPE (treeop0)))))
 	  && TREE_CODE (treeop1) == SSA_NAME
 	  && TYPE_MODE (TREE_TYPE (treeop0))
 	     == TYPE_MODE (TREE_TYPE (treeop1)))
@@ -12311,7 +12311,7 @@ constant_byte_string (tree arg, tree *ptr_offset, tree *mem_size, tree *decl,
       if (str)
 	{
 	  /* Avoid pointers to arrays (see bug 86622).  */
-	  if (POINTER_TYPE_P (TREE_TYPE (arg))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (arg))
 	      && TREE_CODE (TREE_TYPE (TREE_TYPE (arg))) == ARRAY_TYPE
 	      && !(decl && !*decl)
 	      && !(decl && tree_fits_uhwi_p (DECL_SIZE_UNIT (*decl))
@@ -12343,7 +12343,7 @@ constant_byte_string (tree arg, tree *ptr_offset, tree *mem_size, tree *decl,
       if (tree str = string_constant (rhs1, &offset, mem_size, decl))
 	{
 	  /* Avoid pointers to arrays (see bug 86622).  */
-	  if (POINTER_TYPE_P (TREE_TYPE (rhs1))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (rhs1))
 	      && TREE_CODE (TREE_TYPE (TREE_TYPE (rhs1))) == ARRAY_TYPE
 	      && !(decl && !*decl)
 	      && !(decl && tree_fits_uhwi_p (DECL_SIZE_UNIT (*decl))
@@ -12517,7 +12517,7 @@ constant_byte_string (tree arg, tree *ptr_offset, tree *mem_size, tree *decl,
       /* Determine the character type from that of the original
 	 expression.  */
       tree chartype = argtype;
-      if (POINTER_TYPE_P (chartype))
+      if (INDIRECT_TYPE_P (chartype))
 	chartype = TREE_TYPE (chartype);
       while (TREE_CODE (chartype) == ARRAY_TYPE)
 	chartype = TREE_TYPE (chartype);
@@ -13041,9 +13041,9 @@ do_store_flag (sepops ops, rtx target, machine_mode mode)
   /* We won't bother with store-flag operations involving function pointers
      when function pointers must be canonicalized before comparisons.  */
   if (targetm.have_canonicalize_funcptr_for_compare ()
-      && ((POINTER_TYPE_P (TREE_TYPE (arg0))
+      && ((INDIRECT_TYPE_P (TREE_TYPE (arg0))
 	   && FUNC_OR_METHOD_TYPE_P (TREE_TYPE (TREE_TYPE (arg0))))
-	  || (POINTER_TYPE_P (TREE_TYPE (arg1))
+	  || (INDIRECT_TYPE_P (TREE_TYPE (arg1))
 	      && FUNC_OR_METHOD_TYPE_P (TREE_TYPE (TREE_TYPE (arg1))))))
     return 0;
 

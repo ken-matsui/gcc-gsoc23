@@ -68,8 +68,8 @@ bool
 useless_type_conversion_p (tree outer_type, tree inner_type)
 {
   /* Do the following before stripping toplevel qualifiers.  */
-  if (POINTER_TYPE_P (inner_type)
-      && POINTER_TYPE_P (outer_type))
+  if (INDIRECT_TYPE_P (inner_type)
+      && INDIRECT_TYPE_P (outer_type))
     {
       /* Do not lose casts between pointers to different address spaces.  */
       if (TYPE_ADDR_SPACE (TREE_TYPE (outer_type))
@@ -128,8 +128,8 @@ useless_type_conversion_p (tree outer_type, tree inner_type)
     return TYPE_SATURATING (inner_type) == TYPE_SATURATING (outer_type);
 
   /* We need to take special care recursing to pointed-to types.  */
-  else if (POINTER_TYPE_P (inner_type)
-	   && POINTER_TYPE_P (outer_type))
+  else if (INDIRECT_TYPE_P (inner_type)
+	   && INDIRECT_TYPE_P (outer_type))
     {
       /* We do not care for const qualification of the pointed-to types
 	 as const qualification has no semantic value to the middle-end.  */

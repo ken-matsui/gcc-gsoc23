@@ -952,7 +952,7 @@ c_parser_gimple_binary_expression (gimple_parser &parser)
       code = TRUNC_MOD_EXPR;
       break;
     case CPP_PLUS:
-      if (POINTER_TYPE_P (TREE_TYPE (lhs.value)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (lhs.value)))
 	code = POINTER_PLUS_EXPR;
       else
 	code = PLUS_EXPR;
@@ -1115,7 +1115,7 @@ c_parser_gimple_unary_expression (gimple_parser &parser)
 	op = c_parser_gimple_postfix_expression (parser);
 	if (op.value == error_mark_node)
 	  return ret;
-	if (! POINTER_TYPE_P (TREE_TYPE (op.value)))
+	if (! INDIRECT_TYPE_P (TREE_TYPE (op.value)))
 	  {
 	    error_at (op_loc, "expected pointer as argument of unary %<*%>");
 	    return ret;
@@ -1468,7 +1468,7 @@ c_parser_gimple_postfix_expression (gimple_parser &parser)
 		    }
 		  ptr = c_parser_gimple_unary_expression (parser);
 		  if (ptr.value == error_mark_node
-		      || ! POINTER_TYPE_P (TREE_TYPE (ptr.value)))
+		      || ! INDIRECT_TYPE_P (TREE_TYPE (ptr.value)))
 		    {
 		      if (ptr.value != error_mark_node)
 			error_at (ptr.get_start (),
@@ -1832,7 +1832,7 @@ c_parser_gimple_postfix_expression_after_primary (gimple_parser &parser,
 	case CPP_DEREF:
 	  {
 	    /* Structure element reference.  */
-	    if (!POINTER_TYPE_P (TREE_TYPE (expr.value)))
+	    if (!INDIRECT_TYPE_P (TREE_TYPE (expr.value)))
 	      {
 		c_parser_error (parser, "dereference of non-pointer");
 		expr.set_error ();

@@ -1328,7 +1328,7 @@ lower_builtin_assume_aligned (gimple_stmt_iterator *gsi)
   gcall *call = as_a <gcall *> (gsi_stmt (*gsi));
 
   tree lhs = gimple_call_lhs (call);
-  if (!lhs || !POINTER_TYPE_P (TREE_TYPE (lhs)) || TREE_CODE (lhs) != SSA_NAME)
+  if (!lhs || !INDIRECT_TYPE_P (TREE_TYPE (lhs)) || TREE_CODE (lhs) != SSA_NAME)
     return;
 
   tree align = gimple_call_arg (call, 1);

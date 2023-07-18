@@ -2099,7 +2099,7 @@ pa_emit_move_sequence (rtx *operands, machine_mode mode, rtx scratch_reg)
 		  type = TREE_TYPE (decl);
 		  type = strip_array_types (type);
 
-		  if (POINTER_TYPE_P (type))
+		  if (INDIRECT_TYPE_P (type))
 		    mark_reg_pointer (operand0, BITS_PER_UNIT);
 		}
 	    }
@@ -9704,7 +9704,7 @@ pa_function_value (const_tree valtype,
 
   if ((INTEGRAL_TYPE_P (valtype)
        && GET_MODE_BITSIZE (TYPE_MODE (valtype)) < BITS_PER_WORD)
-      || POINTER_TYPE_P (valtype))
+      || INDIRECT_TYPE_P (valtype))
     valmode = word_mode;
   else
     valmode = TYPE_MODE (valtype);

@@ -3443,7 +3443,7 @@ nios2_function_arg_padding (machine_mode mode, const_tree type)
   /* Otherwise, integral types are padded downward: the last byte of a
      stack argument is passed in the last byte of the stack slot.  */
   if (type != 0
-      ? INTEGRAL_TYPE_P (type) || POINTER_TYPE_P (type)
+      ? INTEGRAL_TYPE_P (type) || INDIRECT_TYPE_P (type)
       : GET_MODE_CLASS (mode) == MODE_INT)
     return PAD_DOWNWARD;
 

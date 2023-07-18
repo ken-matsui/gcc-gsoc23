@@ -2144,12 +2144,12 @@ objc_eh_runtime_type (tree type)
       goto make_err_class;
     }
 
-  if (POINTER_TYPE_P (type) && objc_is_object_id (TREE_TYPE (type)))
+  if (INDIRECT_TYPE_P (type) && objc_is_object_id (TREE_TYPE (type)))
     /* We don't want to identify 'id' for GNU. Instead, build a 0
        entry in the exceptions table.  */
     return null_pointer_node;
 
-  if (!POINTER_TYPE_P (type) || !TYPED_OBJECT (TREE_TYPE (type)))
+  if (!INDIRECT_TYPE_P (type) || !TYPED_OBJECT (TREE_TYPE (type)))
     {
 #ifdef OBJCPLUS
       /* This routine is also called for c++ catch clauses; in which case,

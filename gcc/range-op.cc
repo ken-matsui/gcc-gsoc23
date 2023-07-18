@@ -2897,11 +2897,11 @@ operator_cast::op1_range (irange &r, tree type,
   gcc_checking_assert (types_compatible_p (op2.type(), type));
 
   // If we are calculating a pointer, shortcut to what we really care about.
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     {
       // Conversion from other pointers or a constant (including 0/NULL)
       // are straightforward.
-      if (POINTER_TYPE_P (lhs.type ())
+      if (INDIRECT_TYPE_P (lhs.type ())
 	  || (lhs.singleton_p ()
 	      && TYPE_PRECISION (lhs.type ()) >= TYPE_PRECISION (type)))
 	{

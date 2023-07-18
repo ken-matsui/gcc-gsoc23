@@ -834,7 +834,7 @@ rs6000_builtin_type_compatible (tree parmtype, tree argtype)
       && is_float128_p (parmtype) && is_float128_p (argtype))
     return true;
 
-  if (POINTER_TYPE_P (parmtype) && POINTER_TYPE_P (argtype))
+  if (INDIRECT_TYPE_P (parmtype) && INDIRECT_TYPE_P (argtype))
     {
       parmtype = TREE_TYPE (parmtype);
       argtype = TREE_TYPE (argtype);
@@ -1803,7 +1803,7 @@ altivec_resolve_overloaded_builtin (location_t loc, tree fndecl,
 
       /* The C++ front-end converts float * to const void * using
 	 NOP_EXPR<const void *> (NOP_EXPR<void *> (x)).  */
-      if (POINTER_TYPE_P (type)
+      if (INDIRECT_TYPE_P (type)
 	  && TREE_CODE (arg) == NOP_EXPR
 	  && lang_hooks.types_compatible_p (TREE_TYPE (arg),
 					    const_ptr_type_node)
@@ -1816,8 +1816,8 @@ altivec_resolve_overloaded_builtin (location_t loc, tree fndecl,
 
       /* Remove the const from the pointers to simplify the overload
 	 matching further down.  */
-      if (POINTER_TYPE_P (decl_type)
-	  && POINTER_TYPE_P (type)
+      if (INDIRECT_TYPE_P (decl_type)
+	  && INDIRECT_TYPE_P (type)
 	  && TYPE_QUALS (TREE_TYPE (type)) != 0)
 	{
 	  if (TYPE_READONLY (TREE_TYPE (type))
@@ -1833,7 +1833,7 @@ altivec_resolve_overloaded_builtin (location_t loc, tree fndecl,
       /* For RS6000_OVLD_VEC_LXVL, convert any const * to its non constant
 	 equivalent to simplify the overload matching below.  */
       if (fcode == RS6000_OVLD_VEC_LXVL
-	  && POINTER_TYPE_P (type)
+	  && INDIRECT_TYPE_P (type)
 	  && TYPE_READONLY (TREE_TYPE (type)))
 	{
 	  type = build_qualified_type (TREE_TYPE (type), 0);

@@ -139,7 +139,7 @@ do {							 \
 
 /* True if NODE is a thin pointer.  */
 #define TYPE_IS_THIN_POINTER_P(NODE)			\
-  (POINTER_TYPE_P (NODE)				\
+  (INDIRECT_TYPE_P (NODE)				\
    && TREE_CODE (TREE_TYPE (NODE)) == RECORD_TYPE	\
    && TYPE_CONTAINS_TEMPLATE_P (TREE_TYPE (NODE)))
 

@@ -243,7 +243,7 @@ remap_ssa_name (tree name, copy_body_data *id)
       /* At least IPA points-to info can be directly transferred.  */
       if (id->src_cfun->gimple_df
 	  && id->src_cfun->gimple_df->ipa_pta
-	  && POINTER_TYPE_P (TREE_TYPE (name))
+	  && INDIRECT_TYPE_P (TREE_TYPE (name))
 	  && (pi = SSA_NAME_PTR_INFO (name))
 	  && !pi->pt.anything)
 	{
@@ -251,7 +251,7 @@ remap_ssa_name (tree name, copy_body_data *id)
 	  new_pi->pt = pi->pt;
 	}
       /* So can range-info.  */
-      if (!POINTER_TYPE_P (TREE_TYPE (name))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (name))
 	  && SSA_NAME_RANGE_INFO (name))
 	duplicate_ssa_name_range_info (new_tree, name);
       return new_tree;
@@ -280,7 +280,7 @@ remap_ssa_name (tree name, copy_body_data *id)
       /* At least IPA points-to info can be directly transferred.  */
       if (id->src_cfun->gimple_df
 	  && id->src_cfun->gimple_df->ipa_pta
-	  && POINTER_TYPE_P (TREE_TYPE (name))
+	  && INDIRECT_TYPE_P (TREE_TYPE (name))
 	  && (pi = SSA_NAME_PTR_INFO (name))
 	  && !pi->pt.anything)
 	{
@@ -288,7 +288,7 @@ remap_ssa_name (tree name, copy_body_data *id)
 	  new_pi->pt = pi->pt;
 	}
       /* So can range-info.  */
-      if (!POINTER_TYPE_P (TREE_TYPE (name))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (name))
 	  && SSA_NAME_RANGE_INFO (name))
 	duplicate_ssa_name_range_info (new_tree, name);
       if (SSA_NAME_IS_DEFAULT_DEF (name))

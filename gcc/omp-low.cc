@@ -809,7 +809,7 @@ install_var_field (tree var, bool by_ref, int mask, omp_context *ctx)
   /* Prevent redeclaring the var in the split-off function with a restrict
      pointer type.  Note that we only clear type itself, restrict qualifiers in
      the pointed-to type will be ignored by points-to analysis.  */
-  if (POINTER_TYPE_P (type)
+  if (INDIRECT_TYPE_P (type)
       && TYPE_RESTRICT (type))
     type = build_qualified_type (type, TYPE_QUALS (type) & ~TYPE_QUAL_RESTRICT);
 
@@ -1591,7 +1591,7 @@ scan_sharing_clauses (tree clauses, omp_context *ctx)
 	      /* Ignore GOMP_MAP_POINTER kind for arrays in regions that are
 		 not offloaded; there is nothing to map for those.  */
 	      if (!is_gimple_omp_offloaded (ctx->stmt)
-		  && !POINTER_TYPE_P (TREE_TYPE (decl))
+		  && !INDIRECT_TYPE_P (TREE_TYPE (decl))
 		  && !OMP_CLAUSE_MAP_ZERO_BIAS_ARRAY_SECTION (c))
 		break;
 	    }
@@ -4547,7 +4547,7 @@ omp_reduction_init_op (location_t loc, enum tree_code op, tree type)
 	    real_maxval (&min, 1, TYPE_MODE (type));
 	  return build_real (type, min);
 	}
-      else if (POINTER_TYPE_P (type))
+      else if (INDIRECT_TYPE_P (type))
 	{
 	  wide_int min
 	    = wi::min_value (TYPE_PRECISION (type), TYPE_SIGN (type));
@@ -4569,7 +4569,7 @@ omp_reduction_init_op (location_t loc, enum tree_code op, tree type)
 	    real_maxval (&max, 0, TYPE_MODE (type));
 	  return build_real (type, max);
 	}
-      else if (POINTER_TYPE_P (type))
+      else if (INDIRECT_TYPE_P (type))
 	{
 	  wide_int max
 	    = wi::max_value (TYPE_PRECISION (type), TYPE_SIGN (type));
@@ -6216,7 +6216,7 @@ lower_rec_input_clauses (tree clauses, gimple_seq *ilist, gimple_seq *dlist,
 		      tree n1 = fd->loop.n1;
 		      tree step = fd->loop.step;
 		      tree itype = TREE_TYPE (l);
-		      if (POINTER_TYPE_P (itype))
+		      if (INDIRECT_TYPE_P (itype))
 			itype = signed_type_for (itype);
 		      l = fold_build2 (MINUS_EXPR, itype, l, n1);
 		      if (TYPE_UNSIGNED (itype)
@@ -6260,7 +6260,7 @@ lower_rec_input_clauses (tree clauses, gimple_seq *ilist, gimple_seq *dlist,
 			  goto do_dtor;
 			}
 
-		      if (POINTER_TYPE_P (TREE_TYPE (x)))
+		      if (INDIRECT_TYPE_P (TREE_TYPE (x)))
 			x = fold_build_pointer_plus (x, t);
 		      else
 			x = fold_build2 (PLUS_EXPR, TREE_TYPE (x), x,
@@ -6295,7 +6295,7 @@ lower_rec_input_clauses (tree clauses, gimple_seq *ilist, gimple_seq *dlist,
 							    GSI_SAME_STMT);
 			  tree t = OMP_CLAUSE_LINEAR_STEP (c);
 			  enum tree_code code = PLUS_EXPR;
-			  if (POINTER_TYPE_P (TREE_TYPE (new_var)))
+			  if (INDIRECT_TYPE_P (TREE_TYPE (new_var)))
 			    code = POINTER_PLUS_EXPR;
 			  g = gimple_build_assign (iv, code, iv, t);
 			  gsi_insert_before_without_update (&gsi, g,
@@ -7304,7 +7304,7 @@ lower_lastprivate_clauses (tree clauses, tree predicate, gimple_seq *body_p,
 	  gimplify_assign (v, build_zero_cst (type), body_p);
 	  this_stmt_list = cstmt_list;
 	  tree mem;
-	  if (POINTER_TYPE_P (TREE_TYPE (cond_ptr)))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (cond_ptr)))
 	    {
 	      mem = build2 (MEM_REF, type, cond_ptr,
 			    build_int_cst (TREE_TYPE (cond_ptr),
@@ -7580,7 +7580,7 @@ lower_oacc_reductions (location_t loc, tree clauses, tree level, bool inner,
 		  ref_to_res = build_simple_mem_ref (ref_to_res);
 
 		tree type = TREE_TYPE (var);
-		if (POINTER_TYPE_P (type))
+		if (INDIRECT_TYPE_P (type))
 		  type = TREE_TYPE (type);
 
 		outgoing = var;
@@ -9872,7 +9872,7 @@ lower_omp_ordered_clauses (gimple_stmt_iterator *gsi_p, gomp_ordered *ord_stmt,
 	    goto lower_omp_ordered_ret;
 
 	  tree itype = TREE_TYPE (TREE_VALUE (vec));
-	  if (POINTER_TYPE_P (itype))
+	  if (INDIRECT_TYPE_P (itype))
 	    itype = sizetype;
 	  wide_int offset = wide_int::from (wi::to_wide (TREE_PURPOSE (vec)),
 					    TYPE_PRECISION (itype),
@@ -9963,7 +9963,7 @@ lower_omp_ordered_clauses (gimple_stmt_iterator *gsi_p, gomp_ordered *ord_stmt,
 	folded_deps[0] = -folded_deps[0];
 
       tree itype = TREE_TYPE (TREE_VALUE (OMP_CLAUSE_DECL (folded_dep)));
-      if (POINTER_TYPE_P (itype))
+      if (INDIRECT_TYPE_P (itype))
 	itype = sizetype;
 
       TREE_PURPOSE (OMP_CLAUSE_DECL (folded_dep))
@@ -13521,7 +13521,7 @@ lower_omp_target (gimple_stmt_iterator *gsi_p, omp_context *ctx)
 		var1 = lang_hooks.decls.omp_array_data (var, false);
 		size1 = lang_hooks.decls.omp_array_size (var, &ilist);
 		var2 = build_fold_addr_expr (x);
-		if (!POINTER_TYPE_P (TREE_TYPE (var)))
+		if (!INDIRECT_TYPE_P (TREE_TYPE (var)))
 		  var = build_fold_addr_expr (var);
 		size2 = fold_build2 (POINTER_DIFF_EXPR, ssizetype,
 				   build_fold_addr_expr (var1), var);
@@ -13631,7 +13631,7 @@ lower_omp_target (gimple_stmt_iterator *gsi_p, omp_context *ctx)
 		    || omp_is_allocatable_or_ptr (ovar))
 		  {
 		    type = TREE_TYPE (type);
-		    if (POINTER_TYPE_P (type)
+		    if (INDIRECT_TYPE_P (type)
 			&& TREE_CODE (type) != ARRAY_TYPE
 			&& ((OMP_CLAUSE_CODE (c) != OMP_CLAUSE_USE_DEVICE_ADDR
 			    && OMP_CLAUSE_CODE (c) != OMP_CLAUSE_HAS_DEVICE_ADDR
@@ -13929,7 +13929,7 @@ lower_omp_target (gimple_stmt_iterator *gsi_p, omp_context *ctx)
 		if (omp_privatize_by_reference (var))
 		  {
 		    type = TREE_TYPE (type);
-		    if (POINTER_TYPE_P (type)
+		    if (INDIRECT_TYPE_P (type)
 			&& TREE_CODE (type) != ARRAY_TYPE
 			&& ((OMP_CLAUSE_CODE (c) != OMP_CLAUSE_USE_DEVICE_ADDR
 			    && OMP_CLAUSE_CODE (c) != OMP_CLAUSE_HAS_DEVICE_ADDR)

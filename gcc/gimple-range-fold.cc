@@ -941,7 +941,7 @@ fold_using_range::range_of_phi (vrange &r, gphi *phi, fur_source &src)
   bool loop_info_p = false;
   // If SCEV is available, query if this PHI has any known values.
   if (scev_initialized_p ()
-      && !POINTER_TYPE_P (TREE_TYPE (phi_def)))
+      && !INDIRECT_TYPE_P (TREE_TYPE (phi_def)))
     {
       class loop *l = loop_containing_stmt (phi);
       if (l && loop_outer (l))

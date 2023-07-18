@@ -1316,12 +1316,12 @@ objc_add_property_declaration (location_t location, tree decl,
   /* FIXME: We seem to drop any existing DECL_ATTRIBUTES on the floor.  */
   if (property_nullability != OBJC_PROPERTY_NULL_UNSET)
     {
-      if (p_type && !POINTER_TYPE_P (p_type))
+      if (p_type && !INDIRECT_TYPE_P (p_type))
 	error_at (decl_loc, "nullability specifier %qE cannot be applied to"
 		  " non-pointer type %qT",
 		  attrs[OBJC_PROPATTR_GROUP_NULLABLE]->name, p_type);
-      else if (p_type && POINTER_TYPE_P (p_type) && TREE_TYPE (p_type)
-	       && POINTER_TYPE_P (TREE_TYPE (p_type)))
+      else if (p_type && INDIRECT_TYPE_P (p_type) && TREE_TYPE (p_type)
+	       && INDIRECT_TYPE_P (TREE_TYPE (p_type)))
 	error_at (decl_loc, "nullability specifier %qE cannot be applied to"
 		  " multi-level pointer type %qT",
 		  attrs[OBJC_PROPATTR_GROUP_NULLABLE]->name, p_type);
@@ -2485,7 +2485,7 @@ objc_common_type (tree type1, tree type2)
 {
   tree inner1 = TREE_TYPE (type1), inner2 = TREE_TYPE (type2);
 
-  while (POINTER_TYPE_P (inner1))
+  while (INDIRECT_TYPE_P (inner1))
     {
       inner1 = TREE_TYPE (inner1);
       inner2 = TREE_TYPE (inner2);
@@ -2533,7 +2533,7 @@ objc_compare_types (tree ltyp, tree rtyp, int argno, tree callee)
   bool pointers_compatible;
 
   /* We must be dealing with pointer types */
-  if (!POINTER_TYPE_P (ltyp) || !POINTER_TYPE_P (rtyp))
+  if (!INDIRECT_TYPE_P (ltyp) || !INDIRECT_TYPE_P (rtyp))
     return false;
 
   tree ltyp_attr, rtyp_attr;
@@ -2546,7 +2546,7 @@ objc_compare_types (tree ltyp, tree rtyp, int argno, tree callee)
       rtyp_attr = TYPE_ATTRIBUTES (rtyp);
       rtyp = TREE_TYPE (rtyp);
     }
-  while (POINTER_TYPE_P (ltyp) && POINTER_TYPE_P (rtyp));
+  while (INDIRECT_TYPE_P (ltyp) && INDIRECT_TYPE_P (rtyp));
 
   /* We must also handle function pointers, since ObjC is a bit more
      lenient than C or C++ on this.  */
@@ -2760,7 +2760,7 @@ objc_have_common_type (tree ltyp, tree rtyp, int argno, tree callee)
           ltyp = TREE_TYPE (ltyp);  /* Remove indirections.  */
           rtyp = TREE_TYPE (rtyp);
         }
-      while (POINTER_TYPE_P (ltyp) && POINTER_TYPE_P (rtyp));
+      while (INDIRECT_TYPE_P (ltyp) && INDIRECT_TYPE_P (rtyp));
       return !(TREE_CODE (ltyp) == FUNCTION_TYPE && TREE_CODE (rtyp) == FUNCTION_TYPE);
     }
   return false;
@@ -3649,7 +3649,7 @@ objc_is_object_ptr (tree type)
   tree ret;
 
   type = TYPE_MAIN_VARIANT (type);
-  if (!POINTER_TYPE_P (type))
+  if (!INDIRECT_TYPE_P (type))
     return 0;
 
   ret = objc_is_id (type);
@@ -3824,7 +3824,7 @@ objc_generate_write_barrier (tree lhs, enum tree_code modifycode, tree rhs)
 
 	  /* Descend down the cast chain, and record the first objc_gc
 	     attribute found.  */
-	  if (POINTER_TYPE_P (lhstype))
+	  if (INDIRECT_TYPE_P (lhstype))
 	    {
 	      tree attr
 		= lookup_attribute ("objc_gc",
@@ -4375,7 +4375,7 @@ objc_begin_catch_clause (tree decl)
       error ("%<@catch%> parameter cannot be protocol-qualified");
       type = error_mark_node;
     }
-  else if (POINTER_TYPE_P (type) && objc_is_object_id (TREE_TYPE (type)))
+  else if (INDIRECT_TYPE_P (type) && objc_is_object_id (TREE_TYPE (type)))
     /* @catch (id xyz) or @catch (...) but we note this for runtimes that
        identify 'id'.  */
     ;
@@ -8768,7 +8768,7 @@ comp_proto_with_proto (tree proto1, tree proto2, int strict)
 static bool
 objc_type_valid_for_messaging (tree type, bool accept_classes)
 {
-  if (!POINTER_TYPE_P (type))
+  if (!INDIRECT_TYPE_P (type))
     return false;
 
   /* We will check for an NSObject type attribute  on the pointer if other
@@ -9116,7 +9116,7 @@ gen_declaration (tree decl)
 
       if (DECL_NAME (decl))
 	{
-	  if (!POINTER_TYPE_P (TREE_TYPE (decl)))
+	  if (!INDIRECT_TYPE_P (TREE_TYPE (decl)))
 	    strcat (errbuf, " ");
 
 	  strcat (errbuf, IDENTIFIER_POINTER (DECL_NAME (decl)));
@@ -9149,7 +9149,7 @@ gen_type_name_0 (tree type)
 
   if (TYPE_P (type) && TYPE_NAME (type))
     type = TYPE_NAME (type);
-  else if (POINTER_TYPE_P (type) || TREE_CODE (type) == ARRAY_TYPE)
+  else if (INDIRECT_TYPE_P (type) || TREE_CODE (type) == ARRAY_TYPE)
     {
       tree inner = TREE_TYPE (type);
 
@@ -9158,10 +9158,10 @@ gen_type_name_0 (tree type)
 
       gen_type_name_0 (inner);
 
-      if (!POINTER_TYPE_P (inner))
+      if (!INDIRECT_TYPE_P (inner))
 	strcat (errbuf, " ");
 
-      if (POINTER_TYPE_P (type))
+      if (INDIRECT_TYPE_P (type))
 	strcat (errbuf, "*");
       else
 	while (type != inner)

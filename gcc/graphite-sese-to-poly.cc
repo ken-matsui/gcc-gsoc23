@@ -422,7 +422,7 @@ add_param_constraints (scop_p scop, graphite_dim_t p, tree parameter)
   value_range r;
   wide_int min, max;
 
-  gcc_assert (INTEGRAL_TYPE_P (type) || POINTER_TYPE_P (type));
+  gcc_assert (INTEGRAL_TYPE_P (type) || INDIRECT_TYPE_P (type));
 
   if (INTEGRAL_TYPE_P (type)
       && get_range_query (cfun)->range_of_expr (r, parameter)

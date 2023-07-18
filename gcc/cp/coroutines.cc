@@ -4875,7 +4875,7 @@ morph_fn_to_coro (tree orig, tree *resumer, tree *destroyer)
 	    {
 	      /* We pass a reference to *this to the param preview.  */
 	      tree tt = TREE_TYPE (arg);
-	      gcc_checking_assert (POINTER_TYPE_P (tt));
+	      gcc_checking_assert (INDIRECT_TYPE_P (tt));
 	      tree ct = TREE_TYPE (tt);
 	      tree this_ref = build1 (INDIRECT_REF, ct, arg);
 	      tree rt = cp_build_reference_type (ct, false);

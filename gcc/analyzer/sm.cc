@@ -51,7 +51,7 @@ namespace ana {
 bool
 any_pointer_p (tree var)
 {
-  return POINTER_TYPE_P (TREE_TYPE (var));
+  return INDIRECT_TYPE_P (TREE_TYPE (var));
 }
 
 /* Return true if SVAL has pointer or reference type.  */
@@ -61,7 +61,7 @@ any_pointer_p (const svalue *sval)
 {
   if (!sval->get_type ())
     return false;
-  return POINTER_TYPE_P (sval->get_type ());
+  return INDIRECT_TYPE_P (sval->get_type ());
 }
 
 /* class state_machine::state.  */

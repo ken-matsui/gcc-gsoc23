@@ -813,7 +813,7 @@ s390_fn_types_compatible (enum s390_builtin_ov_type_index typeindex,
 
       /* If the incoming pointer argument has more qualifiers than the
 	 argument type it can still be an imperfect match.  */
-      if (POINTER_TYPE_P (b_arg_type) && POINTER_TYPE_P (in_type)
+      if (INDIRECT_TYPE_P (b_arg_type) && INDIRECT_TYPE_P (in_type)
 	  && !(TYPE_QUALS (TREE_TYPE (in_type))
 	       & ~TYPE_QUALS (TREE_TYPE (b_arg_type)))
 	  && (TYPE_QUALS (TREE_TYPE (b_arg_type))

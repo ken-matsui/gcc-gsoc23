@@ -1203,7 +1203,7 @@ create_parameter_descriptors (cgraph_node *node,
 	  desc->call_uses = scalar_call_uses;
 	}
 
-      if (POINTER_TYPE_P (type))
+      if (INDIRECT_TYPE_P (type))
 	{
 	  desc->by_ref = true;
 	  if (TYPE_REF_P (type)

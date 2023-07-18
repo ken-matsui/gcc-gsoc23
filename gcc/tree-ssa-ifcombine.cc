@@ -869,7 +869,7 @@ pass_tree_ifcombine::execute (function *fun)
 		  continue;
 		tree lhs = gimple_assign_lhs (ass);
 		if ((INTEGRAL_TYPE_P (TREE_TYPE (lhs))
-		     || POINTER_TYPE_P (TREE_TYPE (lhs)))
+		     || INDIRECT_TYPE_P (TREE_TYPE (lhs)))
 		    && arith_code_with_undefined_signed_overflow
 			 (gimple_assign_rhs_code (ass)))
 		  rewrite_to_defined_overflow (ass, true);

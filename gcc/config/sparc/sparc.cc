@@ -6718,7 +6718,7 @@ static machine_mode
 sparc_promote_function_mode (const_tree type, machine_mode mode,
 			     int *punsignedp, const_tree, int)
 {
-  if (type && POINTER_TYPE_P (type))
+  if (type && INDIRECT_TYPE_P (type))
     {
       *punsignedp = POINTERS_EXTEND_UNSIGNED;
       return Pmode;

@@ -1322,7 +1322,7 @@ value_replacement (basic_block cond_bb, basic_block middle_bb,
   gimple *assign = gsi_stmt (gsi);
   if (!is_gimple_assign (assign)
       || (!INTEGRAL_TYPE_P (TREE_TYPE (arg0))
-	  && !POINTER_TYPE_P (TREE_TYPE (arg0))))
+	  && !INDIRECT_TYPE_P (TREE_TYPE (arg0))))
     return 0;
 
   if (gimple_assign_rhs_class (assign) != GIMPLE_BINARY_RHS)

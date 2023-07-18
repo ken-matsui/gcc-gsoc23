@@ -1662,7 +1662,7 @@ ix86_vectorize_builtin_gather (const_tree mem_vectype,
     return NULL_TREE;
 
   if ((TREE_CODE (index_type) != INTEGER_TYPE
-       && !POINTER_TYPE_P (index_type))
+       && !INDIRECT_TYPE_P (index_type))
       || (TYPE_MODE (index_type) != SImode
 	  && TYPE_MODE (index_type) != DImode))
     return NULL_TREE;

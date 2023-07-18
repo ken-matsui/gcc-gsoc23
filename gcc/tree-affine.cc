@@ -119,7 +119,7 @@ aff_combination_scale (aff_tree *comb, const widest_int &scale_in)
   if (comb->rest)
     {
       tree type = comb->type;
-      if (POINTER_TYPE_P (type))
+      if (INDIRECT_TYPE_P (type))
 	type = sizetype;
       if (comb->n < MAX_AFF_ELTS)
 	{
@@ -179,7 +179,7 @@ aff_combination_add_elt (aff_tree *comb, tree elt, const widest_int &scale_in)
     }
 
   type = comb->type;
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     type = sizetype;
 
   if (scale == 1)
@@ -234,7 +234,7 @@ aff_combination_convert (aff_tree *comb, tree type)
     }
 
   comb->type = type;
-  if (comb->rest && !POINTER_TYPE_P (type))
+  if (comb->rest && !INDIRECT_TYPE_P (type))
     comb->rest = fold_convert (type, comb->rest);
 
   if (TYPE_PRECISION (type) == TYPE_PRECISION (comb_type))
@@ -534,11 +534,11 @@ aff_combination_to_tree (aff_tree *comb)
   gcc_assert (comb->n == MAX_AFF_ELTS || comb->rest == NULL_TREE);
 
   i = 0;
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     {
       type = sizetype;
       if (comb->n > 0 && comb->elts[0].coef == 1
-	  && POINTER_TYPE_P (TREE_TYPE (comb->elts[0].val)))
+	  && INDIRECT_TYPE_P (TREE_TYPE (comb->elts[0].val)))
 	{
 	  base = comb->elts[0].val;
 	  ++i;
@@ -962,7 +962,7 @@ print_aff (FILE *file, aff_tree *val)
 {
   unsigned i;
   signop sgn = TYPE_SIGN (val->type);
-  if (POINTER_TYPE_P (val->type))
+  if (INDIRECT_TYPE_P (val->type))
     sgn = SIGNED;
   fprintf (file, "{\n  type = ");
   print_generic_expr (file, val->type, TDF_VOPS|TDF_MEMSYMS);

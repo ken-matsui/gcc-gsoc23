@@ -142,7 +142,7 @@ omp_adjust_for_condition (location_t loc, enum tree_code *cond_code, tree *n2,
       break;
 
     case LE_EXPR:
-      if (POINTER_TYPE_P (TREE_TYPE (*n2)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (*n2)))
 	*n2 = fold_build_pointer_plus_hwi_loc (loc, *n2, 1);
       else
 	*n2 = fold_build2_loc (loc, PLUS_EXPR, TREE_TYPE (*n2), *n2,
@@ -150,7 +150,7 @@ omp_adjust_for_condition (location_t loc, enum tree_code *cond_code, tree *n2,
       *cond_code = LT_EXPR;
       break;
     case GE_EXPR:
-      if (POINTER_TYPE_P (TREE_TYPE (*n2)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (*n2)))
 	*n2 = fold_build_pointer_plus_hwi_loc (loc, *n2, -1);
       else
 	*n2 = fold_build2_loc (loc, MINUS_EXPR, TREE_TYPE (*n2), *n2,
@@ -286,7 +286,7 @@ omp_extract_for_data (gomp_for *for_stmt, struct omp_for_data *fd,
 	  fd->lastprivate_conditional++;
 	break;
       case OMP_CLAUSE__CONDTEMP_:
-	if (POINTER_TYPE_P (TREE_TYPE (OMP_CLAUSE_DECL (t))))
+	if (INDIRECT_TYPE_P (TREE_TYPE (OMP_CLAUSE_DECL (t))))
 	  fd->have_pointer_condtemp = true;
 	break;
       case OMP_CLAUSE__SCANTEMP_:
@@ -485,7 +485,7 @@ omp_extract_for_data (gomp_for *for_stmt, struct omp_for_data *fd,
 	}
       else if (iter_type != long_long_unsigned_type_node)
 	{
-	  if (POINTER_TYPE_P (TREE_TYPE (loop->v)))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (loop->v)))
 	    iter_type = long_long_unsigned_type_node;
 	  else if (TYPE_UNSIGNED (TREE_TYPE (loop->v))
 		   && TYPE_PRECISION (TREE_TYPE (loop->v))
@@ -754,7 +754,7 @@ omp_extract_for_data (gomp_for *for_stmt, struct omp_for_data *fd,
 	    {
 	      tree itype = TREE_TYPE (loop->v);
 
-	      if (POINTER_TYPE_P (itype))
+	      if (INDIRECT_TYPE_P (itype))
 		itype = signed_type_for (itype);
 	      t = build_int_cst (itype, (loop->cond_code == LT_EXPR ? -1 : 1));
 	      t = fold_build2 (PLUS_EXPR, itype,

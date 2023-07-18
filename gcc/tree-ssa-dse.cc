@@ -1384,7 +1384,7 @@ dse_optimize_call (gimple_stmt_iterator *gsi, sbitmap live_bytes)
 	{
 	  tree arg = access_node.get_call_arg (stmt);
 
-	  if (!arg || !POINTER_TYPE_P (TREE_TYPE (arg)))
+	  if (!arg || !INDIRECT_TYPE_P (TREE_TYPE (arg)))
 	    return false;
 
 	  if (integer_zerop (arg)

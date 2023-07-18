@@ -1283,7 +1283,7 @@ check_access (GimpleOrTree exp, tree dstwrite,
     {
       /* SRCSTR is normally a pointer to string but as a special case
 	 it can be an integer denoting the length of a string.  */
-      if (POINTER_TYPE_P (TREE_TYPE (srcstr)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (srcstr)))
 	{
 	  if (!check_nul_terminated_array (exp, srcstr, maxread))
 	    /* Return if the array is not nul-terminated and a warning
@@ -3635,7 +3635,7 @@ pass_waccess::check_call_access (gcall *stmt)
 	 operand for later processing.  */
       if (attr_access *access = rdwr_idx.get (i))
 	{
-	  if (POINTER_TYPE_P (TREE_TYPE (arg)))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (arg)))
 	    {
 	      access->ptr = arg;
 	      /* A nonnull ACCESS->SIZE contains VLA bounds.  */
@@ -4661,7 +4661,7 @@ pass_waccess::check_dangling_uses ()
 	  tree rhs = gimple_assign_rhs1 (def_stmt);
 	  if (TREE_CODE (rhs) == ADDR_EXPR)
 	    {
-	      if (!POINTER_TYPE_P (TREE_TYPE (var)))
+	      if (!INDIRECT_TYPE_P (TREE_TYPE (var)))
 		continue;
 	      check_dangling_uses (var, TREE_OPERAND (rhs, 0));
 	    }
@@ -4675,7 +4675,7 @@ pass_waccess::check_dangling_uses ()
 		check_dangling_uses (var, decl, false, true);
 	    }
 	}
-      else if (POINTER_TYPE_P (TREE_TYPE (var)))
+      else if (INDIRECT_TYPE_P (TREE_TYPE (var)))
 	{
 	  if (gcall *call = dyn_cast<gcall *>(def_stmt))
 	    {

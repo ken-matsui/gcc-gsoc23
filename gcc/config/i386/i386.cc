@@ -3393,7 +3393,7 @@ ix86_function_arg (cumulative_args_t cum_v, const function_arg_info &arg)
   if (!cum->caller && cfun->machine->func_type != TYPE_NORMAL)
     {
       gcc_assert (arg.type != NULL_TREE);
-      if (POINTER_TYPE_P (arg.type))
+      if (INDIRECT_TYPE_P (arg.type))
 	{
 	  /* This is the pointer argument.  */
 	  gcc_assert (TYPE_MODE (arg.type) == ptr_mode);
@@ -4104,7 +4104,7 @@ function_value_64 (machine_mode orig_mode, machine_mode mode,
 
       return gen_rtx_REG (mode, regno);
     }
-  else if (POINTER_TYPE_P (valtype))
+  else if (INDIRECT_TYPE_P (valtype))
     {
       /* Pointers are always returned in word_mode.  */
       mode = word_mode;
@@ -4220,7 +4220,7 @@ ix86_promote_function_mode (const_tree type, machine_mode mode,
 {
   if (cfun->machine->func_type == TYPE_NORMAL
       && type != NULL_TREE
-      && POINTER_TYPE_P (type))
+      && INDIRECT_TYPE_P (type))
     {
       *punsignedp = POINTERS_EXTEND_UNSIGNED;
       return word_mode;
@@ -19176,7 +19176,7 @@ ix86_vectorize_builtin_scatter (const_tree vectype,
     return NULL_TREE;
 
   if ((TREE_CODE (index_type) != INTEGER_TYPE
-       && !POINTER_TYPE_P (index_type))
+       && !INDIRECT_TYPE_P (index_type))
       || (TYPE_MODE (index_type) != SImode
 	  && TYPE_MODE (index_type) != DImode))
     return NULL_TREE;
@@ -23422,7 +23422,7 @@ ix86_canonical_va_list_type (tree type)
 
       if ((TREE_CODE (type) == ARRAY_TYPE
 	   && integer_zerop (array_type_nelts (type)))
-	  || POINTER_TYPE_P (type))
+	  || INDIRECT_TYPE_P (type))
 	{
 	  tree elem_type = TREE_TYPE (type);
 	  if (TREE_CODE (elem_type) == RECORD_TYPE

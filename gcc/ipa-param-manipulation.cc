@@ -719,7 +719,7 @@ ipa_param_adjustments::modify_call (cgraph_edge *cs,
 	{
 	  /* Detect type mismatches in calls in invalid programs and make a
 	     poor attempt to gracefully convert them so that we don't ICE.  */
-	  if (!POINTER_TYPE_P (TREE_TYPE (base)))
+	  if (!INDIRECT_TYPE_P (TREE_TYPE (base)))
 	    base = force_value_to_type (ptr_type_node, base);
 
 	  off = build_int_cst (apm->alias_ptr_type, apm->unit_offset);
@@ -2131,7 +2131,7 @@ ipa_param_body_adjustments::modify_call_stmt (gcall **stmt_p,
 	{
 	  /* This must be a by_reference pass-through.  */
 	  recreate = true;
-	  gcc_assert (POINTER_TYPE_P (TREE_TYPE (t)));
+	  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (t)));
 	  pass_through_args.safe_push (i);
 	  pass_through_pbr_indices.safe_push (first_rep_index);
 	  pass_through_offsets.safe_push (agg_arg_offset);

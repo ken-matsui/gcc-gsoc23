@@ -2327,7 +2327,7 @@ Gcc_backend::convert_tree (tree type_tree, tree expr_tree, Location location)
       || TREE_TYPE (expr_tree) == error_mark_node)
     return error_mark_node;
 
-  if (POINTER_TYPE_P (type_tree) || INTEGRAL_TYPE_P (type_tree)
+  if (INDIRECT_TYPE_P (type_tree) || INTEGRAL_TYPE_P (type_tree)
       || SCALAR_FLOAT_TYPE_P (type_tree) || COMPLEX_FLOAT_TYPE_P (type_tree))
     return fold_convert_loc (location.gcc_location (), type_tree, expr_tree);
   else if (TREE_CODE (type_tree) == RECORD_TYPE

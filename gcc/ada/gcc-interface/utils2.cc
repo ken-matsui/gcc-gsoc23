@@ -192,7 +192,7 @@ known_alignment (tree exp)
 	 is at least as aligned as the pointed-to type.  Beware that we can
 	 have a dummy type here (e.g. a Taft Amendment type), for which the
 	 alignment is meaningless and should be ignored.  */
-      if (POINTER_TYPE_P (TREE_TYPE (exp))
+      if (INDIRECT_TYPE_P (TREE_TYPE (exp))
 	  && !TYPE_IS_DUMMY_P (TREE_TYPE (TREE_TYPE (exp)))
 	  && !VOID_TYPE_P (TREE_TYPE (TREE_TYPE (exp))))
 	this_alignment = TYPE_ALIGN (TREE_TYPE (TREE_TYPE (exp)));
@@ -883,9 +883,9 @@ build_binary_op (enum tree_code op_code, tree result_type,
       while ((CONVERT_EXPR_P (left_operand)
 	      || TREE_CODE (left_operand) == VIEW_CONVERT_EXPR)
 	     && (((INTEGRAL_TYPE_P (left_type)
-		   || POINTER_TYPE_P (left_type))
+		   || INDIRECT_TYPE_P (left_type))
 		  && (INTEGRAL_TYPE_P (operand_type (left_operand))
-		      || POINTER_TYPE_P (operand_type (left_operand))))
+		      || INDIRECT_TYPE_P (operand_type (left_operand))))
 		 || (TREE_CODE (left_type) == RECORD_TYPE
 		     && !TYPE_JUSTIFIED_MODULAR_P (left_type)
 		     && TREE_CODE (operand_type (left_operand)) == RECORD_TYPE
@@ -1136,8 +1136,8 @@ build_binary_op (enum tree_code op_code, tree result_type,
 	      best_type = left_base_type;
 	    }
 
-	  else if (POINTER_TYPE_P (left_base_type)
-		   && POINTER_TYPE_P (right_base_type))
+	  else if (INDIRECT_TYPE_P (left_base_type)
+		   && INDIRECT_TYPE_P (right_base_type))
 	    {
 	      tree left_ref_type = TREE_TYPE (left_base_type);
 	      tree right_ref_type = TREE_TYPE (right_base_type);
@@ -1397,7 +1397,7 @@ build_unary_op (enum tree_code op_code, tree result_type, tree operand)
 
 	  /* If the underlying object can alias everything, propagate the
 	     property since we are effectively retrieving the object.  */
-	  if (POINTER_TYPE_P (TREE_TYPE (result))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (result))
 	      && TYPE_REF_CAN_ALIAS_ALL (TREE_TYPE (result)))
 	    {
 	      if (TREE_CODE (result_type) == POINTER_TYPE

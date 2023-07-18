@@ -476,7 +476,7 @@ VN_INFO (tree name)
 	   if we know it is a non-NULL pointer.  */
 	newinfo->visited = true;
 	newinfo->valnum = name;
-	if (POINTER_TYPE_P (TREE_TYPE (name))
+	if (INDIRECT_TYPE_P (TREE_TYPE (name))
 	    && nonnull_arg_p (SSA_NAME_VAR (name)))
 	  {
 	    tree ops[2];
@@ -6752,7 +6752,7 @@ eliminate_dom_walker::eliminate_stmt (basic_block b, gimple_stmt_iterator *gsi)
 	  && TREE_CODE (sprime) == SSA_NAME)
 	{
 	  basic_block sprime_b = gimple_bb (SSA_NAME_DEF_STMT (sprime));
-	  if (POINTER_TYPE_P (TREE_TYPE (lhs))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (lhs))
 	      && SSA_NAME_PTR_INFO (lhs)
 	      && ! SSA_NAME_PTR_INFO (sprime))
 	    {
@@ -6883,7 +6883,7 @@ eliminate_dom_walker::eliminate_stmt (basic_block b, gimple_stmt_iterator *gsi)
 	      /* We preserve conversions to but not from function or method
 		 types.  This asymmetry makes it necessary to re-instantiate
 		 conversions here.  */
-	      if (POINTER_TYPE_P (TREE_TYPE (lhs))
+	      if (INDIRECT_TYPE_P (TREE_TYPE (lhs))
 		  && FUNC_OR_METHOD_TYPE_P (TREE_TYPE (TREE_TYPE (lhs))))
 		sprime = fold_convert (TREE_TYPE (lhs), sprime);
 	      else

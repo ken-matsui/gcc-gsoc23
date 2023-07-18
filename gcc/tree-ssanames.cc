@@ -397,7 +397,7 @@ make_ssa_name_fn (struct function *fn, tree var, gimple *stmt,
       SET_SSA_NAME_VAR_OR_IDENTIFIER (t, var);
     }
   SSA_NAME_DEF_STMT (t) = stmt;
-  if (POINTER_TYPE_P (TREE_TYPE (t)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (t)))
     SSA_NAME_PTR_INFO (t) = NULL;
   else
     SSA_NAME_RANGE_INFO (t) = NULL;
@@ -419,7 +419,7 @@ set_range_info (tree name, const vrange &r)
     return false;
 
   tree type = TREE_TYPE (name);
-  if (POINTER_TYPE_P (type))
+  if (INDIRECT_TYPE_P (type))
     {
       if (r.nonzero_p ())
 	{
@@ -448,7 +448,7 @@ set_range_info (tree name, const vrange &r)
 void
 set_ptr_nonnull (tree name)
 {
-  gcc_assert (POINTER_TYPE_P (TREE_TYPE (name)));
+  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (name)));
   struct ptr_info_def *pi = get_ptr_info (name);
   pi->pt.null = 0;
 }
@@ -458,7 +458,7 @@ set_ptr_nonnull (tree name)
 void
 set_nonzero_bits (tree name, const wide_int &mask)
 {
-  gcc_assert (!POINTER_TYPE_P (TREE_TYPE (name)));
+  gcc_assert (!INDIRECT_TYPE_P (TREE_TYPE (name)));
 
   int_range<2> r (TREE_TYPE (name));
   r.set_nonzero_bits (mask);
@@ -473,7 +473,7 @@ set_nonzero_bits (tree name, const wide_int &mask)
 void
 set_bitmask (tree name, const wide_int &value, const wide_int &mask)
 {
-  gcc_assert (!POINTER_TYPE_P (TREE_TYPE (name)));
+  gcc_assert (!INDIRECT_TYPE_P (TREE_TYPE (name)));
 
   int_range<2> r (TREE_TYPE (name));
   r.update_bitmask (irange_bitmask (value, mask));
@@ -492,7 +492,7 @@ get_nonzero_bits (const_tree name)
   /* Use element_precision instead of TYPE_PRECISION so complex and
      vector types get a non-zero precision.  */
   unsigned int precision = element_precision (TREE_TYPE (name));
-  if (POINTER_TYPE_P (TREE_TYPE (name)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (name)))
     {
       struct ptr_info_def *pi = SSA_NAME_PTR_INFO (name);
       if (pi && pi->align)
@@ -691,7 +691,7 @@ get_ptr_info (tree t)
 {
   struct ptr_info_def *pi;
 
-  gcc_assert (POINTER_TYPE_P (TREE_TYPE (t)));
+  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (t)));
 
   pi = SSA_NAME_PTR_INFO (t);
   if (pi == NULL)
@@ -734,7 +734,7 @@ duplicate_ssa_name_ptr_info (tree name, struct ptr_info_def *ptr_info)
 {
   struct ptr_info_def *new_ptr_info;
 
-  gcc_assert (POINTER_TYPE_P (TREE_TYPE (name)));
+  gcc_assert (INDIRECT_TYPE_P (TREE_TYPE (name)));
   gcc_assert (!SSA_NAME_PTR_INFO (name));
 
   if (!ptr_info)
@@ -749,7 +749,7 @@ duplicate_ssa_name_ptr_info (tree name, struct ptr_info_def *ptr_info)
 void
 duplicate_ssa_name_range_info (tree name, tree src)
 {
-  gcc_checking_assert (!POINTER_TYPE_P (TREE_TYPE (src)));
+  gcc_checking_assert (!INDIRECT_TYPE_P (TREE_TYPE (src)));
   gcc_checking_assert (!range_info_p (name));
 
   if (range_info_p (src))
@@ -768,7 +768,7 @@ tree
 duplicate_ssa_name_fn (struct function *fn, tree name, gimple *stmt)
 {
   tree new_name = copy_ssa_name_fn (fn, name, stmt);
-  if (POINTER_TYPE_P (TREE_TYPE (name)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (name)))
     {
       struct ptr_info_def *old_ptr_info = SSA_NAME_PTR_INFO (name);
 
@@ -788,7 +788,7 @@ duplicate_ssa_name_fn (struct function *fn, tree name, gimple *stmt)
 void
 reset_flow_sensitive_info (tree name)
 {
-  if (POINTER_TYPE_P (TREE_TYPE (name)))
+  if (INDIRECT_TYPE_P (TREE_TYPE (name)))
     {
       /* points-to info is not flow-sensitive.  */
       if (SSA_NAME_PTR_INFO (name))

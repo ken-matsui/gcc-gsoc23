@@ -794,7 +794,7 @@ stmt_may_be_vtbl_ptr_store (gimple *stmt)
       if (!AGGREGATE_TYPE_P (TREE_TYPE (lhs)))
 	{
 	  if (flag_strict_aliasing
-	      && !POINTER_TYPE_P (TREE_TYPE (lhs)))
+	      && !INDIRECT_TYPE_P (TREE_TYPE (lhs)))
 	    return false;
 
 	  if (TREE_CODE (lhs) == COMPONENT_REF
@@ -974,7 +974,7 @@ detect_type_change_ssa (ipa_func_body_info *fbi, tree arg, tree comp_type,
 {
   gcc_checking_assert (TREE_CODE (arg) == SSA_NAME);
   if (!flag_devirtualize
-      || !POINTER_TYPE_P (TREE_TYPE (arg)))
+      || !INDIRECT_TYPE_P (TREE_TYPE (arg)))
     return false;
 
   if (!param_type_may_change_p (current_function_decl, arg, call))
@@ -1163,7 +1163,7 @@ parm_ref_data_pass_through_p (struct ipa_func_body_info *fbi, int index,
      function because it is not goin to use it.  But do not cache the result
      either.  Also, no such calculations for non-pointers.  */
   if (!gimple_vuse (call)
-      || !POINTER_TYPE_P (TREE_TYPE (parm)))
+      || !INDIRECT_TYPE_P (TREE_TYPE (parm)))
     return false;
 
   struct ipa_param_aa_status *paa = parm_bb_aa_status_for_bb (fbi,
@@ -1553,7 +1553,7 @@ compute_complex_assign_jump_func (struct ipa_func_body_info *fbi,
 
   /* Dynamic types are changed in constructors and destructors.  */
   index = ipa_get_param_decl_index (info, SSA_NAME_VAR (ssa));
-  if (index >= 0 && param_type && POINTER_TYPE_P (param_type))
+  if (index >= 0 && param_type && INDIRECT_TYPE_P (param_type))
     ipa_set_ancestor_jf (jfunc, offset,  index,
 			 parm_ref_data_pass_through_p (fbi, index, call, ssa),
 			 false);
@@ -1648,7 +1648,7 @@ compute_complex_ancestor_jump_func (struct ipa_func_body_info *fbi,
     return;
   if (TREE_CODE (tmp) != SSA_NAME
       || SSA_NAME_IS_DEFAULT_DEF (tmp)
-      || !POINTER_TYPE_P (TREE_TYPE (tmp))
+      || !INDIRECT_TYPE_P (TREE_TYPE (tmp))
       || TREE_CODE (TREE_TYPE (TREE_TYPE (tmp))) != RECORD_TYPE)
     return;
 
@@ -1699,7 +1699,7 @@ type_like_member_ptr_p (tree type, tree *method_ptr, tree *delta)
     return false;
 
   fld = TYPE_FIELDS (type);
-  if (!fld || !POINTER_TYPE_P (TREE_TYPE (fld))
+  if (!fld || !INDIRECT_TYPE_P (TREE_TYPE (fld))
       || TREE_CODE (TREE_TYPE (TREE_TYPE (fld))) != METHOD_TYPE
       || !tree_fits_uhwi_p (DECL_FIELD_OFFSET (fld)))
     return false;
@@ -2107,14 +2107,14 @@ determine_known_aggregate_parts (struct ipa_func_body_info *fbi,
      arg_base and arg_offset based on what is actually passed as an actual
      argument.  */
 
-  if (POINTER_TYPE_P (arg_type))
+  if (INDIRECT_TYPE_P (arg_type))
     {
       by_ref = true;
       if (TREE_CODE (arg) == SSA_NAME)
 	{
 	  tree type_size;
           if (!tree_fits_uhwi_p (TYPE_SIZE (TREE_TYPE (arg_type)))
-	      || !POINTER_TYPE_P (TREE_TYPE (arg)))
+	      || !INDIRECT_TYPE_P (TREE_TYPE (arg)))
             return;
 	  check_ref = true;
 	  arg_base = arg;
@@ -2365,7 +2365,7 @@ ipa_compute_jump_functions_for_edge (struct ipa_func_body_info *fbi,
       struct ipa_jump_func *jfunc = ipa_get_ith_jump_func (args, n);
       tree arg = gimple_call_arg (call, n);
       tree param_type = ipa_get_callee_param_type (cs, n);
-      if (flag_devirtualize && POINTER_TYPE_P (TREE_TYPE (arg)))
+      if (flag_devirtualize && INDIRECT_TYPE_P (TREE_TYPE (arg)))
 	{
 	  tree instance;
 	  class ipa_polymorphic_call_context context (cs->caller->decl,
@@ -2379,7 +2379,7 @@ ipa_compute_jump_functions_for_edge (struct ipa_func_body_info *fbi,
 	}
 
       Value_Range vr (TREE_TYPE (arg));
-      if (POINTER_TYPE_P (TREE_TYPE (arg)))
+      if (INDIRECT_TYPE_P (TREE_TYPE (arg)))
 	{
 	  bool addr_nonzero = false;
 	  bool strict_overflow = false;
@@ -2432,7 +2432,7 @@ ipa_compute_jump_functions_for_edge (struct ipa_func_body_info *fbi,
 	  else
 	    ipa_set_jfunc_bits (jfunc, wi::to_widest (arg), 0);
 	}
-      else if (POINTER_TYPE_P (TREE_TYPE (arg)))
+      else if (INDIRECT_TYPE_P (TREE_TYPE (arg)))
 	{
 	  unsigned HOST_WIDE_INT bitpos;
 	  unsigned align;
@@ -2506,7 +2506,7 @@ ipa_compute_jump_functions_for_edge (struct ipa_func_body_info *fbi,
 	  && (jfunc->type != IPA_JF_ANCESTOR
 	      || !ipa_get_jf_ancestor_agg_preserved (jfunc))
 	  && (AGGREGATE_TYPE_P (TREE_TYPE (arg))
-	      || POINTER_TYPE_P (param_type)))
+	      || INDIRECT_TYPE_P (param_type)))
 	determine_known_aggregate_parts (fbi, call, arg, param_type, jfunc);
     }
   if (!useful_context)
@@ -2724,7 +2724,7 @@ ipa_analyze_indirect_call_uses (struct ipa_func_body_info *fbi, gcall *call,
      pointer. */
   if (gimple_code (def) != GIMPLE_PHI
       || gimple_phi_num_args (def) != 2
-      || !POINTER_TYPE_P (TREE_TYPE (target))
+      || !INDIRECT_TYPE_P (TREE_TYPE (target))
       || TREE_CODE (TREE_TYPE (TREE_TYPE (target))) != METHOD_TYPE)
     return;
 
@@ -5834,7 +5834,7 @@ ipcp_update_bits (struct cgraph_node *node, ipcp_transformation *ts)
 
       if (!bits[i]
 	  || !(INTEGRAL_TYPE_P (TREE_TYPE (parm))
-	       || POINTER_TYPE_P (TREE_TYPE (parm)))
+	       || INDIRECT_TYPE_P (TREE_TYPE (parm)))
 	  || !is_gimple_reg (parm))
 	continue;
 

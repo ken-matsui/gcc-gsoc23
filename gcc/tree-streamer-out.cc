@@ -745,7 +745,7 @@ write_ts_type_non_common_tree_pointers (struct output_block *ob, tree expr)
   else if (FUNC_OR_METHOD_TYPE_P (expr))
     stream_write_tree_ref (ob, TYPE_ARG_TYPES (expr));
 
-  if (!POINTER_TYPE_P (expr))
+  if (!INDIRECT_TYPE_P (expr))
     stream_write_tree_ref (ob, TYPE_MIN_VALUE_RAW (expr));
   stream_write_tree_ref (ob, TYPE_MAX_VALUE_RAW (expr));
 }

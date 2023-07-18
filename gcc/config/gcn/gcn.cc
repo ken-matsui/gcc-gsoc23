@@ -1882,8 +1882,8 @@ gcn_addr_space_subset_p (addr_space_t subset, addr_space_t superset)
 static rtx
 gcn_addr_space_convert (rtx op, tree from_type, tree to_type)
 {
-  gcc_assert (POINTER_TYPE_P (from_type));
-  gcc_assert (POINTER_TYPE_P (to_type));
+  gcc_assert (INDIRECT_TYPE_P (from_type));
+  gcc_assert (INDIRECT_TYPE_P (to_type));
 
   addr_space_t as_from = TYPE_ADDR_SPACE (TREE_TYPE (from_type));
   addr_space_t as_to = TYPE_ADDR_SPACE (TREE_TYPE (to_type));
@@ -2860,7 +2860,7 @@ gcn_detect_incoming_pointer_arg (tree fndecl)
   for (tree arg = TYPE_ARG_TYPES (TREE_TYPE (fndecl));
        arg;
        arg = TREE_CHAIN (arg))
-    if (POINTER_TYPE_P (TREE_VALUE (arg)))
+    if (INDIRECT_TYPE_P (TREE_VALUE (arg)))
       cfun->machine->use_flat_addressing = true;
 }
 

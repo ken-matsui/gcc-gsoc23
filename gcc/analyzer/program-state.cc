@@ -719,7 +719,7 @@ sm_state_map::canonicalize_svalue (const svalue *sval,
 				   const extrinsic_state &ext_state)
 {
   region_model_manager *mgr = ext_state.get_model_manager ();
-  if (mgr && sval->get_type () && POINTER_TYPE_P (sval->get_type ()))
+  if (mgr && sval->get_type () && INDIRECT_TYPE_P (sval->get_type ()))
     if (tree cst = sval->maybe_get_constant ())
       if (zerop (cst))
 	return mgr->get_or_create_constant_svalue (null_pointer_node);

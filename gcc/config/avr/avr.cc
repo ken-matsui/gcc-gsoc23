@@ -10582,7 +10582,7 @@ avr_nonconst_pointer_addrspace (tree typ)
   while (ARRAY_TYPE == TREE_CODE (typ))
     typ = TREE_TYPE (typ);
 
-  if (POINTER_TYPE_P (typ))
+  if (INDIRECT_TYPE_P (typ))
     {
       addr_space_t as;
       tree target = TREE_TYPE (typ);
@@ -13640,8 +13640,8 @@ avr_convert_to_type (tree type, tree expr)
 
   if (avr_warn_addr_space_convert
       && expr != error_mark_node
-      && POINTER_TYPE_P (type)
-      && POINTER_TYPE_P (TREE_TYPE (expr)))
+      && INDIRECT_TYPE_P (type)
+      && INDIRECT_TYPE_P (TREE_TYPE (expr)))
     {
       addr_space_t as_old = TYPE_ADDR_SPACE (TREE_TYPE (TREE_TYPE (expr)));
       addr_space_t as_new = TYPE_ADDR_SPACE (TREE_TYPE (type));

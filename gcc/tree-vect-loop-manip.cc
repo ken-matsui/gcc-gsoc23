@@ -2013,7 +2013,7 @@ vect_update_ivs_after_vectorizer (loop_vec_info loop_vinfo,
 	  tree stype = TREE_TYPE (step_expr);
 	  off = fold_build2 (MULT_EXPR, stype,
 			     fold_convert (stype, niters), step_expr);
-	  if (POINTER_TYPE_P (type))
+	  if (INDIRECT_TYPE_P (type))
 	    ni = fold_build_pointer_plus (init_expr, off);
 	  else
 	    ni = fold_convert (type,

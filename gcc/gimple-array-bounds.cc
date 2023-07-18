@@ -105,7 +105,7 @@ get_ref_size (tree arg, tree *pref)
 
   arg = TREE_OPERAND (arg, 0);
   tree type = TREE_TYPE (arg);
-  if (!POINTER_TYPE_P (type))
+  if (!INDIRECT_TYPE_P (type))
     return NULL_TREE;
 
   type = TREE_TYPE (type);
@@ -152,7 +152,7 @@ trailing_array (tree arg, tree *pref)
 
   tree basetype = TREE_TYPE (base);
   if (TREE_CODE (base) == PARM_DECL
-      && POINTER_TYPE_P (basetype))
+      && INDIRECT_TYPE_P (basetype))
     {
       tree ptype = TREE_TYPE (basetype);
       if (TREE_CODE (ptype) == ARRAY_TYPE)
@@ -517,7 +517,7 @@ array_bounds_checker::check_mem_ref (location_t location, tree ref,
   tree reftype = TREE_TYPE (aref.ref);
   /* The size of the referenced array element.  */
   offset_int eltsize = 1;
-  if (POINTER_TYPE_P (reftype))
+  if (INDIRECT_TYPE_P (reftype))
     reftype = TREE_TYPE (reftype);
 
   if (TREE_CODE (reftype) == FUNCTION_TYPE)

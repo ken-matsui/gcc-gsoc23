@@ -393,7 +393,7 @@ simd_clone_clauses_extract (struct cgraph_node *node, tree clauses,
 	      }
 	    else
 	      {
-		if (POINTER_TYPE_P (args[argno]))
+		if (INDIRECT_TYPE_P (args[argno]))
 		  step = fold_convert (ssizetype, step);
 		if (!tree_fits_shwi_p (step))
 		  {
@@ -726,7 +726,7 @@ simd_clone_adjust_return_type (struct cgraph_node *node)
   if (orig_rettype == void_type_node)
     return NULL_TREE;
   t = TREE_TYPE (TREE_TYPE (fndecl));
-  if (INTEGRAL_TYPE_P (t) || POINTER_TYPE_P (t))
+  if (INTEGRAL_TYPE_P (t) || INDIRECT_TYPE_P (t))
     veclen = node->simdclone->vecsize_int;
   else
     veclen = node->simdclone->vecsize_float;
@@ -736,7 +736,7 @@ simd_clone_adjust_return_type (struct cgraph_node *node)
     veclen = exact_div (veclen, GET_MODE_BITSIZE (SCALAR_TYPE_MODE (t)));
   if (multiple_p (veclen, node->simdclone->simdlen))
     veclen = node->simdclone->simdlen;
-  if (POINTER_TYPE_P (t))
+  if (INDIRECT_TYPE_P (t))
     t = pointer_sized_int_node;
   if (known_eq (veclen, node->simdclone->simdlen))
     t = build_vector_type (t, node->simdclone->simdlen);
@@ -843,7 +843,7 @@ simd_clone_adjust_argument_types (struct cgraph_node *node)
 	case SIMD_CLONE_ARG_TYPE_LINEAR_VAL_CONSTANT_STEP:
 	case SIMD_CLONE_ARG_TYPE_LINEAR_VAL_VARIABLE_STEP:
 	case SIMD_CLONE_ARG_TYPE_VECTOR:
-	  if (INTEGRAL_TYPE_P (parm_type) || POINTER_TYPE_P (parm_type))
+	  if (INTEGRAL_TYPE_P (parm_type) || INDIRECT_TYPE_P (parm_type))
 	    veclen = sc->vecsize_int;
 	  else
 	    veclen = sc->vecsize_float;
@@ -857,7 +857,7 @@ simd_clone_adjust_argument_types (struct cgraph_node *node)
 	    veclen = sc->simdlen;
 	  adj.op = IPA_PARAM_OP_NEW;
 	  adj.param_prefix_index = IPA_PARAM_PREFIX_SIMD;
-	  if (POINTER_TYPE_P (parm_type))
+	  if (INDIRECT_TYPE_P (parm_type))
 	    adj.type = build_vector_type (pointer_sized_int_node, veclen);
 	  else
 	    adj.type = build_vector_type (parm_type, veclen);
@@ -898,7 +898,7 @@ simd_clone_adjust_argument_types (struct cgraph_node *node)
 
       adj.base_index = i;
       adj.prev_clone_index = i;
-      if (INTEGRAL_TYPE_P (base_type) || POINTER_TYPE_P (base_type))
+      if (INTEGRAL_TYPE_P (base_type) || INDIRECT_TYPE_P (base_type))
 	veclen = sc->vecsize_int;
       else
 	veclen = sc->vecsize_float;
@@ -912,7 +912,7 @@ simd_clone_adjust_argument_types (struct cgraph_node *node)
       if (sc->mask_mode != VOIDmode)
 	adj.type
 	  = lang_hooks.types.type_for_mode (sc->mask_mode, 1);
-      else if (POINTER_TYPE_P (base_type))
+      else if (INDIRECT_TYPE_P (base_type))
 	adj.type = build_vector_type (pointer_sized_int_node, veclen);
       else
 	adj.type = build_vector_type (base_type, veclen);
@@ -1001,7 +1001,7 @@ simd_clone_init_simd_arrays (struct cgraph_node *node,
        arg = DECL_CHAIN (arg), i++, j++)
     {
       if ((*adjustments->m_adj_params)[j].op == IPA_PARAM_OP_COPY
-	  || POINTER_TYPE_P (TREE_TYPE (arg)))
+	  || INDIRECT_TYPE_P (TREE_TYPE (arg)))
 	continue;
 
       node->simdclone->args[i].vector_arg = arg;
@@ -1405,7 +1405,7 @@ simd_clone_linear_addend (struct cgraph_node *node, unsigned int i,
       gsi_insert_before (&gsi, g, GSI_SAME_STMT);
       ret = gimple_assign_lhs (g);
     }
-  if (POINTER_TYPE_P (ptype))
+  if (INDIRECT_TYPE_P (ptype))
     {
       tree size = TYPE_SIZE_UNIT (TREE_TYPE (ptype));
       if (size && TREE_CODE (size) == INTEGER_CST)
@@ -1755,7 +1755,7 @@ simd_clone_adjust (struct cgraph_node *node)
       {
 	tree orig_arg = node->simdclone->args[i].orig_arg;
 	gcc_assert (INTEGRAL_TYPE_P (TREE_TYPE (orig_arg))
-		    || POINTER_TYPE_P (TREE_TYPE (orig_arg)));
+		    || INDIRECT_TYPE_P (TREE_TYPE (orig_arg)));
 	tree def = NULL_TREE;
 	if (TREE_ADDRESSABLE (orig_arg))
 	  {

@@ -1071,7 +1071,7 @@ verify_ssa (bool check_modified_stmt, bool check_ssa_operands)
 	    }
 
 	  void *info = NULL;
-	  if (POINTER_TYPE_P (TREE_TYPE (name)))
+	  if (INDIRECT_TYPE_P (TREE_TYPE (name)))
 	    info = SSA_NAME_PTR_INFO (name);
 	  else if (INTEGRAL_TYPE_P (TREE_TYPE (name)))
 	    info = SSA_NAME_RANGE_INFO (name);

@@ -5451,7 +5451,7 @@ make_tree (tree type, rtx x)
 
       /* If TYPE is a POINTER_TYPE, we might need to convert X from
 	 address mode to pointer mode.  */
-      if (POINTER_TYPE_P (type))
+      if (INDIRECT_TYPE_P (type))
 	x = convert_memory_address_addr_space
 	  (SCALAR_INT_TYPE_MODE (type), x, TYPE_ADDR_SPACE (TREE_TYPE (type)));
 

@@ -944,10 +944,10 @@ gimple_fold_builtin_memory_op (gimple_stmt_iterator *gsi,
 	 order barrier, i.e. is equivalent to a VIEW_CONVERT_EXPR that can
 	 modify the storage order of objects (see storage_order_barrier_p).  */
       tree srctype
-	= POINTER_TYPE_P (TREE_TYPE (src))
+	= INDIRECT_TYPE_P (TREE_TYPE (src))
 	  ? TREE_TYPE (TREE_TYPE (src)) : NULL_TREE;
       tree desttype
-	= POINTER_TYPE_P (TREE_TYPE (dest))
+	= INDIRECT_TYPE_P (TREE_TYPE (dest))
 	  ? TREE_TYPE (TREE_TYPE (dest)) : NULL_TREE;
       tree destvar, srcvar, srcoff;
       unsigned int src_align, dest_align;
@@ -1476,7 +1476,7 @@ gimple_fold_builtin_memset (gimple_stmt_iterator *gsi, tree c, tree len)
     etype = TREE_TYPE (etype);
 
   if (!INTEGRAL_TYPE_P (etype)
-      && !POINTER_TYPE_P (etype))
+      && !INDIRECT_TYPE_P (etype))
     return NULL_TREE;
 
   if (! var_decl_component_p (var))
@@ -3431,7 +3431,7 @@ gimple_fold_builtin_sprintf_chk (gimple_stmt_iterator *gsi,
 	  if (nargs == 5)
 	    {
 	      arg = gimple_call_arg (stmt, 4);
-	      if (POINTER_TYPE_P (TREE_TYPE (arg)))
+	      if (INDIRECT_TYPE_P (TREE_TYPE (arg)))
 		len = c_strlen (arg, 1);
 	    }
 	}
@@ -3554,7 +3554,7 @@ gimple_fold_builtin_sprintf (gimple_stmt_iterator *gsi)
 
       /* Don't fold calls with source arguments of invalid (nonpointer)
 	 types.  */
-      if (!POINTER_TYPE_P (TREE_TYPE (orig)))
+      if (!INDIRECT_TYPE_P (TREE_TYPE (orig)))
 	return false;
 
       tree orig_len = NULL_TREE;
@@ -3806,7 +3806,7 @@ gimple_fold_builtin_fprintf (gimple_stmt_iterator *gsi,
   /* If the format specifier was "%s", call __builtin_fputs (arg, fp).  */
   else if (strcmp (fmt_str, target_percent_s) == 0)
     {
-      if (!arg || ! POINTER_TYPE_P (TREE_TYPE (arg)))
+      if (!arg || ! INDIRECT_TYPE_P (TREE_TYPE (arg)))
 	return false;
       if (fn_fputs)
 	{
@@ -3884,7 +3884,7 @@ gimple_fold_builtin_printf (gimple_stmt_iterator *gsi, tree fmt,
 	  if (fcode == BUILT_IN_VPRINTF || fcode == BUILT_IN_VPRINTF_CHK)
 	    return false;
 
-	  if (!arg || ! POINTER_TYPE_P (TREE_TYPE (arg)))
+	  if (!arg || ! INDIRECT_TYPE_P (TREE_TYPE (arg)))
 	    return false;
 
 	  str = c_getstr (arg);
@@ -3958,7 +3958,7 @@ gimple_fold_builtin_printf (gimple_stmt_iterator *gsi, tree fmt,
   /* If the format specifier was "%s\n", call __builtin_puts(arg).  */
   else if (strcmp (fmt_str, target_percent_s_newline) == 0)
     {
-      if (!arg || ! POINTER_TYPE_P (TREE_TYPE (arg)))
+      if (!arg || ! INDIRECT_TYPE_P (TREE_TYPE (arg)))
 	return false;
       if (fn_puts)
 	{
@@ -6964,7 +6964,7 @@ follow_outer_ssa_edges (tree val)
       /* We cannot temporarily rewrite stmts with undefined overflow
 	 behavior, so avoid expanding them.  */
       if ((ANY_INTEGRAL_TYPE_P (TREE_TYPE (val))
-	   || POINTER_TYPE_P (TREE_TYPE (val)))
+	   || INDIRECT_TYPE_P (TREE_TYPE (val)))
 	  && !TYPE_OVERFLOW_WRAPS (TREE_TYPE (val)))
 	return NULL_TREE;
       /* If the definition does not dominate fosa_bb temporarily reset
@@ -8566,7 +8566,7 @@ gimple_fold_indirect_ref (tree t)
 
   STRIP_NOPS (sub);
   subtype = TREE_TYPE (sub);
-  if (!POINTER_TYPE_P (subtype)
+  if (!INDIRECT_TYPE_P (subtype)
       || TYPE_REF_CAN_ALIAS_ALL (ptype))
     return NULL_TREE;
 
