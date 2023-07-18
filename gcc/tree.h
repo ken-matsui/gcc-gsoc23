@@ -1054,6 +1054,10 @@ extern void omp_clause_range_check_failed (const_tree, const char *, int,
 #define TYPE_REF_IS_RVALUE(NODE) \
   (REFERENCE_TYPE_CHECK (NODE)->base.private_flag)
 
+/* True if reference type NODE is a C++ lvalue reference.  */
+#define TYPE_REF_IS_LVALUE(NODE) \
+  (TYPE_REF_P (NODE) && !TYPE_REF_IS_RVALUE (NODE))
+
 /* Nonzero in a _DECL if the use of the name is defined as a
    deprecated feature by __attribute__((deprecated)).  */
 #define TREE_DEPRECATED(NODE) \
