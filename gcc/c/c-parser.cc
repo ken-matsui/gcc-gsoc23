@@ -115,9 +115,9 @@ c_parse_init (void)
   tree id;
   int mask = 0;
 
-  /* Make sure RID_MAX hasn't grown past the 8 bits used to hold the keyword in
-     the c_token structure.  */
-  gcc_assert (RID_MAX <= 255);
+  /* Make sure RID_MAX hasn't grown past the 16 bits used to hold the keyword
+     in the c_token structure.  */
+  gcc_assert (RID_MAX <= 65535);
 
   mask |= D_CXXONLY;
   if (!flag_isoc99)

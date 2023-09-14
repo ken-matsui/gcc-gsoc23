@@ -44,7 +44,7 @@ struct GTY (()) cp_token {
   enum cpp_ttype type : 8;
   /* If this token is a keyword, this value indicates which keyword.
      Otherwise, this value is RID_MAX.  */
-  enum rid keyword : 8;
+  enum rid keyword : 16;
   /* Token flags.  */
   unsigned char flags;
   /* True if this token is from a context where it is implicitly extern "C" */
@@ -59,7 +59,9 @@ struct GTY (()) cp_token {
   bool purged_p : 1;
   bool tree_check_p : 1;
   bool main_source_p : 1;
-  /* 3 unused bits.  */
+  /* These booleans use 5 bits within 1 byte, resulting in 3 unused bits.
+     Since there would be 3 bytes of internal fragmentation to the location
+     field, the total unused bits would be 27 (= 3 + 24).  */
 
   /* The location at which this token was found.  */
   location_t location;
@@ -102,7 +104,7 @@ struct GTY (()) cp_lexer {
 
   /* Saved pieces of end token we replaced with the eof token.  */
   enum cpp_ttype saved_type : 8;
-  enum rid saved_keyword : 8;
+  enum rid saved_keyword : 16;
 
   /* The next lexer in a linked list of lexers.  */
   struct cp_lexer *next;

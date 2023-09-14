@@ -988,11 +988,14 @@ struct GTY(()) cpp_hashnode {
   unsigned int directive_index : 7;	/* If is_directive,
 					   then index into directive table.
 					   Otherwise, a NODE_OPERATOR.  */
-  unsigned int rid_code : 8;		/* Rid code - for front ends.  */
+  unsigned int rid_code : 16;		/* Rid code - for front ends.  */
   unsigned int flags : 9;		/* CPP flags.  */
   ENUM_BITFIELD(node_type) type : 2;	/* CPP node type.  */
 
-  /* 5 bits spare.  */
+  /* Bitfields use 35 bits (= 1 + 7 + 16 + 9 + 2).  The exceeded 3 bits in
+     terms of bytes leave 5 unused bits within 1 byte.  Since there would be
+     3 bytes of internal fragmentation to the deferred field, the total unused
+     bits would be 29 (= 5 + 24).  */
 
   /* The deferred cookie is applicable to NT_USER_MACRO or NT_VOID.
      The latter for when a macro had a prevailing undef.

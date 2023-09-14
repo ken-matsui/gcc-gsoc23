@@ -26,7 +26,7 @@ struct token_indent_info
 {
   location_t location;
   ENUM_BITFIELD (cpp_ttype) type : 8;
-  ENUM_BITFIELD (rid) keyword : 8;
+  ENUM_BITFIELD (rid) keyword : 16;
 };
 
 /* Extract token information from TOKEN, which ought to either be a
