@@ -45,6 +45,10 @@ along with GCC; see the file COPYING3.  If not see
 #include "gomp-constants.h"
 #include "predict.h"
 #include "memmodel.h"
+#include "method.h"
+
+#include "print-tree.h"
+#include "tree-pretty-print.h"
 
 /* There routines provide a modular interface to perform many parsing
    operations.  They may therefore be used during actual parsing, or
@@ -11714,6 +11718,133 @@ classtype_has_nothrow_assign_or_copy_p (tree type, bool assign_p)
   return saw_copy;
 }
 
+/* Return true if FN_TYPE is invocable with the given ARG_TYPES.  */
+
+static bool
+is_invocable_p (tree fn_type, tree arg_types)
+{
+  /* ARG_TYPES must be a TREE_VEC.  */
+  gcc_assert (TREE_CODE (arg_types) == TREE_VEC);
+
+  /* Access check is required to determine if the given is invocable.  */
+  deferring_access_check_sentinel acs (dk_no_deferred);
+
+  /* std::is_invocable is an unevaluated context.  */
+  cp_unevaluated cp_uneval_guard;
+
+  bool is_ptrdatamem;
+  bool is_ptrmemfunc;
+  if (TREE_CODE (fn_type) == REFERENCE_TYPE)
+    {
+      tree deref_fn_type = TREE_TYPE (fn_type);
+      is_ptrdatamem = TYPE_PTRDATAMEM_P (deref_fn_type);
+      is_ptrmemfunc = TYPE_PTRMEMFUNC_P (deref_fn_type);
+
+      /* Dereference fn_type if it is a pointer to member.  */
+      if (is_ptrdatamem || is_ptrmemfunc)
+	fn_type = deref_fn_type;
+    }
+  else
+    {
+      is_ptrdatamem = TYPE_PTRDATAMEM_P (fn_type);
+      is_ptrmemfunc = TYPE_PTRMEMFUNC_P (fn_type);
+    }
+
+  if (is_ptrdatamem && TREE_VEC_LENGTH (arg_types) != 1)
+    /* A pointer to data member with non-one argument is not invocable.  */
+    return false;
+
+  if (is_ptrmemfunc && TREE_VEC_LENGTH (arg_types) == 0)
+    /* A pointer to member function with no arguments is not invocable.  */
+    return false;
+
+  /* Construct an expression of a pointer to member.  */
+  tree datum;
+  if (is_ptrdatamem || is_ptrmemfunc)
+    {
+      tree datum_type = TREE_VEC_ELT (arg_types, 0);
+
+      /* Dereference datum.  */
+      if (CLASS_TYPE_P (datum_type))
+	{
+	  bool is_refwrap = false;
+
+	  tree datum_decl = TYPE_NAME (TYPE_MAIN_VARIANT (datum_type));
+	  if (decl_in_std_namespace_p (datum_decl))
+	    {
+	      tree name = DECL_NAME (datum_decl);
+	      if (name && (id_equal (name, "reference_wrapper")))
+		{
+		  /* Handle std::reference_wrapper.  */
+		  is_refwrap = true;
+		  datum_type = cp_build_reference_type (datum_type, false);
+		}
+	    }
+
+	  datum = build_trait_object (datum_type);
+
+	  /* If datum_type was not std::reference_wrapper, check if it has
+	     operator*() overload.  If datum_type was std::reference_wrapper,
+	     avoid dereferencing the datum twice.  */
+	  if (!is_refwrap)
+	    if (get_class_binding (datum_type, get_identifier ("operator*")))
+	      /* Handle operator*().  */
+	      datum = build_x_indirect_ref (UNKNOWN_LOCATION, datum,
+					    RO_UNARY_STAR, NULL_TREE,
+					    tf_none);
+	}
+      else if (POINTER_TYPE_P (datum_type))
+	datum = build_trait_object (TREE_TYPE (datum_type));
+      else
+	datum = build_trait_object (datum_type);
+    }
+
+  /* Build a function expression.  */
+  tree fn;
+  if (is_ptrdatamem)
+    fn = build_m_component_ref (datum, build_trait_object (fn_type), tf_none);
+  else if (is_ptrmemfunc)
+    fn = build_trait_object (TYPE_PTRMEMFUNC_FN_TYPE (fn_type));
+  else
+    fn = build_trait_object (fn_type);
+
+  /* Construct arguments to the function and an expression of a call.  */
+  if (!is_ptrdatamem)
+    {
+      releasing_vec args;
+
+      if (is_ptrmemfunc)
+	{
+	  /* A pointer to member function is internally converted to a pointer
+	     to function that takes a pointer to the dereferenced datum type
+	     as its first argument and original arguments afterward.  If the
+	     function is a const member function, the first argument also
+	     requires a const datum pointer and vice-versa.  */
+
+	  tree datum_type = TREE_TYPE (datum);
+	  if (TYPE_REF_P (datum_type))
+	    datum_type = TREE_TYPE (datum_type);
+
+	  datum = build_trait_object (build_pointer_type (datum_type));
+	  vec_safe_push (args, datum);
+	}
+
+      for (int i = is_ptrmemfunc ? 1 : 0; i < TREE_VEC_LENGTH (arg_types); ++i)
+	{
+	  tree arg_type = TREE_VEC_ELT (arg_types, i);
+	  tree arg = build_trait_object (arg_type);
+	  vec_safe_push (args, arg);
+	}
+
+      fn = finish_call_expr (fn, &args, false, false, tf_none);
+    }
+
+  if (error_operand_p (fn))
+    return false;
+
+  return true;
+}
+
 /* Return true if DERIVED is pointer interconvertible base of BASE.  */
 
 static bool
@@ -12181,6 +12312,9 @@ trait_expr_value (cp_trait_kind kind, tree type1, tree type2)
     case CPTK_IS_FUNCTION:
       return type_code1 == FUNCTION_TYPE;
 
+    case CPTK_IS_INVOCABLE:
+      return is_invocable_p (type1, type2);
+
     case CPTK_IS_LAYOUT_COMPATIBLE:
       return layout_compatible_type_p (type1, type2);
 
@@ -12390,6 +12524,7 @@ finish_trait_expr (location_t loc, cp_trait_kind kind, tree type1, tree type2)
       break;
 
     case CPTK_IS_CONVERTIBLE:
+    case CPTK_IS_INVOCABLE:
     case CPTK_IS_NOTHROW_ASSIGNABLE:
     case CPTK_IS_NOTHROW_CONSTRUCTIBLE:
     case CPTK_IS_NOTHROW_CONVERTIBLE:
